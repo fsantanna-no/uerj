@@ -1,0 +1,250 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[nohead,a4paper,lmargin=1.5cm,
+rmargin=2.0cm,tmargin=2.0cm,bmargin=2.0cm]{geometry}
+
+\usepackage[brazilian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage[pdftex]{graphicx}
+\usepackage{verbatim}
+\usepackage{xspace}
+\usepackage{color}
+\usepackage{url}
+
+\newcommand{\code}[1] {{\small{\texttt{#1}}}}
+\newcommand{\TODO}[1]{\colorbox{red}{TODO: #1}\linebreak}
+\newcommand{\CEU}{\textsc{C\'{e}u}\xspace}
+\newcommand{\GVT}{\emph{LuaGravity}\xspace}
+
+\title{Memorial Descritivo}
+\author{Francisco Sant'Anna}
+\date{Rio de Janeiro, \today}
+
+\begin{document}
+
+\maketitle
+
+\section{Resumo}
+
+\section{Introdução}
+
+Brasileiro, nascido no Rio de Janeiro em 1979, Doutor em Ciência da Computação 
+pela PUC--Rio em 2014.
+%
+O meu interesse por computação veio durante a juventude, em meados da década de 
+90, quando ganhei um PC com modem, no auge do período das BBSs.
+
+Minha vida acadêmica teve início no CAp--UERJ, onde estudei desde o primário 
+até o vestibular.
+%
+Em 1997, ingressei na turma de Engenharia da Computação da UFRJ e cursei os 
+dois primeiros anos, me transferindo em 1999 para a PUC--Rio, onde me formei em 
+2003.
+%
+Em paralelo à universidade trabalhei em diversas empresas, nas áreas de 
+segurança de redes, desenvolvimento Web, e sistemas embarcados.
+%
+Após terminar a faculdade, atuei por três anos na área de jogos e aplicativos 
+para celulares.
+
+Em 2007 retornei à faculdade para o mestrado em linguagens de programação com o 
+professor Roberto Ierusalimschy.
+%
+Meu interesse por linguagens de programação iniciou-se na graduação, após fazer 
+algumas disciplinas específicas com o professor Roberto, e culminou com o 
+projeto final que foi uma linguagem para simular circuitos digitais.
+%
+No mestrado desenvolvi uma extensão para Lua funcionar de forma reativa, na 
+qual aplicações são guiadas por estímulos externos.
+%
+Além da pesquisa da dissertação, também atuei no desenvolvimento do padrão de 
+TV Digital brasileira, mais especificamente na integração entre as linguagens 
+NCL e Lua.
+%
+O doutorado continuou na linha de sistemas reativos, onde projetei a linguagem 
+\CEU com foco em verificações estáticas para sistemas concorrentes de tempo 
+real.
+Durante esse período, fiz doutorado sanduíche na Suécia onde aplicamos \CEU à 
+área de redes de sensores sem fio.
+%
+Após o doutorado, iniciei o pós doutorado na PUC--Rio em 2013, onde continuo 
+com o desenvolvimento de \CEU.
+
+Como professor, atuei
+ORT
+CCE
+reativos
+
+\section{Pesquisa e Publicações}
+
+O foco principal da minha pesquisa é em linguagens concorrentes, mais 
+especificamente em linguagens para sistemas reativos.
+%
+Em sistemas reativos, o controle de aplicações é predominantemente guiado por 
+interações contínuas e em tempo real com o mundo externo.
+%
+Interações com o ambiente têm natureza reativa: um estímulo externo gera uma 
+reação no programa que pode gera um estímulo de volta ao ambiente.
+%
+Por exemplo, em um sistema de janelas, o movimento do mouse altera 
+instantanemente a posição do ponteiro na tela, enquanto que o clique sobre o 
+ícone \code{[X]} fecha a janela de aplicação.
+%
+Os principais desafios dentro desse contexto são o de manter o sistema 
+``responsivo'' (i.e., com resposta idealmente imediata) e o de tratar estímulos 
+simultâneos/concorrentes de forma correta.
+
+A área de sistemas reativos me acompanhou (e me desafiou) durante toda minha
+trajetória como programador e pesquisador:
+no estágio com sistemas embarcados, no projeto final com sistemas digitais, 
+como profissional na indústria de jogos, em sistemas multimídia/TV Digital, e 
+finalmente, como objeto fim na pesquisa em linguagens reativas durante o 
+mestrado e doutorado.
+
+Como pesquisador, vivenciei três projetos bem delimitados em escopo e 
+experiências: o padrão de TV Digital brasileiro, a linguagem \GVT, desenvolvida 
+no mestrado e a linguagem \CEU, desenvolvida no doutorado.
+
+Entre 2007 e 2009, fui pesquisador do Laboratório Telemídia, coordenado pelo 
+professor Luiz Fernando Gomes Soares, idealizador do Sistema Brasileiro de TV 
+Digital (conhecido como Ginga).
+%
+Através do Ginga, emissoras podem distribuir aplicações que executam em 
+sincronia com programas de TV, permitindo que telespectadores interajam em 
+tempo real.
+%
+A linguagem declarativa NCL, desenvolvida para esse fim, pode ser estendida com 
+scripts escritos em Lua (de maneira análoga a como JavaScript estende HTML).
+%
+Durante o período no Telemídia, fui o responsável pelo design, documentação e 
+implementação da ponte \emph{NCLua} entre as linguagens NCL e Lua.
+%
+NCLua é usado para auxiliar NCL em tarefas difíceis de realizar 
+declarativamente, tais como comunicação por TCP/IP e interações mais complexas 
+(e.g., jogos).
+%
+O principal artigo referente a esse período foi publicado no \emph{WebMedia} em 
+2008~\cite{nclua.webmedia}, simpósio nacional onde muitos trabalhos 
+relacionados ao Ginga são publicados.
+Além do artigo, fui co-autor do capítulo sobre \emph{NCLua} do livro de 
+NCL~\cite{nclua.book} (baseado no conteúdo de um mini-curso dado no 
+\emph{WebMedia} de 2009~\cite{nclua.shortcourse}).
+Também escrevi a parte da norma ABNT referente ao 
+\emph{NCLua}~\cite{nclua.abnt}.
+Finalmente, escrevemos um artigo com viés mais teórico para a conferência 
+\emph{DocEng} em 2009~\cite{nclua.doceng}.
+
+O mesmo período entre 2007 e 2009 constituiu o mestrado sob orientação do 
+professor Roberto.
+%
+O mestrado foi uma experiência transformativa de ``assimilação'' do modo de 
+operação da academia.
+%
+A abrangência e o rigor da literatura acadêmica foram fundamentais para a 
+formulação e reflexão sobre os problemas encontrados em sistemas reativos, 
+assim como para o levantamento do estado da arte da área.
+%Aliado pela a experiência prática com o desenvolvimento de jogos e TV Digital
+%
+Com o decorrer da pesquisa, identificamos duas abordagens complementares que 
+visavam facilitar o desenvolvimento e verificação de sistemas reativos:
+o estilo imperativo da linguagem Esterel e
+o estilo declarativo das linguagens functionais reativas (FRP).
+%
+A dissertação de mestrado discutiu essas duas abordagens com base no design da 
+linguagem \GVT, uma extensão em tempo de execução para a linguagem Lua.
+%
+Com o \GVT é possível escrever comandos em paralelo tais como \code{await E} 
+para bloquear uma linha de execução até que o evento \code{E} ocorra (estilo 
+imperativo), ou ainda expressões como \code{a=b+c} em que a mudança em \code{b} 
+ou \code{c} atualiza o valor de \code{a} automaticamente (estilo FRP).
+%
+O trabalho com o \GVT foi publicado no \emph{SBLP} de 
+2009~\cite{luagravity.sblp} e apresentado no \emph{Lua workshop} de 2009.
+
+O período entre 2009 e os dias de hoje compreende o doutorado e o 
+desenvolvimento da linguagem \CEU.
+%
+Resultado do mestrado, \GVT teve um caráter mais exploratório, não tão 
+preocupado com um design de linguagem completo e robusto.
+%
+\GVT é uma extensão carregada em tempo de execução e, portanto,
+atrelada à semântica de Lua, por exemplo, o uso de coleta de lixo é obrigatório 
+e não existe acesso ao código fonte original ou à árvore sintática (para 
+verificações estáticas).
+%
+Dessa maneira, vi a necessidade de recomeçar, ``dar um passo atrás, para dar 
+dois a frente''.
+%
+\CEU nasceu com requisitos mais rigorosos: eficiência no uso de recursos, 
+garantias estáticas para concorrência e apoio em uma semântica precisa.
+%
+Como consequência, também direcionei os casos de uso a aplicações onde
+eficiência e garantias estáticas tornam-se diferencais, mesmo com alguma 
+limitação em expressividade:
+Redes de sensores sem fio (RSSF) executam em hardware bastante restrito, 
+dependem de bateria para funcionar e são instalados em locais de acesso físico 
+difícil (florestas, vulcões, etc.).
+%
+Utilizamos \CEU para desenvolver drivers e protocolos já existentes para RSSFs, 
+com recursos equivalentes aos desenvolvidos originalmente em C.
+No entanto, as implementações em \CEU têm garantias teóricas de responsividade 
+e de ausência de condições de corrida em variáveis compartilhadas.
+%
+O design de \CEU com os casos de uso foi publicado em 2013 no 
+\emph{SenSys}~\cite{ceu.sensys13}, a conferência de maior prestígio na área de 
+RSSFs.
+%
+Com o fim do doutorado, o foco foi em expandir o poder de expressividade de 
+\CEU, em particular no suporte a aplicações com alocação dinâmica.
+Como resultado, a nova abstração de \emph{organismos} unifica objetos e linhas 
+de execução em uma mesma construção, sem abrir mão das garantias estáticas do 
+design original de \CEU.
+%
+Esse conceito foi apresentado no \emph{Future Programming Workshop} e 
+\emph{Workshop on Reactive and Event-based Languages \& Systems} que 
+aconteceram dentro do \emph{OOPSLA/SPLASH} em 2014.
+O artigo completo será publicado na conferência \emph{Modularity/AOSD} em 
+2015~\cite{ceu.mod15}.
+
+\CEU é um projeto de longo prazo, com diversas opções de continuidade.
+%
+ACADEMIC
+%
+EDUCATION
+No que diz respeito a EDUCACAO, \CEU faz parte do programa de algum curso ou 
+disciplina desde 2011:
+lecionei RSSF para o 3\textsuperscript{o} ano técnico da escola ORT por dois 
+anos;
+na PUC--Rio, criei a disciplina eletiva \emph{Sistemas Reativos}, que em 2015 
+estará sendo dada pela segunda vez.
+%
+Fui informado (por e-mail, de maneira informal) sobre o uso de \CEU na 
+disciplina de RSSF de 
+Stanford\footnote{\url{http://web.stanford.edu/class/cs240e/}} e de 
+Compiladores em 
+Berkeley\footnote{\url{https://www.youtube.com/watch?v=hC5i-Wr4FuA}}.
+%
+\CEU particiou do \emph{Google Summer of Code} com um estudante da Índia em 
+parceria com o LabLua (onde trabalho atualmente).
+%
+COMMUNITY
+Também estamos desenvolvendo uma comunidade auto 
+suficiente\footnote{\url{http://www.ceu-lang.org/}}, com website, implementação 
+open source, documentação, wiki, vídeos e lista de discussão.
+%
+
+
+
+- stangeloop
+academia
+    - além dos artigos, wgld, phd adriano
+
+Arduino até smartphones e Desktops
+
+OSS
+
+\bibliographystyle{acm}
+\bibliography{my}
+
+\end{document}

@@ -1,0 +1,61 @@
+== SenSys 2013 (A1)
+Safe system-level concurrency on resource-constrained nodes
+SenSys '13 Proceedings of the 11th ACM Conference on Embedded Networked Sensor Systems
+http://dl.acm.org/citation.cfm?id=2517360
+- Impresso:
+    - primeira página
+    - ACM digital library
+- TODO comprovacao A1
+- TODO percentual 17%
+
+== Modularity 2015
+- TODO
+- TODO comprovacao A1
+
+== LuaGravity
+- Github:
+https://github.com/fsantanna/luagravity
+- Lua site:
+http://www.lua.org/papers.html
+- Impresso:
+    - primeira página
+    - lua.org/papers
+
+== NCLua
+NCLua: objetos imperativos lua na linguagem declarativa NCL
+WebMedia '08 Proceedings of the 14th Brazilian Symposium on Multimedia and the Web
+http://dl.acm.org/citation.cfm?id=1666091.1666107&coll=DL&dl=ACM&CFID=480685136&CFTOKEN=82060789
+- Github:
+https://github.com/fsantanna/nclua
+- Impresso:
+    - primeira página
+    - ACM Digital Library
+
+== Relating
+Relating declarative hypermedia objects and imperative objects through the NCL glue language
+DocEng '09 Proceedings of the 9th ACM symposium on Document engineering
+http://dl.acm.org/citation.cfm?id=1600193.1600243&coll=DL&dl=ACM&CFID=480685136&CFTOKEN=82060789
+- Impresso:
+    - primeira página
+    - ACM Digital Library
+
+== Livro
+Programando com Objetos NCLua. Programando em NCL
+- Impresso:
+    - capa, meu nome, primeira página do capítulo
+- Link para o livro:
+http://www.submarino.com.br/produto/6956679/livro-programando-em-ncl
+
+== Minicurso
+http://comissoes.sbc.org.br/ce-webmedia/webmedia2009/index.php.24.html
+- Impresso
+    - primeira página, site
+
+== Reativos
+- Webpage:
+https://github.com/fsantanna/reativos
+https://groups.google.com/forum/#!forum/reativos
+- Impresso:
+    - Email 2014/2
+    - Email 2015/1
+

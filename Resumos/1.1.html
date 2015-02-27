@@ -1,0 +1,980 @@
+<p><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head></p>
+
+<h1>Resumo</h1>
+
+<ul>
+<li>O que é uma LP?
+<ul>
+<li>notação formal: abcxyz -> |PL| -> 010101 -> |PC|</li>
+<li>propriedades: genericidade, nível, poder</li>
+</ul></li>
+<li>Diferença sintaxe vs semântica
+<ul>
+<li>forma vs conteúdo</li>
+</ul></li>
+<li>Compilador
+<ul>
+<li>código fonte -> linguagem alvo (binário)</li>
+<li>análise / front end
+<ul>
+<li>char -> token -> AST -> AST(correta) -> RI</li>
+</ul></li>
+<li>síntese / back end
+<ul>
+<li>RI -> target -> target(otim) -> target(não-reloc)</li>
+</ul></li>
+<li>tabela de símbolos, banco de dados</li>
+</ul></li>
+<li>Sintaxe
+<ul>
+<li>análise léxica (scanning) e sintática (parsing)</li>
+<li>concreto -> abstrato (AST)</li>
+<li>léxico "1", sintático "1+1"
+<ul>
+<li>diferentes técnicas</li>
+</ul></li>
+<li>metalinguagens</li>
+<li>léxico
+<ul>
+<li>manual ou gerador de analisador léxico</li>
+<li>expressões regulares e autômatos finitos
+<ul>
+<li>concatenação, união, repetição</li>
+<li>transformação RE -> NFA -> DFA</li>
+<li>NFA&lt;-RE   = O(|r|)</li>
+<li>DFA&lt;-NFA  = O(|r|^3) + O(|x|)</li>
+<li>NFA simul = O(|x||r|)</li>
+<li>(+) base teórica, alto nível, eficiente</li>
+<li>(-) pouco expressivo (recursões)</li>
+</ul></li>
+</ul></li>
+<li>sintático
+<ul>
+<li>CFGs e autômatos de pilha
+<ul>
+<li>BNF, recursão
+<ul>
+<li>terminais, não terminais, produções, símbolo inicial</li>
+</ul></li>
+</ul></li>
+<li>derivações e árvores
+<ul>
+<li>esquera/direita, concreta/abstrata</li>
+</ul></li>
+<li>ambiguidade
+<ul>
+<li>associatividade, precedência, dangling else, x*y</li>
+</ul></li>
+<li>top down (preditivo)
+<ul>
+<li>topo da pilha é o que vai casar
+<ul>
+<li>começa com S</li>
+</ul></li>
+<li>parser recursivo descendente
+<ul>
+<li>uma função para cada regra</li>
+</ul></li>
+<li>LL
+<ul>
+<li>FIRST, FOLLOW</li>
+</ul></li>
+<li>percorrimento em pré ordem
+<ul>
+<li>pais primeiro</li>
+<li>notação polonesa</li>
+</ul></li>
+</ul></li>
+<li>bottom up (shift reduce)
+<ul>
+<li>topo da pilha tem o que já casou
+<ul>
+<li>termina com S</li>
+</ul></li>
+<li>LR</li>
+<li>percorrimento em pós ordem
+<ul>
+<li>filhos primeiro</li>
+<li>notação polonesa inversa</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>separação léxico-sintático
+<ul>
+<li>simplicidade</li>
+<li>eficiência</li>
+<li>portabilidade</li>
+</ul></li>
+</ul></li>
+<li>Semântica
+<ul>
+<li>semântica estática
+<ul>
+<li>restrições à sintaxe
+<ul>
+<li>declarações/usos, contexto</li>
+</ul></li>
+<li>esquemas de tradução
+<ul>
+<li>S-attributes, L-attributes</li>
+<li>ASTs</li>
+<li>tipos: int[][] v;</li>
+</ul></li>
+<li>sistemas de tipos
+<ul>
+<li>corretude, documentação, otimizações</li>
+<li>tipos: estático/dinâmico, fraco/forte, síntese/inferência, 
+estrutural/nominal, polimórfico</li>
+<li>checagem: operadores/operandos, declarações/usos,</li>
+<li>geração de código: memória, coerções, instruções</li>
+</ul></li>
+</ul></li>
+<li>semântica dinâmica
+<ul>
+<li>regras de execução</li>
+<li>independente de implementação</li>
+<li>denotacional
+<ul>
+<li>sintaxe, funções</li>
+<li>composição, parte por subpartes</li>
+<li>provas por indução e locais</li>
+</ul></li>
+<li>operacional
+<ul>
+<li>sintaxe, interpretador</li>
+<li>sequência de configirações</li>
+<li>próximo à implementação</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h1>Sintaxe e Semântica</h1>
+
+<h2>O que é uma linguagem de Programação?</h2>
+
+<ul>
+<li>uma notação formal para comandar a execução de instruções/algoritmos para uma 
+máquina</li>
+<li>a partir de uma sentença precisa descrita em uma linguagem de programação, a 
+máquina irá executar o que aquela sentença significa</li>
+<li><p>abcxyz -> |PL| -> 010101 -> |PC|</p></li>
+<li><p>a natureza da linguagem vai determinar que tipo de notação é aceita (sintaxe) 
+e o que a linguagem pode expressar de forma a controlar a
+máquina (semântica)</p></li>
+<li><p>os termos "formal" e "preciso" sugerem que, numa linguagem de programação, 
+não há margens para ambiguidades e cada sentença deve ter apenas um sentido.</p></li>
+<li>ambiguidade, redundancia, metáforas</li>
+<li>como contraste, humanos se comunicam através de linguagens naturais, onde a 
+ambiguidade não é um problema pois o cérebro humano é capaz de contextualizar
+as sentenças (ou no pior dos casos, perguntar)</li>
+<li><p>outras linguagens formais, matemática (prova de teoremas, conjuntos, lógica)</p></li>
+<li><p>Propriedades de LPs:</p>
+
+<ul>
+<li>genericidade
+<ul>
+<li>linguagens genéricas</li>
+<li>linguagens de domínio específico
+<ul>
+<li>como centralizar um texto em SQL</li>
+<li>como fazer uma consulta a um banco de dados em HTML</li>
+</ul></li>
+</ul></li>
+<li>nível
+<ul>
+<li>linguagens de baixo nível
+<ul>
+<li>detalhes/concreto, próximo a arquitetura, mapeamento 1:1</li>
+</ul></li>
+<li>linguagens de alto nível
+<ul>
+<li>intenção/abstrato, matemática</li>
+</ul></li>
+</ul></li>
+<li>poder de expressividade
+<ul>
+<li>turing complete</li>
+</ul></li>
+<li>cada design de LP deve escolher de forma criteriosa entre as diversas 
+alternativas, oferecendo uma maneira diferenciada para o programador
+controlar a máquina:
+<ul>
+<li>a language that doesn't affect the way you think about programming, 
+is not worth knowing.
+<ul>
+<li>Alan Perlis, conhecido por ALGOL, 1o ganhador do prêmio Turing</li>
+</ul></li>
+</ul></li>
+<li>exemplos:
+<ul>
+<li>C: genérico, baixo nível, turing completa</li>
+<li>Java: genérico, médio nível (no ptrs, jumps), turing completa</li>
+<li>LISP: genérico, alto nível, turing completa</li>
+<li>BlooP: loops limitados (funções primitivas recursivas)
+<ul>
+<li>garantias estáticas</li>
+<li>problema da parada</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2>Diferença entre Sintaxe e Semântica</h2>
+
+<ul>
+<li><p>existem dois conceitos complementares ligados a natureza de uma linguagem de 
+programação</p></li>
+<li><p>Sintaxe:</p>
+
+<ul>
+<li>a sintaxe define a estrutura ou a forma da linguagem de programação</li>
+<li><p>para linguagens textuais, a sintaxe define regras para combinar letras, 
+dígitos, etc.  para formar palavras (ou tokens), para então
+combinar palavras para formar frases completas (ou sentenças)</p></li>
+<li><p>como exemplo, as sentenças em C devem terminar com ';'</p>
+
+<ul>
+<li>a=1 b=2;</li>
+</ul></li>
+<li><p>a syntaxe não lida com o sentido dessas palavras ou frases</p></li>
+<li><p>como uma analogia às linguagens naturais, a frase</p>
+
+<ul>
+<li>"as duas cores dessa cadeira são preto, branco e vermelho."</li>
+<li>apesar da forma estar correta (sujeito, verbo, predicado), a frase 
+possui um erro semântico</li>
+</ul></li>
+<li><p>NOTA: nem todas as linguagens são textuais,
+linguagens gráficas
+exemplo LabView
+menos margem a erros sintáticos</p></li>
+</ul></li>
+<li><p>Semântica:</p>
+
+<ul>
+<li>a semântica lida com o conteúdo, sentido ou interpretação em uma 
+linguagem de programação</li>
+<li>o problema semântico exemplificado acima pode ser comparado ao problema 
+semântico de passagem de parâmetros para funções:
+<ul>
+<li>em alguma parte do programa (def cadeira (cor1, cor2))</li>
+<li>em outra parte (cadeira(PRETO,BRANCO,VERMELHO))</li>
+<li>o analisador semântico iria detectar que a definição e uso de 
+"cadeira" não são compatíveis</li>
+</ul></li>
+</ul></li>
+<li><p>Sintaxe diferente, mesma semântica:</p>
+
+<ul>
+<li>x += y        // C</li>
+<li>x := x + y    // Algol, Pascal, ML, Ada</li>
+</ul></li>
+<li><p>Sintaxe igual, semântica diferente:</p>
+
+<ul>
+<li>s.f = 1;      // C, estrutura estática pré declarada</li>
+<li>s.f = 1;      // Lua, tabela dinâmica, polimorfico, meta método</li>
+</ul></li>
+</ul>
+
+<h2>Estrutura geral de um compilador</h2>
+
+<ul>
+<li>compilador é um software que transforma o código fonte de um programa escrito 
+em uma dada linguagem em uma outra linguagem alvo</li>
+<li>tipicamente, a linguagem alvo é a linguagem binária de máquina na qual o 
+programa deve executar</li>
+<li><p>a transformação é feita em etapas bem definidas, cada uma se baseia em 
+teorias e técnicas distintas:</p></li>
+<li><p>Análise / Front-end:</p>
+
+<ul>
+<li>CARACTERES       --[analisador léxico]-->
+TOKENS           --[analisador sintático]-->
+ÁRVORE SINTÁTICA --[analisador semântico]-->
+ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI</li>
+</ul></li>
+<li>Síntese / Back-end:
+<ul>
+<li>RI/CI             --[gerador de código]-->
+CÓDIGO DE MÁQUINA --[otimizador de código]-->
+CÓDIGO DE MÁQUINA --[ligador]-->
+CÓDIGO DE MÁQUINA (não relocável)</li>
+</ul></li>
+<li><p>Tabela de Símbolos</p>
+
+<ul>
+<li>preenchida e compartilhada por todas as fases</li>
+</ul></li>
+<li><p>as fases são divididas entre análise e síntese, também conhecidas como "front 
+end" e "back end" do compilador</p></li>
+<li>o back end do compilador lida com a geração de código para uma arquitetura 
+específica
+<ul>
+<li>envolve conhecimentos "baixo nível"</li>
+<li>interpretação vs compilação</li>
+</ul></li>
+<li><p>idealmente, a divisão bem definida entre front end e back end permite 
+"plugar" a análise de diferentes linguagens para uma dada arquitetura
+(trocando apenas o front end)
+ou gerar código de uma linguagem para diferentes arquiteturas (trocando
+apenas o back end)</p>
+
+<ul>
+<li>GCC e LLVM são exemplos de ferramentas com esse fim</li>
+</ul></li>
+<li><p>a tabela de símbolos serve como um banco de dados compartilhado por todas as 
+fases</p>
+
+<ul>
+<li>guarda linha,      tipo,              escopo</li>
+<li>mensagens de erro, análise semântica, geração de código</li>
+</ul></li>
+<li><p>a seguir, focaremos apenas no front end que lida com a sintaxe e semântica de 
+linguagens</p></li>
+</ul>
+
+<h2>Sintaxe</h2>
+
+<ul>
+<li>as duas primeiras fases do front end, análise léxica e sintática, lidam com a 
+forma (sintaxe) da linguagem
+<ul>
+<li>basicamente, transformar uma entrada textual "concreta" em uma forma mais 
+abstrata, que elimina detalhes</li>
+<li>geralmente árvore sintática abstrata (AST)</li>
+<li>após essa fase, duas sintaxes distintas para uma construção seriam 
+indistinguíveis na árvore abstrata</li>
+<li>(+ 1 2) LISP ... (1 + 2) C, ambos:</li>
+</ul></li>
+</ul>
+
+<pre>
+        +
+       / \
+      2   1
+</pre>
+
+<ul>
+<li>regras léxicas detectam (1) como número, (+) como operador, (x) como um 
+identificador, (while) como palavra reservada</li>
+<li><p>regras sintáticas detectam (1+1) como expressão, (x=1) como atribuição, 
+(while (1) { x=x+1; }) como um loop</p></li>
+<li><p>regras léxicas e sintáticas são passos separados pois usam técnicas 
+diferentes para descrever as regras, e reconhecer a entrada de acordo com as
+regras</p></li>
+<li>note que em ambos os casos, existem infinitas possibilidades
+<ul>
+<li>x, xx, xxx, ...</li>
+<li>while (1) { while(1) { ... } }</li>
+</ul></li>
+<li>regras devem ser descritas de forma finita para reconhecer formas infinitas</li>
+<li>para isso, uso de meta linguagens
+<ul>
+<li>expressões regulares para léxico</li>
+<li>BNFs para sintaxe</li>
+</ul></li>
+</ul>
+
+<h3>Análise Léxica (scanning)</h3>
+
+<ul>
+<li>primeira fase de um compilador</li>
+<li>lida com o código fonte como uma sequência de caracteres</li>
+<li>transforma em uma sequência de tokens
+<ul>
+<li>palavras chave, operadores, identificadors, constantes, pontuações</li>
+</ul></li>
+<li>fluxo de caracteres --> lexeme --> <token, atributos>
+<ul>
+<li>ignora espaços e comentários</li>
+</ul></li>
+<li>exemplo:</li>
+</ul>
+
+<pre>
+    x = 1;    -->    <ID,"x">, <=>, <NUM,1>, <;>
+</pre>
+
+<ul>
+<li><p>x vai para a tabela de símbolos</p>
+
+<ul>
+<li>linha, tipo, escopo</li>
+</ul></li>
+<li><p>scanner é um outro programa de computador</p>
+
+<ul>
+<li>manual</li>
+<li>ferramenta especializada
+<ul>
+<li>gerador de analisador léxico</li>
+<li>usa a teoria de expressões regulares e correspondência com autômatos 
+finitos
+<ul>
+<li>base teórica</li>
+<li>alto nível</li>
+<li>eficiente</li>
+</ul></li>
+<li>"lex"</li>
+</ul></li>
+</ul></li>
+<li><p>expressões regulares</p>
+
+<ul>
+<li>alto nível: queremos reconhecer o texto através de casamento de padrões</li>
+<li>operações
+<ul>
+<li>concatenação
+<ul>
+<li>token <code>&lt;while&gt;</code> é w-h-i-l-e</li>
+</ul></li>
+<li>união
+<ul>
+<li>um palavra reservada é <code>&lt;while&gt; OU &lt;for&gt; OU &lt;return&gt; OU ...</code></li>
+</ul></li>
+<li>repetição
+<ul>
+<li>token <code>&lt;num&gt;</code> é uma sequência qualquer de dígitos (1-3-5-1-...)</li>
+<li>é o que torna possível reconhecer entradas infitas</li>
+</ul></li>
+</ul></li>
+<li>metalinguagem
+<ul>
+<li>REGRA = padrão</li>
+<li>caractere é representado por ele próprio</li>
+<li>concatenação por justaposição</li>
+<li>união por "|"</li>
+<li>repetição por "*"</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<pre>
+letra = a | b | c | d | ...
+digito = 0 | 1 | 2 | ...
+identificador = <letra> (<letra>|<digito>)*
+    // letra seguida de uma sequência de letras ou digitos
+</pre>
+
+<ul>
+<li>.
+<ul>
+<li>.
+<ul>
+<li>agrupamento com (), precedência</li>
+</ul></li>
+<li>NFA, DFA
+<ul>
+<li>qualquer expressão regular pode ser transformada em um
+autômato finito não determinístico</li>
+<li>qualquer NFA pode ser transformado em um DFA</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<pre>
+CASO BASE:
+r = epsilon
+    --> (*i) --c--> (f*)
+r = char
+    --> (*i) --eps--> (f*)
+
+INDUÇÃO:
+r = st
+    --> (*i) --eps--> (s) --eps--> (t) --eps--> (f*)
+r = s|t
+            /--eps--> (s) --\
+    --> (*i)                 --eps--> (f*)
+            \--eps--> (t) --/
+r = s*
+    --> (*i) --eps--> (s) --eps--> (f*)
+           \          \e/          /
+            \--eps----------------/
+</pre>
+
+<ul>
+<li><p>.</p>
+
+<ul>
+<li><p>.</p>
+
+<ul>
+<li>exemplo de identificador</li>
+<li>Eificiência
+<ul>
+<li>DFA processa string x em O(|x|)</li>
+<li>NFA simula DFA em O(|x||r|) (r=size of expression)</li>
+<li>NFA -> DFA em O(2^n) (n=numero de estados)
+<ul>
+<li>caso típico é O(|r|^3)</li>
+</ul></li>
+<li>RE -> NFA em O(|r|)</li>
+</ul></li>
+<li>Dúvida entre simular NFA ou gerar um DFA
+<ul>
+<li>NFA caso, |r|^2 &lt; |x|
+NFA->DFA, caso contrário</li>
+<li>LEX, converter</li>
+<li>grep, checar regra acima</li>
+<li>search editor, simular</li>
+</ul></li>
+</ul></li>
+<li><p>vantagens</p>
+
+<ul>
+<li>base teórica, alto nível, eficiente</li>
+</ul></li>
+<li>desvantages
+<ul>
+<li>pouco expressivo, e.g., não pode reconhecer estruturas recursivas</li>
+</ul></li>
+</ul></li>
+<li><p>lookahead</p>
+
+<ul>
+<li><code>&lt;</code> vs <code>&lt;=</code></li>
+<li>buffering</li>
+</ul></li>
+</ul>
+
+<h3>Análise Sintática (parsing)</h3>
+
+<ul>
+<li>a toda linguagem está associada uma gramática
+<ul>
+<li>gramática livre de contexto, no caso de LPs</li>
+<li>descreve estruturas hierárquicas e recursivas
+<ul>
+<li>program, block, statement, declaration, variable</li>
+<li>block, statement, block</li>
+</ul></li>
+</ul></li>
+<li>metalinguagem
+<ul>
+<li>REGRA: padrão</li>
+<li>BNF: Backus-Naur form
+<ul>
+<li>terminais, não terminais, produções, símbolo inicial</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<pre>
+Exp ::= Exp '+' Exp
+      | <num>
+</pre>
+
+<ul>
+<li><p>.</p>
+
+<ul>
+<li>.
+<ul>
+<li>terminais vêm do scanner</li>
+<li>não terminais denotam a hierarquia e recursão da gramática
+<ul>
+<li>composição</li>
+</ul></li>
+<li>produções denotam os possíveis padrões de reconhecimento</li>
+<li>símbolo inicial representa qual regra geral a linguagem reconhece</li>
+<li>livre de contexto, apenas não terminais do lado esquerdo</li>
+<li>correspondência com autômatos de pilha</li>
+</ul></li>
+</ul></li>
+<li><p>derivações e árvores</p>
+
+<ul>
+<li>derivações
+<ul>
+<li>processo de escolha das regras para casar a entrada</li>
+<li>forma uma árvore naturalmente</li>
+</ul></li>
+<li>árvores sintáticas/concretas (de parsing)
+<ul>
+<li>nós são os não terminais</li>
+<li>folhas são os terminais</li>
+</ul></li>
+<li>derivações à esquerda e à direita
+<ul>
+<li>que nós "casam" primeiro</li>
+</ul></li>
+</ul></li>
+<li><p>árvores concretas vs abstratas</p>
+
+<ul>
+<li>remoção de informações irrelevantes: pontuações, parênteses, etc.</li>
+<li>Exp => Exp , + , Exp</li>
+<li><ul>
+<li>=> Exp , Exp</li>
+</ul></li>
+</ul></li>
+<li><p>amibiguidade</p>
+
+<ul>
+<li>se a gramática não é ambíguia, só existe uma árvore de derivação
+<ul>
+<li>e não importa se esquerda ou direita</li>
+</ul></li>
+<li>é um problema pois duas árvores pode implicar duas semânticas
+<ul>
+<li>associatividade e precedência de expressões</li>
+<li>dangling else
+<ul>
+<li>if e1 then s1 else if e2 then s2
+<ul>
+<li>if e1 then (if e2 then s1 else s2)</li>
+<li>if e1 then (if e2 then s1) else s2</li>
+</ul></li>
+</ul></li>
+<li>x * y
+<ul>
+<li>requer que o scanner tenha acesso à tabela de símbolos</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>top down vs bottom up</p>
+
+<ul>
+<li>general idea for parsing algorithms</li>
+<li>top down (preditivo)
+<ul>
+<li>topo da pilha tem o que vai casar
+<ul>
+<li>começa com S</li>
+</ul></li>
+<li>a partir da regra inicial, casa as sub regras que a formam</li>
+<li>parser recursivo descendente</li>
+<li>LL (lê da esquerda, gera árvore à esquerda)</li>
+<li>equivale a percorrer a árvore em pré ordem (pais primeiro)</li>
+</ul></li>
+<li>bottom up (shift reduce)
+<ul>
+<li>topo da pilha tem o que já casou
+<ul>
+<li>termina com S</li>
+</ul></li>
+<li>a partir das sub regras na pilha, reduz às regras, até a regra inicial</li>
+<li>LR (lê da esquerda, gera árvore à direita)</li>
+<li>equivale a percorrer a árvore em pós ordem (filhos primeiro)</li>
+</ul></li>
+<li>analogia polish (TD), reverse polish (BU)
+<ul>
+<li>flat stream de chars => flat stream of terminal/non-terminals</li>
+</ul></li>
+</ul></li>
+<li><p>top down</p>
+
+<ul>
+<li>parser recursivo descendente
+<ul>
+<li>uma função para cada regra</li>
+<li>regra tenta casar terminais com entrada</li>
+<li>e chama funções auxiliares para não terminais</li>
+<li>backtracking</li>
+<li>determinístico
+<ul>
+<li>mas esconde ambiguidades</li>
+</ul></li>
+</ul></li>
+<li>parser preditivo: LL(k)
+<ol>
+<li>predição: escolha a produção que casa com o lookahead</li>
+<li>casamento: case os terminais com a entrada não consumida</li>
+</ol></li>
+<li>parsing preditivo
+<ul>
+<li>FIRST(rrr): conjunto de terminais que podem aparecer no início de rrr
+<ul>
+<li>interseção de duas produções possíveis <em>deve</em> ser vazia</li>
+</ul></li>
+<li>FOLLOW(A): conjunto de terminais que podem vir após A</li>
+<li>tabela preditiva
+<ul>
+<li>montar T[A,a]
+<ul>
+<li>se o topo da pilha for "A" e a entrada for "a"
+<ul>
+<li>desempilhe "A" e empilhe "T[A,a]=rrr" em ordem reversa</li>
+</ul></li>
+</ul></li>
+<li>para cada produção A -> rrr
+<ul>
+<li>para cada terminal "a" em FIRST(rrr)
+<ul>
+<li>T[A,a] = A->rrr</li>
+</ul></li>
+<li>se <epsilon E FIRST(rrr)>
+<ul>
+<li>para cada terminal "b" em FOLLOW(A)
+<ul>
+<li>T[A,b] = A->rrr</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>se T[A,a] = nil
+<ul>
+<li>erro caso topo="A" e entrada="a"</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>recursão à esquerda
+<ul>
+<li>transformação para recursão à direita</li>
+</ul></li>
+</ul></li>
+<li><p>bottom up</p>
+
+<ul>
+<li>LR
+<ol>
+<li>shift: consome a entrada e empilha símbolo na pilha</li>
+<li>reduce: para uma regra A->rrr, consome rrr da pilha e empilha A</li>
+</ol></li>
+<li>Itens
+<ul>
+<li>produção + ponto: A->.XY , A->X.Y , A->XY.</li>
+</ul></li>
+<li>TODO: action, goto, table construction</li>
+<li>TODO: LR, SLR, LALR</li>
+</ul></li>
+<li><p>comparação top down vs bottom up</p>
+
+<ul>
+<li>ambos determinísticos
+<ul>
+<li>ao lerem tokens, estão sempre em um estado e vão para um estado</li>
+<li>sem backtracking (LL/LR)</li>
+</ul></li>
+<li>autômato de pilha
+<ul>
+<li>pilha de execução / ou regras sendo parseadas</li>
+<li>pilha das regras reconhecidas</li>
+</ul></li>
+<li>lookahead necessário/não necessário</li>
+<li>recursão à esquerda</li>
+<li>classe de linguagens</li>
+</ul></li>
+<li><p>geradores de parser</p>
+
+<ul>
+<li>yacc: LALR (ruby, php, go)</li>
+<li>ANTLR: LL(*)
+<ul>
+<li>lookahead indefinido usando RE</li>
+</ul></li>
+<li>parser recursivo descendente: gcc, Lua</li>
+</ul></li>
+<li><p>recuperação de erro</p>
+
+<ul>
+<li>modo de pânico
+<ul>
+<li>tokens de sincronização (;, })</li>
+</ul></li>
+<li>produções de erro
+<ul>
+<li>antecipação de erros comuns
+<ul>
+<li>coloca erros na gramática para tratamento diferenciado</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h3>Separação Léxico-Sintático</h3>
+
+<ul>
+<li>simplicidade</li>
+<li>eficiência</li>
+<li>portabilidade (dependência de I/O)</li>
+</ul>
+
+<h2>Semântica</h2>
+
+<ul>
+<li><p>semântica estática vs dinâmica</p>
+
+<ul>
+<li>estática: se programas sintaticamente corretos têm sentido semântico
+<ul>
+<li>impõe restrições a programas sintaticamente corretos</li>
+<li>supre deficiências e/ou simplificações de gramáticas livre de 
+contexto</li>
+<li>exemplos
+<ul>
+<li>se identificadores são declarados antes dos usos</li>
+<li>usos de acordo com o contexto</li>
+<li>número de argumentos em chamadas</li>
+<li>concorrência</li>
+</ul></li>
+</ul></li>
+<li>dinâmica: descreve regras de como o programa deve executar</li>
+</ul></li>
+<li><p>semântica estática</p>
+
+<ul>
+<li>esquemas de tradução
+<ul>
+<li>a ponte entre as fases de análise sintática e análise semântica se dá 
+através de fragmentos de código (ou regras de definição) associados à CFG
+<ul>
+<li>processo conhecido como tradução</li>
+</ul></li>
+<li>os fragmentos de código são executados automaticamente no processo de 
+derivação e preenchem os terminais e não terminais com atributos
+<ul>
+<li>tipicamente, os atributos geram a AST associada a derivação</li>
+</ul></li>
+<li>durante o processo de derivação, os parâmetros podem ser compartilhados 
+entre os símbolos das regras (terminais e não terminais)
+<ul>
+<li>atributos sintetizados (S-attributes) ou herdados (L-attributes)</li>
+</ul></li>
+<li>atributos sintetizados denotam atributos adquiridos exclusivamente dos 
+filhos</li>
+<li>atributos herdados denotam atributos adquiridos dos pais ou irmãos</li>
+<li>ordem de avaliação
+<ul>
+<li>S-attr: somente sintetizados</li>
+<li>L-attr: sintetizados ou herdados (c/ filhos da esq->dir)</li>
+<li>LR: S-attr: notação polonesa inversa (ab+c<em>)</li>
+<li>LL: L-attr: notação polonesa (</em>+abc)</li>
+<li>grafo de dependência
+<ul>
+<li>sem ciclos</li>
+</ul></li>
+</ul></li>
+<li>aplicações
+<ul>
+<li>ASTs: E -> E1 + E2 { E.node=new Node(E1.node, E2.node) }
+    E -> '(' E1 ')' { E.node = E1.node }
+<ul>
+<li>S-attr ou L-attr</li>
+</ul></li>
+<li>tipos: int[][] v;
+<ul>
+<li>L-attr, ao chegar em v, tipo está completo
+<ul>
+<li>elimina padrão "visitor"</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>sistema de tipos
+<ul>
+<li>coleção de regras que atribui tipos às partes do programa e verifica 
+se as conexões entre essas partes está consistente</li>
+<li>objetivos
+<ul>
+<li>prevenir bugs
+<ul>
+<li>programa incorreto nunca executa</li>
+<li>vs TDD
+<ul>
+<li>programa correto nunca falha</li>
+</ul></li>
+</ul></li>
+<li>documentação</li>
+<li>permitir otimizações (evitar checagens em tempo de execução)</li>
+</ul></li>
+<li>propriedades
+<ul>
+<li>sistema dinâmico ou estático
+<ul>
+<li>tipagem gradual</li>
+</ul></li>
+<li>sistema fraco ou forte
+<ul>
+<li>memory safety</li>
+</ul></li>
+<li>síntese (Java) ou inferência (ML)</li>
+<li>tipagem estrutural ou nominal
+<ul>
+<li>static duck typing</li>
+</ul></li>
+<li>polimórfico
+<ul>
+<li>Va, list(a)->int</li>
+</ul></li>
+</ul></li>
+<li>usos
+<ul>
+<li>checagem
+<ul>
+<li>operadores e operandos</li>
+<li>declarações e usos
+<ul>
+<li>ambientes</li>
+</ul></li>
+</ul></li>
+<li>geração de código
+<ul>
+<li>memória de armazenamento
+<ul>
+<li>pilha, heap, tamanho, alinhamento</li>
+</ul></li>
+<li>coerções</li>
+<li>escolha de instruções
+<ul>
+<li>1+1 vs 1.0+1.0</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>conversões de tipo
+<ul>
+<li>explícito (cast)</li>
+<li>implícito (coerção)</li>
+</ul></li>
+<li>operações e funções sobrecarregadas
+<ul>
+<li>1+1 vs 1.0+1.0</li>
+<li>err(), err("msg")</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>semântica dinâmica</p>
+
+<ul>
+<li>descrição formal do comportamento de programas em execução
+<ul>
+<li>metalinguagem formal (matemática)</li>
+</ul></li>
+<li>independente de implementação</li>
+<li>técnicas
+<ul>
+<li>axiomática, denotacional, operacional</li>
+</ul></li>
+<li>denotacional
+<ul>
+<li>sintaxe abstrata, funções de avaliação
+<ul>
+<li>manipulam um domínio</li>
+</ul></li>
+<li>funções operam sobre a sintaxe e descrevem o seu significado</li>
+<li>composição, parte denotada <em>somente</em> por subpartes
+<ul>
+<li>sem estado</li>
+<li>relação com linguagens funcionais</li>
+</ul></li>
+</ul></li>
+<li>operacional
+<ul>
+<li>sintaxe abstrata, interpretador</li>
+<li>execução gera uma sequência de configurações (estados) da máquina
+<ul>
+<li>parecido com linguagem de uma máquina abstrata</li>
+</ul></li>
+</ul></li>
+<li>TODO: exemplos</li>
+<li>comparação
+<ul>
+<li>operacional: mais próximo da implementação final</li>
+<li>denotacional: composição implica provas por indução estrutural (na 
+CFG), e também provas locais</li>
+</ul></li>
+</ul></li>
+</ul>

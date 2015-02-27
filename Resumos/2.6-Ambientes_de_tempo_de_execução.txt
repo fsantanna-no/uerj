@@ -1,0 +1,116 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+# Resumo
+
+# Ambientes de tempo de execução
+
+- estado global de execução de um programa
+    - memória, registradores, I/O, CPUs
+- requisitos mínimos para execução de um programa
+    - estado inicial, bibliotecas, variáveis de ambiente
+- tempo de execução ("em paralelo") ou tempo de compilação (instruções embuídas 
+  no código gerado)
+
+## Linguagens de programação
+
+- TODO: compilação e interpretação
+
+- programas são escritos em uma linguagem de programação
+- uma notação formal para comandar a execução de instruções/algoritmos para uma 
+  máquina
+
+
+- antes de executar, o código fonte precisa ser compilado
+
+## Estrutura geral de um compilador
+
+- compilador é um software que transforma o código fonte de um programa escrito 
+  em uma dada linguagem em uma outra linguagem alvo
+- tipicamente, a linguagem alvo é a linguagem binária de máquina na qual o 
+  programa deve executar
+- a transformação é feita em etapas bem definidas, cada uma se baseia em 
+  teorias e técnicas distintas:
+
+- Análise / Front-end:
+    - CARACTERES       --[analisador léxico]-->
+      TOKENS           --[analisador sintático]-->
+      ÁRVORE SINTÁTICA --[analisador semântico]-->
+      ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+- Síntese / Back-end:
+    - RI/CI             --[gerador de código]-->
+      CÓDIGO DE MÁQUINA --[otimizador de código]-->
+      CÓDIGO DE MÁQUINA --[ligador]-->
+      CÓDIGO DE MÁQUINA (não relocável)
+- Tabela de Símbolos
+    - preenchida e compartilhada por todas as fases
+
+- as fases são divididas entre análise e síntese, também conhecidas como "front 
+  end" e "back end" do compilador
+- o back end do compilador lida com a geração de código para uma arquitetura 
+  específica
+    - envolve conhecimentos "baixo nível"
+    - interpretação vs compilação
+- idealmente, a divisão bem definida entre front end e back end permite 
+  "plugar" a análise de diferentes linguagens para uma dada arquitetura
+  (trocando apenas o front end)
+  ou gerar código de uma linguagem para diferentes arquiteturas (trocando
+  apenas o back end)
+    - GCC e LLVM são exemplos de ferramentas com esse fim
+
+- a tabela de símbolos serve como um banco de dados compartilhado por todas as 
+  fases
+    - guarda linha,      tipo,              escopo
+    - mensagens de erro, análise semântica, geração de código
+    - inclusive pela fase de execução
+        - o formato ELF (Executable and Linkable Format)
+            - .symtab: símbolos locais, debugger
+            - .dynsym: símbolos globais, carregamento dinâmico
+
+- Execução:
+    - CÓDIGO DE MÁQUINA --[carregador]--> EXECUÇÃO
+    - as fases anteriores acontecem somente uma vez
+    - o carregador, toda vez que o programa é executado, pelo SO
+        - no linux, `execve()`
+        - copia a imagem do disco para a memória
+        - copia argumentos de chamada para a pilha
+        - inicializa registradores
+
+## Ambientes de tempo de execução
+
+- atribuições do RTE
+    - organização e controle de memória
+        - mapeamento endereço lógico e físico
+        - separação código (RO), dados (RO/RW)
+        - controle da heap, pilha, coletor de lixo
+    - protocolo de chamadas de funções
+        - interoperação com outras bibliotecas
+        - passagem de parâmetros
+        - carregamento dinâmico de bibliotecas
+    - chamadas de sistema
+        - I/O
+    - escalonamento
+        - linguagens concorrentes
+- ambientes de execução externos
+    - API normal
+    - p-threads
+        - não pode ser entendido a partir do ambiente que o chama (C)
+            - escalonamento, pilhas, tudo escondido
+        - faz chamadas de sistema
+- crt0.o
+    - ambiente de execução de C
+    - inicializa SP, FP
+    - preenche vetor de interrupção
+    - zera a região BSS
+    - chama "main"
+- alocação dinâmica
+    - pilha
+        - chamada de funções
+            - push na chamada
+            - pop no retorno
+        - árvores de ativação
+            - DFS
+                - a menos de exceções ou erros
+                - chamadas em pré ordem, retornos em pós ordem
+        - registros de ativação
