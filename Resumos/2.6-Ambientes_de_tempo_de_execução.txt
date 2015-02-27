@@ -83,6 +83,7 @@
     - organização e controle de memória
         - mapeamento endereço lógico e físico
         - separação código (RO), dados (RO/RW)
+            - imagem [CODE|STATIC|HEAP>|<STACK]
         - controle da heap, pilha, coletor de lixo
     - protocolo de chamadas de funções
         - interoperação com outras bibliotecas
@@ -98,19 +99,156 @@
         - não pode ser entendido a partir do ambiente que o chama (C)
             - escalonamento, pilhas, tudo escondido
         - faz chamadas de sistema
-- crt0.o
+- crt0.o (c-run-time)
     - ambiente de execução de C
+        - parte do carregador
     - inicializa SP, FP
     - preenche vetor de interrupção
     - zera a região BSS
     - chama "main"
 - alocação dinâmica
     - pilha
-        - chamada de funções
-            - push na chamada
-            - pop no retorno
+        - locais, temporárias, chamadas de função
+        - ponteiro para o topo da pilha (SP)
+            - operações de push, pop
+    - chamadas de função
+        - múltiplas chamadas, chamadas reentrantes
+        - chamada e retorno
+            - empilha instrução seguinte na chamada
+            - desempilha instrução e pula para ela
         - árvores de ativação
             - DFS
                 - a menos de exceções ou erros
                 - chamadas em pré ordem, retornos em pós ordem
+        - convenções de chamada
         - registros de ativação
+            - layout
+            - endereço de retorno, parâmetros, locais, temporárias
+            - FP: ponteiro para o frame
+                - FP = SP logo após chamada
+                    - para stack trace, FP atual deve ser copiado antes
+                - SP = FP logo antes do retorno
+            - chamada
+                - empilha argumentos            [var]
+                - empilha FP                    [fixo]
+                - empilha endereço de retorno   [fixo]
+                - empilha outros registradores  [fixo]
+            - prólogo
+                - FP = SP
+                - reserva espaço para locais    [fixo]
+            - epílogo
+                - SP = FP
+                - recupera outros registradores
+                - recupera endereço de retorno
+                - desempilha FP
+                - empilha valor de retorno
+                - pula para endereço de retorno
+            - link de acesso
+                - uplink léxico
+                - acesso a locais de funções aninhadas (acima)
+                - ALGOL, Pascal, ML
+        - stack unwinding
+        - otimização de chamada de cauda
+            - fundamental em linguagens funcionais
+            - reaproveitamento da pilha
+                - chamada que não usa retornos
+                    - altera argumentos
+                    - e dá goto, em vez de call
+                - quebra debugging
+    - heap
+        - dados que vivem indefinidamente
+        - gerenciador de memória
+            - rastreia espaço livre
+                - alocação e desalocação (liberação)
+            - dificuldades
+                - variação do tamanhos dos blocos
+                - ordem de alocação e desalocação arbitrária
+            - propriedades
+                - localidade, fragmentação, execução
+            - localidade
+                - programas tendem a executar uma pequena fração do código 
+                  mexendo em uma pequena fração da memória
+                    - hierarquia de memória
+                        - disparidade em ordem de grandeza de disco, ram, 
+                          cache, registradores
+                - TODO: MRU?
+            - fragmentação
+                - buracos livres entre blocos usados
+                    - TODO
+                    - best fit
+                    - first fit
+                - pools de memória
+                    - fragmentação 0 para blocos de mesmo tamanho
+            - execução
+                - TODO
+        - desalocação
+            - manual
+                - C / C++
+                - problemas
+                    - vazamento de memória (memory leaks)
+                    - ponteiros pendentes (dangling pointers)
+                - valgrind
+            - automático, coleta de lixo
+                - lixo: dados que não podem ser referenciados
+                    - desalocados quando descobertos
+                - LISP'58
+                - does not work with type-unsafe languages C/C++
+                    - aritmética de ponteiros, casts
+                - métricas de performance
+                    - tempo total de execução
+                    - tempo de pausa
+                    - uso de espaço
+                    - localidade
+                        - TODO
+                - referências com acesso
+                    - conjunto raíz
+                        - variáveis estáticas
+                        - variáveis na pilha
+                    - uma vez não referenciáveis, nunca mais referenciáveis
+                - modificador (mutator)
+                    - alocação
+                    - passagem e retorno de função
+                    - atribuições
+                    - término de funções
+                - abordagens
+                    - acompanhamento do modificador
+                        - contagem de referência
+                    - percorrimento periódico
+                        - coletor por rastreamento
+                - contagem de referência
+                    - alocação: ref=1
+                    - passagem: ref++
+                    - atribuição: to--; fr++
+                    - término: ref(i)--;
+                    - vantagens
+                        - simples
+                        - imediato e incremental
+                    - desvantagens
+                        - sem ciclos
+                        - caro: dados e CPU
+                - coletor por rastreamento
+                    - executa periodicamente
+                        - ex., quando alcança um limiar
+                    - mark-and-sweep
+                        - MARK:
+                            - a partir do conjunto raiz, percorre todas as 
+                              referências recursivamente, marcando-as
+                        - SWEEP:
+                            - coleta as referências não marcadas
+                    - tri-color mark-and-sweep
+                        - incremental
+                        - branco: candidatos à coleta
+                        - cinza: alcançáveis pela raiz, mas com algum filho 
+                          ainda branco
+                            - inicialmente=conjunto-raiz
+                        - pretos: alcançáveis e sem filhos brancos
+                            - incialmente=vazio
+                        - continuamente remova ref do cinza, seta filhos de ref 
+                          para cinza e seta ref para preto
+                        - coleta brancos quando cinza está vazio
+                    - generacional
+                        - objetos morrem jovens (80-98% até 1M de instruções 
+                          após o nascimento)
+                        - divide a heap em partições (gerações)
+                        - quando uma geração enche, move objetos vivos para 
+                          próxima geração

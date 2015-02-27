@@ -1,40 +1,44 @@
+== Modularity 2015 (A1)
+Structured Synchronous Reactive Programming with Céu
+Modularity'15: Proceedings of 14th International Conference on Modularity
+(Antigo AOSD: International Conference on Aspect-Oriented Software Development)
+- Impresso
+    - primeira página
+    - programa: http://www.aosd.net/2015/wednesday
+
 == SenSys 2013 (A1)
 Safe system-level concurrency on resource-constrained nodes
-SenSys '13 Proceedings of the 11th ACM Conference on Embedded Networked Sensor Systems
+SenSys'13: Proceedings of the 11th ACM Conference on Embedded Networked Sensor Systems
 http://dl.acm.org/citation.cfm?id=2517360
 - Impresso:
     - primeira página
     - ACM digital library
-- TODO comprovacao A1
-- TODO percentual 17%
 
-== Modularity 2015
-- TODO
-- TODO comprovacao A1
-
-== LuaGravity
-- Github:
-https://github.com/fsantanna/luagravity
-- Lua site:
-http://www.lua.org/papers.html
-- Impresso:
-    - primeira página
-    - lua.org/papers
-
-== NCLua
-NCLua: objetos imperativos lua na linguagem declarativa NCL
-WebMedia '08 Proceedings of the 14th Brazilian Symposium on Multimedia and the Web
-http://dl.acm.org/citation.cfm?id=1666091.1666107&coll=DL&dl=ACM&CFID=480685136&CFTOKEN=82060789
-- Github:
-https://github.com/fsantanna/nclua
+== Relating 2009 (B1)
+Relating declarative hypermedia objects and imperative objects through the NCL glue language
+DocEng'09: Proceedings of the 9th ACM symposium on Document engineering
+http://dl.acm.org/citation.cfm?id=1600193.1600243&coll=DL&dl=ACM&CFID=480685136&CFTOKEN=82060789
 - Impresso:
     - primeira página
     - ACM Digital Library
 
-== Relating
-Relating declarative hypermedia objects and imperative objects through the NCL glue language
-DocEng '09 Proceedings of the 9th ACM symposium on Document engineering
-http://dl.acm.org/citation.cfm?id=1600193.1600243&coll=DL&dl=ACM&CFID=480685136&CFTOKEN=82060789
+== LuaGravity 2009 (B3)
+LuaGravity, a Reactive Language Based on Implicit Invocation
+SBLP'09: Proceedings of Simpósio Brasileiro de Linguagens de Programação
+- Impresso:
+    - primeira página
+    - lua.org/papers
+- Github:
+https://github.com/fsantanna/luagravity
+- Lua site:
+http://www.lua.org/papers.html
+
+== NCLua 2008 (B3)
+NCLua: objetos imperativos lua na linguagem declarativa NCL
+WebMedia'08: Proceedings of the 14th Brazilian Symposium on Multimedia and the Web
+http://dl.acm.org/citation.cfm?id=1666091.1666107&coll=DL&dl=ACM&CFID=480685136&CFTOKEN=82060789
+- Github:
+https://github.com/fsantanna/nclua
 - Impresso:
     - primeira página
     - ACM Digital Library
@@ -59,3 +63,22 @@ https://groups.google.com/forum/#!forum/reativos
     - Email 2014/2
     - Email 2015/1
 
+== Documento de área "Ciência da Computação" 2013
+http://www.capes.gov.br/images/stories/download/avaliacaotrienal/Docs_de_area/Ci%C3%AAncia_da_Computa%C3%A7%C3%A3o_doc_area_e_comiss%C3%A3o_att08deoutubro.pdf
+Seção IV, páginas 15--16
+
+Como exemplos, a conferência Modularity passa por duas fases de
+
+SenSys tem média histórica de 17% de aceitação
+
+Modularity'15 is deeply committed to publishing works of the highest caliber. 
+To this aim, two separate paper submission deadlines and review stages are 
+offered. A paper accepted in any round will be published in the proceedings and 
+presented at the conference. Promising papers submitted in the first round that 
+are not accepted may be invited to be revised and resubmitted for review by the 
+same reviewers in the second round. Authors of such invited resubmissions are 
+asked to also submit a letter explaining the revisions made to the paper to 
+address the reviewers' concerns. While there is no guarantee that an invited 
+resubmission will be accepted, this procedure (similar to major revisions 
+requested by journals) is designed to help authors of promising work get their 
+papers into the conference.
