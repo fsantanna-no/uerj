@@ -4,85 +4,74 @@
 
 <h1>Resumo</h1>
 
-<ul>
-<li>controlam o estado global de execução de um programa
-<ul>
-<li>memória, registradores, I/O, CPUs</li>
-</ul></li>
-<li>estrutura geral de um compilador
-<ul>
-<li>código fonte -> linguagem alvo (binário)</li>
-<li>análise / front end</li>
-<li>síntese / back end</li>
-<li>tabela de símbolos</li>
-<li>execução:</li>
-</ul></li>
-<li>atribuições do RTE
-<ul>
-<li>organização e controle de memória</li>
-<li>protocolo de chamadas de funções</li>
-<li>chamadas de sistema</li>
-<li>escalonamento</li>
-</ul></li>
-<li>ambientes de execução externos
-<ul>
-<li>p-threads</li>
-</ul></li>
-<li>crt0.o (c-run-time)</li>
-<li>alocação dinâmica
-<ul>
-<li>pilha</li>
-<li>chamadas de função
-<ul>
-<li>registros de ativação
-<ul>
-<li>chamada</li>
-<li>prólogo</li>
-<li>epílogo</li>
-<li>link de acesso</li>
-</ul></li>
-<li>stack unwinding</li>
-<li>otimização de chamada de cauda</li>
-</ul></li>
-<li>heap
-<ul>
-<li>gerenciador de memória
-<ul>
-<li>rastreia espaço livre</li>
-<li>dificuldades
-<ul>
-<li>variação do tamanhos dos blocos</li>
-<li>ordem de alocação e desalocação arbitrária</li>
-</ul></li>
-<li>propriedades
-<ul>
-<li>localidade, fragmentação, execução</li>
-</ul></li>
-</ul></li>
-<li>desalocação
-<ul>
-<li>manual
-<ul>
-<li>vazamento de memória (memory leaks)</li>
-<li>ponteiros pendentes (dangling pointers)</li>
-</ul></li>
-<li>automático, coleta de lixo
-<ul>
-<li>contagem de referência</li>
-<li>coletor por rastreamento
-<ul>
-<li>tri-color mark-and-sweep
-<ul>
-<li>incremental</li>
-</ul></li>
-<li>generacional</li>
-<li>compactação</li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+<ol>
+<li>Introdução
+<ol>
+<li>estrutura de um compilador</li>
+<li>atribuições do ambiente de execução</li>
+<li>exemplos</li>
+</ol></li>
+<li>Alocação Dinâmica
+<ol>
+<li>pilha e chamadas de função</li>
+<li>heap e coletores de lixo</li>
+<li>TODO: finalização (atexit, finalizers, destructors)</li>
+</ol></li>
+<li>Máquinas Virtuais
+<ol>
+<li>interpretação</li>
+<li>exemplos</li>
+<li>JIT</li>
+</ol></li>
+</ol>
+
+<!--
+- controlam o estado global de execução de um programa
+    - memória, registradores, I/O, CPUs
+- estrutura geral de um compilador
+    - código fonte -> linguagem alvo (binário)
+    - análise / front end
+    - síntese / back end
+    - tabela de símbolos
+    - execução:
+- atribuições do RTE
+    - organização e controle de memória
+    - protocolo de chamadas de funções
+    - chamadas de sistema
+    - escalonamento
+- ambientes de execução externos
+    - p-threads
+- crt0.o (c-run-time)
+- alocação dinâmica
+    - pilha
+    - chamadas de função
+        - registros de ativação
+            - chamada
+            - prólogo
+            - epílogo
+            - link de acesso
+        - stack unwinding
+        - otimização de chamada de cauda
+    - heap
+        - gerenciador de memória
+            - rastreia espaço livre
+            - dificuldades
+                - variação do tamanhos dos blocos
+                - ordem de alocação e desalocação arbitrária
+            - propriedades
+                - localidade, fragmentação, execução
+        - desalocação
+            - manual
+                - vazamento de memória (memory leaks)
+                - ponteiros pendentes (dangling pointers)
+            - automático, coleta de lixo
+                - contagem de referência
+                - coletor por rastreamento
+                    - tri-color mark-and-sweep
+                        - incremental
+                    - generacional
+                    - compactação
+-->
 
 <h1>Ambientes de tempo de execução</h1>
 
@@ -499,6 +488,47 @@ próxima geração</li>
 </ul></li>
 </ul></li>
 </ul></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2>Máquinas Virtuais</h2>
+
+<ul>
+<li>fase de tradução
+<ul>
+<li>código fonte -> representação intermediária</li>
+</ul></li>
+<li>simula uma máquina real
+<ul>
+<li>busca, decodifica, executa</li>
+</ul></li>
+<li>mesmos tradeoffs
+<ul>
+<li>de pilha ou de registrador</li>
+</ul></li>
+<li>portabilidade
+<ul>
+<li>OSes, máquinas, browsers, até mesmo hardwares</li>
+</ul></li>
+<li>JVM (java), Parrot (perl), CLR (.net), Squeak (smalltalk)</li>
+<li>JIT
+<ul>
+<li>combina a velocidade de compilação
+com a flexibilidade de interpretação</li>
+<li>latência vs tempo total
+<ul>
+<li>demora na inicialização</li>
+</ul></li>
+<li>detecta sequências de bytecode executadas com frequência e as transforma 
+para linguagem de máquina
+<ul>
+<li>loops muito longos</li>
+</ul></li>
+<li>server vs client code</li>
+<li>em teoria pode ser mais rápido que compilação
+<ul>
+<li>por exemplo, pode detectar a CPU e usar instruções específicas</li>
 </ul></li>
 </ul></li>
 </ul>

@@ -1,0 +1,306 @@
+<p><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head></p>
+
+<h1>Resumo</h1>
+
+<ol>
+<li>Introdução
+<ol>
+<li>o que é uma LP?</li>
+<li>diferença compilação e interpretação</li>
+<li>estrutura de um compilador</li>
+</ol></li>
+<li>Sintaxe e Semântica
+<ol>
+<li>análise léxica</li>
+<li>análise sintática</li>
+<li>análise semântica</li>
+</ol></li>
+<li>Ambiente de Execução
+<ol>
+<li>alocação dinâmica</li>
+<li>maquinas virtuais</li>
+<li>JIT</li>
+</ol></li>
+</ol>
+
+<h1>Compilação e Interpretação</h1>
+
+<h2>O que é uma linguagem de Programação?</h2>
+
+<ul>
+<li>uma notação formal para comandar a execução de instruções/algoritmos para uma 
+máquina</li>
+<li>a partir de uma sentença precisa descrita em uma linguagem de programação, a 
+máquina irá executar o que aquela sentença significa</li>
+<li>abcxyz -> |PL| -> 010101 -> |PC|</li>
+<li><p>duas técnicas para o processamento de linguagens</p>
+
+<ul>
+<li>compilação: transforma os comandos para a linguagem de máquina, antes de 
+executá-los</li>
+<li>interpretação: executa diretamente os comandos escritos na linguagem
+<ul>
+<li>simulação da máquina real</li>
+</ul></li>
+<li>velocidade vs flexibilidade</li>
+</ul></li>
+<li><p>compilação pura vs interpretação pura</p>
+
+<ul>
+<li>C/C++</li>
+<li>código de máquina para máquina virtual com linguagem estática
+<ul>
+<li>Pascal pcode, Java byte code</li>
+</ul></li>
+<li>código de máquina para máquina virtual com linguagem dinâmica
+<ul>
+<li>Lua, JavaScript (V8)</li>
+</ul></li>
+<li>Basic, shell, REPL</li>
+<li>JIT</li>
+</ul></li>
+</ul>
+
+<h2>Estrutura geral de um compilador e interpretador</h2>
+
+<ul>
+<li>compilador é um software que transforma o código fonte de um programa escrito 
+em uma dada linguagem em uma outra linguagem alvo</li>
+<li>tipicamente, a linguagem alvo é a linguagem binária de máquina na qual o 
+programa deve executar</li>
+<li><p>a transformação é feita em etapas bem definidas, cada uma se baseia em 
+teorias e técnicas distintas:</p></li>
+<li><p>Análise / Front-end:</p>
+
+<ul>
+<li>CARACTERES       --[analisador léxico]-->
+TOKENS           --[analisador sintático]-->
+ÁRVORE SINTÁTICA --[analisador semântico]-->
+ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI</li>
+</ul></li>
+<li>Síntese / Back-end:
+<ul>
+<li>RI/CI             --[gerador de código]-->
+CÓDIGO DE MÁQUINA --[otimizador de código]-->
+CÓDIGO DE MÁQUINA --[ligador]-->
+CÓDIGO DE MÁQUINA (não relocável)</li>
+</ul></li>
+<li>Tabela de Símbolos
+<ul>
+<li>preenchida e compartilhada por todas as fases</li>
+</ul></li>
+<li><p>Execução</p>
+
+<ul>
+<li>CÓDIGO DE MÁQUINA --[carregador]--> EXECUÇÃO</li>
+<li>entrada --[execução]--> saída</li>
+</ul></li>
+<li><p>as fases são divididas entre análise e síntese, também conhecidas como "front 
+end" e "back end" do compilador</p></li>
+<li>o back end do compilador lida com a geração de código para uma arquitetura 
+específica
+<ul>
+<li>envolve conhecimentos "baixo nível"</li>
+<li>interpretação vs compilação</li>
+</ul></li>
+<li><p>idealmente, a divisão bem definida entre front end e back end permite 
+"plugar" a análise de diferentes linguagens para uma dada arquitetura
+(trocando apenas o front end)
+ou gerar código de uma linguagem para diferentes arquiteturas (trocando
+apenas o back end)</p>
+
+<ul>
+<li>GCC e LLVM são exemplos de ferramentas com esse fim</li>
+</ul></li>
+<li><p>um interpretador encapsula um compilador no ambiente de execução</p>
+
+<ul>
+<li>código fonte+entrada --[compilador]--> execução+saída
+                   ---eval-----/</li>
+<li>fase anterior que transforma código fonte em representação intermediária</li>
+</ul></li>
+<li>comparação
+<ul>
+<li>compilação
+<ul>
+<li>velocidade
+<ul>
+<li>foco na fase de otimização</li>
+</ul></li>
+<li>segurança
+<ul>
+<li>foco na análise semântica
+<ul>
+<li>sistema de tipos</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>interpretação
+<ul>
+<li>flexibilidade
+<ul>
+<li>eval</li>
+<li>reflexão (inspeção)
+<ul>
+<li>instanciação, chamadas, types</li>
+</ul></li>
+</ul></li>
+<li>velocidade de compilação
+<ul>
+<li>não gera AST</li>
+</ul></li>
+</ul></li>
+<li>visão clássica
+<ul>
+<li>REPL
+<ul>
+<li>read eval print loop</li>
+<li>read eval execute loop</li>
+</ul></li>
+<li>basic, shell</li>
+</ul></li>
+<li>visão moderna
+<ul>
+<li>java tem VM mas é compilado e analisado estaticamente</li>
+<li>linguagens dinâmicas também possuem VM ou até mesmo JITs</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2>Sintaxe e Semântica</h2>
+
+<ul>
+<li>as duas primeiras fases do front end, análise léxica e sintática, lidam com a 
+forma (sintaxe) da linguagem
+<ul>
+<li>basicamente, transformar uma entrada textual "concreta" em uma forma mais 
+abstrata, que elimina detalhes</li>
+<li>geralmente árvore sintática abstrata (AST)</li>
+<li>após essa fase, duas sintaxes distintas para uma construção seriam 
+indistinguíveis na árvore abstrata</li>
+<li>(+ 1 2) LISP ... (1 + 2) C, ambos:</li>
+</ul></li>
+</ul>
+
+<pre>
+        +
+       / \
+      2   1
+</pre>
+
+<ul>
+<li>regras léxicas detectam (1) como número, (+) como operador, (x) como um 
+identificador, (while) como palavra reservada</li>
+<li><p>regras sintáticas detectam (1+1) como expressão, (x=1) como atribuição, 
+(while (1) { x=x+1; }) como um loop</p></li>
+<li><p>regras léxicas e sintáticas são passos separados pois usam técnicas 
+diferentes para descrever as regras, e reconhecer a entrada de acordo com as
+regras</p></li>
+<li>note que em ambos os casos, existem infinitas possibilidades
+<ul>
+<li>x, xx, xxx, ...</li>
+<li>while (1) { while(1) { ... } }</li>
+</ul></li>
+<li>regras devem ser descritas de forma finita para reconhecer formas infinitas</li>
+<li><p>para isso, uso de meta linguagens</p>
+
+<ul>
+<li>expressões regulares para léxico</li>
+<li>BNFs para sintaxe</li>
+</ul></li>
+<li><p>semântica estática vs dinâmica</p>
+
+<ul>
+<li>estática: se programas sintaticamente corretos têm sentido semântico
+<ul>
+<li>impõe restrições a programas sintaticamente corretos</li>
+<li>supre deficiências e/ou simplificações de gramáticas livre de 
+contexto</li>
+<li>exemplos
+<ul>
+<li>se identificadores são declarados antes dos usos</li>
+<li>usos de acordo com o contexto</li>
+<li>número de argumentos em chamadas</li>
+<li>concorrência</li>
+</ul></li>
+</ul></li>
+<li>dinâmica: descreve regras de como o programa deve executar</li>
+</ul></li>
+</ul>
+
+<h2>Ambiente de execução</h2>
+
+<ul>
+<li>controlam o estado global de execução de um programa
+<ul>
+<li>memória, registradores, I/O, CPUs</li>
+</ul></li>
+<li>requisitos mínimos para execução de um programa
+<ul>
+<li>estado inicial, bibliotecas, variáveis de ambiente</li>
+</ul></li>
+<li><p>tempo de execução ("em paralelo") ou tempo de compilação (instruções embuídas 
+no código gerado)</p></li>
+<li><p>mesmo compiladores possuem ambiente de execução</p>
+
+<ul>
+<li>crt0.o (c-run-time)
+<ul>
+<li>ambiente de execução de C
+<ul>
+<li>parte do carregador</li>
+</ul></li>
+<li>inicializa SP, FP</li>
+<li>preenche vetor de interrupção</li>
+<li>zera a região BSS</li>
+<li>chama "main"</li>
+</ul></li>
+</ul></li>
+<li><p>interpretação</p>
+
+<ul>
+<li>tudo e mais máquina virtual</li>
+</ul></li>
+<li><p>máquinas virtuais</p>
+
+<ul>
+<li>fase de tradução
+<ul>
+<li>código fonte -> representação intermediária</li>
+</ul></li>
+<li>simula uma máquina real
+<ul>
+<li>busca, decodifica, executa</li>
+</ul></li>
+<li>mesmos tradeoffs
+<ul>
+<li>de pilha ou de registrador</li>
+</ul></li>
+<li>portabilidade
+<ul>
+<li>OSes, máquinas, browsers, até mesmo hardwares</li>
+</ul></li>
+<li>JVM (java), Parrot (perl), CLR (.net), Squeak (smalltalk)</li>
+<li>JIT
+<ul>
+<li>combina a velocidade de compilação
+com a flexibilidade de interpretação</li>
+<li>latência vs tempo total
+<ul>
+<li>demora na inicialização</li>
+</ul></li>
+<li>detecta sequências de bytecode executadas com frequência e as transforma 
+para linguagem de máquina
+<ul>
+<li>loops muito longos</li>
+</ul></li>
+<li>server vs client code</li>
+<li>em teoria pode ser mais rápido que compilação
+<ul>
+<li>por exemplo, pode detectar a CPU e usar instruções específicas</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>

@@ -4,125 +4,112 @@
 
 <h1>Resumo</h1>
 
-<ul>
-<li>O que é uma LP?
-<ul>
-<li>notação formal: abcxyz -> |PL| -> 010101 -> |PC|</li>
-<li>propriedades: genericidade, nível, poder</li>
-</ul></li>
-<li>Diferença sintaxe vs semântica
-<ul>
-<li>forma vs conteúdo</li>
-</ul></li>
-<li>Compilador
-<ul>
-<li>código fonte -> linguagem alvo (binário)</li>
-<li>análise / front end</li>
-<li>síntese / back end</li>
-<li>tabela de símbolos, banco de dados</li>
-</ul></li>
+<ol>
+<li>Introdução
+<ol>
+<li>o que é uma LP?</li>
+<li>diferença sintaxe e semântica</li>
+<li>estrutura de um compilador</li>
+</ol></li>
 <li>Sintaxe
-<ul>
-<li>análise léxica (scanning) e sintática (parsing)</li>
-<li>concreto -> abstrato (AST)</li>
-<li>léxico "1", sintático "1+1"</li>
-<li>metalinguagens</li>
-<li>léxico
-<ul>
-<li>manual ou gerador de analisador léxico</li>
-<li>expressões regulares e autômatos finitos
-<ul>
-<li>concatenação, união, repetição</li>
+<ol>
+<li>análise léxica
+<ol>
+<li>expressões regulares e autômato finito</li>
 <li>transformação RE -> NFA -> DFA</li>
-<li>NFA&lt;-RE   = O(|r|)</li>
-<li>DFA&lt;-NFA  = O(|r|^3) + O(|x|)</li>
-<li>NFA simul = O(|x||r|)</li>
-</ul></li>
-</ul></li>
-<li>sintático
-<ul>
-<li>CFGs e autômatos de pilha
-<ul>
-<li>BNF, recursão
-<ul>
-<li>terminais, não terminais, produções, símbolo inicial</li>
-</ul></li>
-</ul></li>
-<li>derivações e árvores
-<ul>
-<li>esquera/direita, concreta/abstrata</li>
-</ul></li>
-<li>ambiguidade
-<ul>
-<li>associatividade, precedência, dangling else, x*y</li>
-</ul></li>
-<li>top down (preditivo)
-<ul>
-<li>topo da pilha é o que vai casar</li>
-<li>parser recursivo descendente</li>
-<li>LL
-<ul>
-<li>FIRST, FOLLOW</li>
-</ul></li>
-<li>percorrimento em pré ordem
-<ul>
-<li>notação polonesa</li>
-</ul></li>
-</ul></li>
-<li>bottom up (shift reduce)
-<ul>
-<li>topo da pilha tem o que já casou</li>
-<li>LR</li>
-<li>percorrimento em pós ordem
-<ul>
-<li>notação polonesa inversa</li>
-</ul></li>
-</ul></li>
-</ul></li>
-<li>separação léxico-sintático</li>
-</ul></li>
+</ol></li>
+<li>análise sintática
+<ol>
+<li>gramáticas livre de contexto</li>
+<li>top-down</li>
+<li>bottom-up</li>
+</ol></li>
+<li>separação lex &amp; yacc</li>
+</ol></li>
 <li>Semântica
-<ul>
-<li>semântica estática
-<ul>
-<li>restrições à sintaxe
-<ul>
-<li>declarações/usos, contexto</li>
-</ul></li>
-<li>esquemas de tradução
-<ul>
-<li>S-attributes, L-attributes</li>
-<li>ASTs</li>
-<li>tipos: int[][] v;</li>
-</ul></li>
-<li>sistemas de tipos
-<ul>
-<li>corretude, documentação, otimizações</li>
-<li>tipos: estático/dinâmico, fraco/forte, síntese/inferência, 
-estrutural/nominal, polimórfico</li>
-<li>checagem: operadores/operandos, declarações/usos,</li>
-<li>geração de código: memória, coerções, instruções</li>
-</ul></li>
-</ul></li>
-<li>semântica dinâmica
-<ul>
-<li>regras de execução</li>
-<li>independente de implementação</li>
-<li>denotacional
-<ul>
-<li>sintaxe, funções</li>
-<li>composição, parte por subpartes</li>
-<li>provas por indução e locais</li>
-</ul></li>
-<li>operacional
-<ul>
-<li>sintaxe, interpretador</li>
-<li>sequência de configirações</li>
-<li>próximo à implementação</li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+<ol>
+<li>estática
+<ol>
+<li>esquemas de tradução</li>
+<li>sistemas de tipos</li>
+</ol></li>
+<li>dinâmica
+<ol>
+<li>denotacional</li>
+<li>operacional</li>
+</ol></li>
+</ol></li>
+</ol>
+
+<!--
+- O que é uma LP?
+    - notação formal: abcxyz -> |PL| -> 010101 -> |PC|
+    - propriedades: genericidade, nível, poder
+- Diferença sintaxe vs semântica
+    - forma vs conteúdo
+- Compilador
+    - código fonte -> linguagem alvo (binário)
+    - análise / front end
+    - síntese / back end
+    - tabela de símbolos, banco de dados
+- Sintaxe
+    - análise léxica (scanning) e sintática (parsing)
+    - concreto -> abstrato (AST)
+    - léxico "1", sintático "1+1"
+    - metalinguagens
+    - léxico
+        - manual ou gerador de analisador léxico
+        - expressões regulares e autômatos finitos
+            - concatenação, união, repetição
+            - transformação RE -> NFA -> DFA
+            - NFA<-RE   = O(|r|)
+            - DFA<-NFA  = O(|r|^3) + O(|x|)
+            - NFA simul = O(|x||r|)
+    - sintático
+        - CFGs e autômatos de pilha
+            - BNF, recursão
+        - derivações e árvores
+            - esquera/direita, concreta/abstrata
+        - ambiguidade
+            - associatividade, precedência, dangling else, x*y
+        - top down (preditivo)
+            - topo da pilha é o que vai casar
+            - parser recursivo descendente
+            - LL: FIRST, FOLLOW
+            - percorrimento em pré ordem
+                - notação polonesa
+        - bottom up (shift reduce)
+            - topo da pilha tem o que já casou
+            - LR
+            - percorrimento em pós ordem
+                - notação polonesa inversa
+    - separação léxico-sintático
+- Semântica
+    - semântica estática
+        - restrições à sintaxe
+            - declarações/usos, contexto
+        - esquemas de tradução
+            - S-attributes, L-attributes
+            - ASTs
+            - tipos: int[][] v;
+        - sistemas de tipos
+            - corretude, documentação, otimizações
+            - tipos: estático/dinâmico, fraco/forte, síntese/inferência, 
+              estrutural/nominal, polimórfico
+            - checagem: operadores/operandos, declarações/usos,
+            - geração de código: memória, coerções, instruções
+    - semântica dinâmica
+        - regras de execução
+        - independente de implementação
+        - denotacional
+            - sintaxe, funções
+            - composição, parte por subpartes
+            - provas por indução e locais
+        - operacional
+            - sintaxe, interpretador
+            - sequência de configirações
+            - próximo à implementação
+-->
 
 <h1>Sintaxe e Semântica</h1>
 

@@ -11,8 +11,13 @@
 2. Alocação Dinâmica
     1. pilha e chamadas de função
     2. heap e coletores de lixo
-3. TODO
+    3. TODO: finalização (atexit, finalizers, destructors)
+3. Máquinas Virtuais
+    1. interpretação
+    2. exemplos
+    3. JIT
 
+<!--
 - controlam o estado global de execução de um programa
     - memória, registradores, I/O, CPUs
 - estrutura geral de um compilador
@@ -58,6 +63,7 @@
                         - incremental
                     - generacional
                     - compactação
+-->
 
 # Ambientes de tempo de execução
 
@@ -311,3 +317,26 @@
                         - ao detectar objeto vivo, move vivos para nova área
                             - não precisa desalocar mortos
                             - zero fragmentação (maior localidade)
+
+## Máquinas Virtuais
+
+- fase de tradução
+    - código fonte -> representação intermediária
+- simula uma máquina real
+    - busca, decodifica, executa
+- mesmos tradeoffs
+    - de pilha ou de registrador
+- portabilidade
+    - OSes, máquinas, browsers, até mesmo hardwares
+- JVM (java), Parrot (perl), CLR (.net), Squeak (smalltalk)
+- JIT
+    - combina a velocidade de compilação
+      com a flexibilidade de interpretação
+    - latência vs tempo total
+        - demora na inicialização
+    - detecta sequências de bytecode executadas com frequência e as transforma 
+      para linguagem de máquina
+        - loops muito longos
+    - server vs client code
+    - em teoria pode ser mais rápido que compilação
+        - por exemplo, pode detectar a CPU e usar instruções específicas

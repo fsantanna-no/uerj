@@ -13,7 +13,7 @@
     2. análise sintática
     3. análise semântica
 3. Ambiente de Execução
-    1. compiladores também
+    1. alocação dinâmica
     2. maquinas virtuais
     3. JIT
 

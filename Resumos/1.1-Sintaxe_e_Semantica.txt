@@ -25,6 +25,7 @@
         1. denotacional
         2. operacional
 
+<!--
 - O que é uma LP?
     - notação formal: abcxyz -> |PL| -> 010101 -> |PC|
     - propriedades: genericidade, nível, poder
@@ -92,6 +93,7 @@
             - sintaxe, interpretador
             - sequência de configirações
             - próximo à implementação
+-->
 
 # Sintaxe e Semântica
 
