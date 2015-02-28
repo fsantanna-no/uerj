@@ -4,4 +4,501 @@
 
 <h1>Resumo</h1>
 
+<ul>
+<li>controlam o estado global de execução de um programa
+<ul>
+<li>memória, registradores, I/O, CPUs</li>
+</ul></li>
+<li>estrutura geral de um compilador
+<ul>
+<li>código fonte -> linguagem alvo (binário)</li>
+<li>análise / front end</li>
+<li>síntese / back end</li>
+<li>tabela de símbolos</li>
+<li>execução:</li>
+</ul></li>
+<li>atribuições do RTE
+<ul>
+<li>organização e controle de memória</li>
+<li>protocolo de chamadas de funções</li>
+<li>chamadas de sistema</li>
+<li>escalonamento</li>
+</ul></li>
+<li>ambientes de execução externos
+<ul>
+<li>p-threads</li>
+</ul></li>
+<li>crt0.o (c-run-time)</li>
+<li>alocação dinâmica
+<ul>
+<li>pilha</li>
+<li>chamadas de função
+<ul>
+<li>registros de ativação
+<ul>
+<li>chamada</li>
+<li>prólogo</li>
+<li>epílogo</li>
+<li>link de acesso</li>
+</ul></li>
+<li>stack unwinding</li>
+<li>otimização de chamada de cauda</li>
+</ul></li>
+<li>heap
+<ul>
+<li>gerenciador de memória
+<ul>
+<li>rastreia espaço livre</li>
+<li>dificuldades
+<ul>
+<li>variação do tamanhos dos blocos</li>
+<li>ordem de alocação e desalocação arbitrária</li>
+</ul></li>
+<li>propriedades
+<ul>
+<li>localidade, fragmentação, execução</li>
+</ul></li>
+</ul></li>
+<li>desalocação
+<ul>
+<li>manual
+<ul>
+<li>vazamento de memória (memory leaks)</li>
+<li>ponteiros pendentes (dangling pointers)</li>
+</ul></li>
+<li>automático, coleta de lixo
+<ul>
+<li>contagem de referência</li>
+<li>coletor por rastreamento
+<ul>
+<li>tri-color mark-and-sweep
+<ul>
+<li>incremental</li>
+</ul></li>
+<li>generacional</li>
+<li>compactação</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+
 <h1>Ambientes de tempo de execução</h1>
+
+<ul>
+<li>controlam o estado global de execução de um programa
+<ul>
+<li>memória, registradores, I/O, CPUs</li>
+</ul></li>
+<li>requisitos mínimos para execução de um programa
+<ul>
+<li>estado inicial, bibliotecas, variáveis de ambiente</li>
+</ul></li>
+<li>tempo de execução ("em paralelo") ou tempo de compilação (instruções embuídas 
+no código gerado)</li>
+</ul>
+
+<h2>Linguagens de programação</h2>
+
+<ul>
+<li><p>TODO: compilação e interpretação</p></li>
+<li><p>programas são escritos em uma linguagem de programação</p></li>
+<li><p>uma notação formal para comandar a execução de instruções/algoritmos para uma 
+máquina</p></li>
+<li><p>antes de executar, o código fonte precisa ser compilado</p></li>
+</ul>
+
+<h2>Estrutura geral de um compilador</h2>
+
+<ul>
+<li>compilador é um software que transforma o código fonte de um programa escrito 
+em uma dada linguagem em uma outra linguagem alvo</li>
+<li>tipicamente, a linguagem alvo é a linguagem binária de máquina na qual o 
+programa deve executar</li>
+<li><p>a transformação é feita em etapas bem definidas, cada uma se baseia em 
+teorias e técnicas distintas:</p></li>
+<li><p>Análise / Front-end:</p>
+
+<ul>
+<li>CARACTERES       --[analisador léxico]-->
+TOKENS           --[analisador sintático]-->
+ÁRVORE SINTÁTICA --[analisador semântico]-->
+ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI</li>
+</ul></li>
+<li>Síntese / Back-end:
+<ul>
+<li>RI/CI             --[gerador de código]-->
+CÓDIGO DE MÁQUINA --[otimizador de código]-->
+CÓDIGO DE MÁQUINA --[ligador]-->
+CÓDIGO DE MÁQUINA (não relocável)</li>
+</ul></li>
+<li><p>Tabela de Símbolos</p>
+
+<ul>
+<li>preenchida e compartilhada por todas as fases</li>
+</ul></li>
+<li><p>as fases são divididas entre análise e síntese, também conhecidas como "front 
+end" e "back end" do compilador</p></li>
+<li>o back end do compilador lida com a geração de código para uma arquitetura 
+específica
+<ul>
+<li>envolve conhecimentos "baixo nível"</li>
+<li>interpretação vs compilação</li>
+</ul></li>
+<li><p>idealmente, a divisão bem definida entre front end e back end permite 
+"plugar" a análise de diferentes linguagens para uma dada arquitetura
+(trocando apenas o front end)
+ou gerar código de uma linguagem para diferentes arquiteturas (trocando
+apenas o back end)</p>
+
+<ul>
+<li>GCC e LLVM são exemplos de ferramentas com esse fim</li>
+</ul></li>
+<li><p>a tabela de símbolos serve como um banco de dados compartilhado por todas as 
+fases</p>
+
+<ul>
+<li>guarda linha,      tipo,              escopo</li>
+<li>mensagens de erro, análise semântica, geração de código</li>
+<li>inclusive pela fase de execução
+<ul>
+<li>o formato ELF (Executable and Linkable Format)
+<ul>
+<li>.symtab: símbolos locais, debugger</li>
+<li>.dynsym: símbolos globais, carregamento dinâmico</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>Execução:</p>
+
+<ul>
+<li>CÓDIGO DE MÁQUINA --[carregador]--> EXECUÇÃO</li>
+<li>as fases anteriores acontecem somente uma vez</li>
+<li>o carregador, toda vez que o programa é executado, pelo SO
+<ul>
+<li>no linux, <code>execve()</code></li>
+<li>copia a imagem do disco para a memória</li>
+<li>copia argumentos de chamada para a pilha</li>
+<li>inicializa registradores</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2>Ambientes de tempo de execução</h2>
+
+<ul>
+<li>atribuições do RTE
+<ul>
+<li>organização e controle de memória
+<ul>
+<li>mapeamento endereço lógico e físico</li>
+<li>separação código (RO), dados (RO/RW)
+<ul>
+<li>imagem [CODE|STATIC|HEAP>|<STACK]</li>
+</ul></li>
+<li>controle da heap, pilha, coletor de lixo</li>
+</ul></li>
+<li>protocolo de chamadas de funções
+<ul>
+<li>interoperação com outras bibliotecas</li>
+<li>passagem de parâmetros</li>
+<li>carregamento dinâmico de bibliotecas</li>
+</ul></li>
+<li>chamadas de sistema
+<ul>
+<li>I/O</li>
+</ul></li>
+<li>escalonamento
+<ul>
+<li>linguagens concorrentes</li>
+</ul></li>
+</ul></li>
+<li>ambientes de execução externos
+<ul>
+<li>API normal</li>
+<li>p-threads
+<ul>
+<li>não pode ser entendido a partir do ambiente que o chama (C)
+<ul>
+<li>escalonamento, pilhas, tudo escondido</li>
+</ul></li>
+<li>faz chamadas de sistema</li>
+</ul></li>
+</ul></li>
+<li>crt0.o (c-run-time)
+<ul>
+<li>ambiente de execução de C
+<ul>
+<li>parte do carregador</li>
+</ul></li>
+<li>inicializa SP, FP</li>
+<li>preenche vetor de interrupção</li>
+<li>zera a região BSS</li>
+<li>chama "main"</li>
+</ul></li>
+<li>alocação dinâmica
+<ul>
+<li>pilha
+<ul>
+<li>locais, temporárias, chamadas de função</li>
+<li>ponteiro para o topo da pilha (SP)
+<ul>
+<li>operações de push, pop</li>
+</ul></li>
+</ul></li>
+<li>chamadas de função
+<ul>
+<li>múltiplas chamadas, chamadas reentrantes</li>
+<li>chamada e retorno
+<ul>
+<li>empilha instrução seguinte na chamada</li>
+<li>desempilha instrução e pula para ela</li>
+</ul></li>
+<li>árvores de ativação
+<ul>
+<li>DFS
+<ul>
+<li>a menos de exceções ou erros</li>
+<li>chamadas em pré ordem, retornos em pós ordem</li>
+</ul></li>
+</ul></li>
+<li>convenções de chamada</li>
+<li>registros de ativação
+<ul>
+<li>layout</li>
+<li>endereço de retorno, parâmetros, locais, temporárias</li>
+<li>FP: ponteiro para o frame
+<ul>
+<li>FP = SP logo após chamada
+<ul>
+<li>para stack trace, FP atual deve ser copiado antes</li>
+</ul></li>
+<li>SP = FP logo antes do retorno</li>
+</ul></li>
+<li>chamada
+<ul>
+<li>empilha argumentos            [var]</li>
+<li>empilha FP                    [fixo]</li>
+<li>empilha endereço de retorno   [fixo]</li>
+<li>empilha outros registradores  [fixo]</li>
+</ul></li>
+<li>prólogo
+<ul>
+<li>FP = SP</li>
+<li>reserva espaço para locais    [fixo]</li>
+</ul></li>
+<li>epílogo
+<ul>
+<li>SP = FP</li>
+<li>recupera outros registradores</li>
+<li>recupera endereço de retorno</li>
+<li>desempilha FP</li>
+<li>empilha valor de retorno</li>
+<li>pula para endereço de retorno</li>
+</ul></li>
+<li>link de acesso
+<ul>
+<li>uplink léxico</li>
+<li>acesso a locais de funções aninhadas (acima)</li>
+<li>ALGOL, Pascal, ML</li>
+</ul></li>
+</ul></li>
+<li>stack unwinding</li>
+<li>otimização de chamada de cauda
+<ul>
+<li>fundamental em linguagens funcionais</li>
+<li>reaproveitamento da pilha
+<ul>
+<li>chamada que não usa retornos
+<ul>
+<li>altera argumentos</li>
+<li>e dá goto, em vez de call</li>
+</ul></li>
+<li>quebra debugging</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>heap
+<ul>
+<li>dados que vivem indefinidamente</li>
+<li>gerenciador de memória
+<ul>
+<li>rastreia espaço livre
+<ul>
+<li>alocação e desalocação (liberação)</li>
+</ul></li>
+<li>dificuldades
+<ul>
+<li>variação do tamanhos dos blocos</li>
+<li>ordem de alocação e desalocação arbitrária</li>
+</ul></li>
+<li>propriedades
+<ul>
+<li>localidade, fragmentação, execução</li>
+</ul></li>
+<li>localidade
+<ul>
+<li>programas tendem a executar uma pequena fração do código 
+mexendo em uma pequena fração da memória
+<ul>
+<li>hierarquia de memória
+<ul>
+<li>disparidade em ordem de grandeza de disco, ram, 
+cache, registradores</li>
+</ul></li>
+</ul></li>
+<li>TODO: MRU?</li>
+</ul></li>
+<li>fragmentação
+<ul>
+<li>buracos livres entre blocos usados
+<ul>
+<li>TODO</li>
+<li>best fit</li>
+<li>first fit</li>
+</ul></li>
+<li>pools de memória
+<ul>
+<li>fragmentação 0 para blocos de mesmo tamanho</li>
+</ul></li>
+</ul></li>
+<li>execução
+<ul>
+<li>TODO</li>
+</ul></li>
+</ul></li>
+<li>desalocação
+<ul>
+<li>manual
+<ul>
+<li>C / C++</li>
+<li>problemas
+<ul>
+<li>vazamento de memória (memory leaks)</li>
+<li>ponteiros pendentes (dangling pointers)</li>
+</ul></li>
+<li>valgrind</li>
+</ul></li>
+<li>automático, coleta de lixo
+<ul>
+<li>lixo: dados que não podem ser referenciados
+<ul>
+<li>desalocados quando descobertos</li>
+</ul></li>
+<li>LISP'58</li>
+<li>does not work with type-unsafe languages C/C++
+<ul>
+<li>aritmética de ponteiros, casts</li>
+</ul></li>
+<li>métricas de performance
+<ul>
+<li>tempo total de execução</li>
+<li>tempo de pausa</li>
+<li>uso de espaço</li>
+<li>localidade
+<ul>
+<li>TODO</li>
+</ul></li>
+</ul></li>
+<li>referências com acesso
+<ul>
+<li>conjunto raíz
+<ul>
+<li>variáveis estáticas</li>
+<li>variáveis na pilha</li>
+</ul></li>
+<li>uma vez não referenciáveis, nunca mais referenciáveis</li>
+</ul></li>
+<li>modificador (mutator)
+<ul>
+<li>alocação</li>
+<li>passagem e retorno de função</li>
+<li>atribuições</li>
+<li>término de funções</li>
+</ul></li>
+<li>abordagens
+<ul>
+<li>acompanhamento do modificador
+<ul>
+<li>contagem de referência</li>
+</ul></li>
+<li>percorrimento periódico
+<ul>
+<li>coletor por rastreamento</li>
+</ul></li>
+</ul></li>
+<li>contagem de referência
+<ul>
+<li>alocação: ref=1</li>
+<li>passagem: ref++</li>
+<li>atribuição: to--; fr++</li>
+<li>término: ref(i)--;</li>
+<li>vantagens
+<ul>
+<li>simples</li>
+<li>imediato e incremental</li>
+</ul></li>
+<li>desvantagens
+<ul>
+<li>sem ciclos</li>
+<li>caro: dados e CPU</li>
+</ul></li>
+</ul></li>
+<li>coletor por rastreamento
+<ul>
+<li>executa periodicamente
+<ul>
+<li>ex., quando alcança um limiar</li>
+</ul></li>
+<li>mark-and-sweep
+<ul>
+<li>MARK:
+<ul>
+<li>a partir do conjunto raiz, percorre todas as 
+referências recursivamente, marcando-as</li>
+</ul></li>
+<li>SWEEP:
+<ul>
+<li>coleta as referências não marcadas</li>
+</ul></li>
+</ul></li>
+<li>tri-color mark-and-sweep
+<ul>
+<li>incremental</li>
+<li>branco: candidatos à coleta</li>
+<li>cinza: alcançáveis pela raiz, mas com algum filho 
+ainda branco
+<ul>
+<li>inicialmente=conjunto-raiz</li>
+</ul></li>
+<li>pretos: alcançáveis e sem filhos brancos
+<ul>
+<li>incialmente=vazio</li>
+</ul></li>
+<li>continuamente remova ref do cinza, seta filhos de ref 
+para cinza e seta ref para preto</li>
+<li>coleta brancos quando cinza está vazio</li>
+</ul></li>
+<li>generacional
+<ul>
+<li>objetos morrem jovens (80-98% até 1M de instruções 
+após o nascimento)</li>
+<li>divide a heap em partições (gerações)</li>
+<li>quando uma geração enche, move objetos vivos para 
+próxima geração</li>
+</ul></li>
+<li>compactação
+<ul>
+<li>ao detectar objeto vivo, move vivos para nova área
+<ul>
+<li>não precisa desalocar mortos</li>
+<li>zero fragmentação (maior localidade)</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>

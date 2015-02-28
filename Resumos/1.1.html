@@ -17,24 +17,15 @@
 <li>Compilador
 <ul>
 <li>código fonte -> linguagem alvo (binário)</li>
-<li>análise / front end
-<ul>
-<li>char -> token -> AST -> AST(correta) -> RI</li>
-</ul></li>
-<li>síntese / back end
-<ul>
-<li>RI -> target -> target(otim) -> target(não-reloc)</li>
-</ul></li>
+<li>análise / front end</li>
+<li>síntese / back end</li>
 <li>tabela de símbolos, banco de dados</li>
 </ul></li>
 <li>Sintaxe
 <ul>
 <li>análise léxica (scanning) e sintática (parsing)</li>
 <li>concreto -> abstrato (AST)</li>
-<li>léxico "1", sintático "1+1"
-<ul>
-<li>diferentes técnicas</li>
-</ul></li>
+<li>léxico "1", sintático "1+1"</li>
 <li>metalinguagens</li>
 <li>léxico
 <ul>
@@ -46,8 +37,6 @@
 <li>NFA&lt;-RE   = O(|r|)</li>
 <li>DFA&lt;-NFA  = O(|r|^3) + O(|x|)</li>
 <li>NFA simul = O(|x||r|)</li>
-<li>(+) base teórica, alto nível, eficiente</li>
-<li>(-) pouco expressivo (recursões)</li>
 </ul></li>
 </ul></li>
 <li>sintático
@@ -69,44 +58,28 @@
 </ul></li>
 <li>top down (preditivo)
 <ul>
-<li>topo da pilha é o que vai casar
-<ul>
-<li>começa com S</li>
-</ul></li>
-<li>parser recursivo descendente
-<ul>
-<li>uma função para cada regra</li>
-</ul></li>
+<li>topo da pilha é o que vai casar</li>
+<li>parser recursivo descendente</li>
 <li>LL
 <ul>
 <li>FIRST, FOLLOW</li>
 </ul></li>
 <li>percorrimento em pré ordem
 <ul>
-<li>pais primeiro</li>
 <li>notação polonesa</li>
 </ul></li>
 </ul></li>
 <li>bottom up (shift reduce)
 <ul>
-<li>topo da pilha tem o que já casou
-<ul>
-<li>termina com S</li>
-</ul></li>
+<li>topo da pilha tem o que já casou</li>
 <li>LR</li>
 <li>percorrimento em pós ordem
 <ul>
-<li>filhos primeiro</li>
 <li>notação polonesa inversa</li>
 </ul></li>
 </ul></li>
 </ul></li>
-<li>separação léxico-sintático
-<ul>
-<li>simplicidade</li>
-<li>eficiência</li>
-<li>portabilidade</li>
-</ul></li>
+<li>separação léxico-sintático</li>
 </ul></li>
 <li>Semântica
 <ul>

@@ -3,6 +3,28 @@
 </head>
 
 # Resumo
+
+1. Introdução
+    1. o que é uma LP?
+    2. diferença sintaxe e semântica
+    3. estrutura de um compilador
+2. Sintaxe
+    1. análise léxica
+        1. expressões regulares e autômato finito
+        2. transformação RE -> NFA -> DFA
+    2. análise sintática
+        1. gramáticas livre de contexto
+        2. top-down
+        3. bottom-up
+    3. separação lex & yacc
+3. Semântica
+    1. estática
+        1. esquemas de tradução
+        2. sistemas de tipos
+    2. dinâmica
+        1. denotacional
+        2. operacional
+
 - O que é uma LP?
     - notação formal: abcxyz -> |PL| -> 010101 -> |PC|
     - propriedades: genericidade, nível, poder
@@ -11,15 +33,12 @@
 - Compilador
     - código fonte -> linguagem alvo (binário)
     - análise / front end
-        - char -> token -> AST -> AST(correta) -> RI
     - síntese / back end
-        - RI -> target -> target(otim) -> target(não-reloc)
     - tabela de símbolos, banco de dados
 - Sintaxe
     - análise léxica (scanning) e sintática (parsing)
     - concreto -> abstrato (AST)
     - léxico "1", sintático "1+1"
-        - diferentes técnicas
     - metalinguagens
     - léxico
         - manual ou gerador de analisador léxico
@@ -29,37 +48,25 @@
             - NFA<-RE   = O(|r|)
             - DFA<-NFA  = O(|r|^3) + O(|x|)
             - NFA simul = O(|x||r|)
-            - (+) base teórica, alto nível, eficiente
-            - (-) pouco expressivo (recursões)
     - sintático
         - CFGs e autômatos de pilha
             - BNF, recursão
-                - terminais, não terminais, produções, símbolo inicial
         - derivações e árvores
             - esquera/direita, concreta/abstrata
         - ambiguidade
             - associatividade, precedência, dangling else, x*y
         - top down (preditivo)
             - topo da pilha é o que vai casar
-                - começa com S
             - parser recursivo descendente
-                - uma função para cada regra
-            - LL
-                - FIRST, FOLLOW
+            - LL: FIRST, FOLLOW
             - percorrimento em pré ordem
-                - pais primeiro
                 - notação polonesa
         - bottom up (shift reduce)
             - topo da pilha tem o que já casou
-                - termina com S
             - LR
             - percorrimento em pós ordem
-                - filhos primeiro
                 - notação polonesa inversa
     - separação léxico-sintático
-        - simplicidade
-        - eficiência
-        - portabilidade
 - Semântica
     - semântica estática
         - restrições à sintaxe

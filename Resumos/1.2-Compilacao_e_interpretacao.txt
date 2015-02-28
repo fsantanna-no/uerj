@@ -1,0 +1,199 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+# Resumo
+
+1. Introdução
+    1. o que é uma LP?
+    2. diferença compilação e interpretação
+    3. estrutura de um compilador
+2. Sintaxe e Semântica
+    1. análise léxica
+    2. análise sintática
+    3. análise semântica
+3. Ambiente de Execução
+    1. compiladores também
+    2. maquinas virtuais
+    3. JIT
+
+# Compilação e Interpretação
+
+## O que é uma linguagem de Programação?
+
+- uma notação formal para comandar a execução de instruções/algoritmos para uma 
+  máquina
+- a partir de uma sentença precisa descrita em uma linguagem de programação, a 
+  máquina irá executar o que aquela sentença significa
+- abcxyz -> |PL| -> 010101 -> |PC|
+- duas técnicas para o processamento de linguagens
+    - compilação: transforma os comandos para a linguagem de máquina, antes de 
+      executá-los
+    - interpretação: executa diretamente os comandos escritos na linguagem
+        - simulação da máquina real
+    - velocidade vs flexibilidade
+
+- compilação pura vs interpretação pura
+    - C/C++
+    - código de máquina para máquina virtual com linguagem estática
+        - Pascal pcode, Java byte code
+    - código de máquina para máquina virtual com linguagem dinâmica
+        - Lua, JavaScript (V8)
+    - Basic, shell, REPL
+    - JIT
+
+## Estrutura geral de um compilador e interpretador
+
+- compilador é um software que transforma o código fonte de um programa escrito 
+  em uma dada linguagem em uma outra linguagem alvo
+- tipicamente, a linguagem alvo é a linguagem binária de máquina na qual o 
+  programa deve executar
+- a transformação é feita em etapas bem definidas, cada uma se baseia em 
+  teorias e técnicas distintas:
+
+- Análise / Front-end:
+    - CARACTERES       --[analisador léxico]-->
+      TOKENS           --[analisador sintático]-->
+      ÁRVORE SINTÁTICA --[analisador semântico]-->
+      ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+- Síntese / Back-end:
+    - RI/CI             --[gerador de código]-->
+      CÓDIGO DE MÁQUINA --[otimizador de código]-->
+      CÓDIGO DE MÁQUINA --[ligador]-->
+      CÓDIGO DE MÁQUINA (não relocável)
+- Tabela de Símbolos
+    - preenchida e compartilhada por todas as fases
+- Execução
+    - CÓDIGO DE MÁQUINA --[carregador]--> EXECUÇÃO
+    - entrada --[execução]--> saída
+
+- as fases são divididas entre análise e síntese, também conhecidas como "front 
+  end" e "back end" do compilador
+- o back end do compilador lida com a geração de código para uma arquitetura 
+  específica
+    - envolve conhecimentos "baixo nível"
+    - interpretação vs compilação
+- idealmente, a divisão bem definida entre front end e back end permite 
+  "plugar" a análise de diferentes linguagens para uma dada arquitetura
+  (trocando apenas o front end)
+  ou gerar código de uma linguagem para diferentes arquiteturas (trocando
+  apenas o back end)
+    - GCC e LLVM são exemplos de ferramentas com esse fim
+
+- um interpretador encapsula um compilador no ambiente de execução
+    - código fonte+entrada --[compilador]--> execução+saída
+                           \---eval-----/
+    - fase anterior que transforma código fonte em representação intermediária
+- comparação
+    - compilação
+        - velocidade
+            - foco na fase de otimização
+        - segurança
+            - foco na análise semântica
+                - sistema de tipos
+    - interpretação
+        - flexibilidade
+            - eval
+            - reflexão (inspeção)
+                - instanciação, chamadas, types
+        - velocidade de compilação
+            - não gera AST
+    - visão clássica
+        - REPL
+            - read eval print loop
+            - read eval execute loop
+        - basic, shell
+    - visão moderna
+        - java tem VM mas é compilado e analisado estaticamente
+        - linguagens dinâmicas também possuem VM ou até mesmo JITs
+
+## Sintaxe e Semântica
+
+- as duas primeiras fases do front end, análise léxica e sintática, lidam com a 
+  forma (sintaxe) da linguagem
+    - basicamente, transformar uma entrada textual "concreta" em uma forma mais 
+      abstrata, que elimina detalhes
+    - geralmente árvore sintática abstrata (AST)
+    - após essa fase, duas sintaxes distintas para uma construção seriam 
+      indistinguíveis na árvore abstrata
+    - (+ 1 2) LISP ... (1 + 2) C, ambos:
+
+<pre>
+        +
+       / \
+      2   1
+</pre>
+
+- regras léxicas detectam (1) como número, (+) como operador, (x) como um 
+  identificador, (while) como palavra reservada
+- regras sintáticas detectam (1+1) como expressão, (x=1) como atribuição, 
+  (while (1) { x=x+1; }) como um loop
+
+- regras léxicas e sintáticas são passos separados pois usam técnicas 
+  diferentes para descrever as regras, e reconhecer a entrada de acordo com as
+  regras
+- note que em ambos os casos, existem infinitas possibilidades
+    - x, xx, xxx, ...
+    - while (1) { while(1) { ... } }
+- regras devem ser descritas de forma finita para reconhecer formas infinitas
+- para isso, uso de meta linguagens
+    - expressões regulares para léxico
+    - BNFs para sintaxe
+
+- semântica estática vs dinâmica
+    - estática: se programas sintaticamente corretos têm sentido semântico
+        - impõe restrições a programas sintaticamente corretos
+        - supre deficiências e/ou simplificações de gramáticas livre de 
+          contexto
+        - exemplos
+            - se identificadores são declarados antes dos usos
+            - usos de acordo com o contexto
+            - número de argumentos em chamadas
+            - concorrência
+    - dinâmica: descreve regras de como o programa deve executar
+
+## Ambiente de execução
+
+- controlam o estado global de execução de um programa
+    - memória, registradores, I/O, CPUs
+- requisitos mínimos para execução de um programa
+    - estado inicial, bibliotecas, variáveis de ambiente
+- tempo de execução ("em paralelo") ou tempo de compilação (instruções embuídas 
+  no código gerado)
+
+- mesmo compiladores possuem ambiente de execução
+    - crt0.o (c-run-time)
+        - ambiente de execução de C
+            - parte do carregador
+        - inicializa SP, FP
+        - preenche vetor de interrupção
+        - zera a região BSS
+        - chama "main"
+
+- interpretação
+    - tudo e mais máquina virtual
+
+- máquinas virtuais
+    - fase de tradução
+        - código fonte -> representação intermediária
+    - simula uma máquina real
+        - busca, decodifica, executa
+    - mesmos tradeoffs
+        - de pilha ou de registrador
+    - portabilidade
+        - OSes, máquinas, browsers, até mesmo hardwares
+    - JVM (java), Parrot (perl), CLR (.net), Squeak (smalltalk)
+    - JIT
+        - combina a velocidade de compilação
+          com a flexibilidade de interpretação
+        - latência vs tempo total
+            - demora na inicialização
+        - detecta sequências de bytecode executadas com frequência e as transforma 
+          para linguagem de máquina
+            - loops muito longos
+        - server vs client code
+        - em teoria pode ser mais rápido que compilação
+            - por exemplo, pode detectar a CPU e usar instruções específicas
+
+
+

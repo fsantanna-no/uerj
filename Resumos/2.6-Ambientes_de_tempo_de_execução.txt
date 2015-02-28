@@ -4,9 +4,64 @@
 
 # Resumo
 
+1. Introdução
+    1. estrutura de um compilador
+    2. atribuições do ambiente de execução
+    3. exemplos
+2. Alocação Dinâmica
+    1. pilha e chamadas de função
+    2. heap e coletores de lixo
+3. TODO
+
+- controlam o estado global de execução de um programa
+    - memória, registradores, I/O, CPUs
+- estrutura geral de um compilador
+    - código fonte -> linguagem alvo (binário)
+    - análise / front end
+    - síntese / back end
+    - tabela de símbolos
+    - execução:
+- atribuições do RTE
+    - organização e controle de memória
+    - protocolo de chamadas de funções
+    - chamadas de sistema
+    - escalonamento
+- ambientes de execução externos
+    - p-threads
+- crt0.o (c-run-time)
+- alocação dinâmica
+    - pilha
+    - chamadas de função
+        - registros de ativação
+            - chamada
+            - prólogo
+            - epílogo
+            - link de acesso
+        - stack unwinding
+        - otimização de chamada de cauda
+    - heap
+        - gerenciador de memória
+            - rastreia espaço livre
+            - dificuldades
+                - variação do tamanhos dos blocos
+                - ordem de alocação e desalocação arbitrária
+            - propriedades
+                - localidade, fragmentação, execução
+        - desalocação
+            - manual
+                - vazamento de memória (memory leaks)
+                - ponteiros pendentes (dangling pointers)
+            - automático, coleta de lixo
+                - contagem de referência
+                - coletor por rastreamento
+                    - tri-color mark-and-sweep
+                        - incremental
+                    - generacional
+                    - compactação
+
 # Ambientes de tempo de execução
 
-- estado global de execução de um programa
+- controlam o estado global de execução de um programa
     - memória, registradores, I/O, CPUs
 - requisitos mínimos para execução de um programa
     - estado inicial, bibliotecas, variáveis de ambiente
@@ -252,3 +307,7 @@
                         - divide a heap em partições (gerações)
                         - quando uma geração enche, move objetos vivos para 
                           próxima geração
+                    - compactação
+                        - ao detectar objeto vivo, move vivos para nova área
+                            - não precisa desalocar mortos
+                            - zero fragmentação (maior localidade)
