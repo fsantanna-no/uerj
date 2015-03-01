@@ -1,0 +1,177 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+# Resumo
+
+1. Introdução
+    1. o que é uma LP?
+    2. estrutura de um compilador
+    3. back end vs front end
+2. Linguagens Intermediárias
+    1. requisitos, vantagens, exemplos
+    2. DAG, 3-addr
+    3. declarações e tipos
+3. Geração de Código Intermediário
+    1. expressões
+    2. controle de fluxo
+
+# Linguagens intermediárias
+
+## O que é uma linguagem de Programação?
+
+- uma notação formal para comandar a execução de instruções/algoritmos para uma 
+  máquina
+- a partir de uma sentença precisa descrita em uma linguagem de programação, a 
+  máquina irá executar o que aquela sentença significa
+- abcxyz -> |PL| -> 010101 -> |PC|
+- TODO: mais
+
+## Estrutura geral de um compilador e interpretador
+
+- compilador é um software que transforma o código fonte de um programa escrito 
+  em uma dada linguagem em uma outra linguagem alvo
+- tipicamente, a linguagem alvo é a linguagem binária de máquina na qual o 
+  programa deve executar
+- a transformação é feita em etapas bem definidas, cada uma se baseia em 
+  teorias e técnicas distintas:
+
+- Análise / Front-end:
+    - CARACTERES       --[analisador léxico]-->
+      TOKENS           --[analisador sintático]-->
+      ÁRVORE SINTÁTICA --[analisador semântico]-->
+      ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+- Síntese / Back-end:
+    - RI/CI             --[gerador de código]-->
+      CÓDIGO DE MÁQUINA --[otimizador de código]-->
+      CÓDIGO DE MÁQUINA --[ligador]-->
+      CÓDIGO DE MÁQUINA (não relocável)
+- Tabela de Símbolos
+    - preenchida e compartilhada por todas as fases
+- Execução
+    - CÓDIGO DE MÁQUINA --[carregador]--> EXECUÇÃO
+    - entrada --[execução]--> saída
+
+- as fases são divididas entre análise e síntese, também conhecidas como "front 
+  end" e "back end" do compilador
+- o back end do compilador lida com a geração de código para uma arquitetura 
+  específica
+    - envolve conhecimentos "baixo nível"
+    - interpretação vs compilação
+- idealmente, a divisão bem definida entre front end e back end permite 
+  "plugar" a análise de diferentes linguagens para uma dada arquitetura
+  (trocando apenas o front end)
+  ou gerar código de uma linguagem para diferentes arquiteturas (trocando
+  apenas o back end)
+    - GCC e LLVM são exemplos de ferramentas com esse fim
+
+## Linguagens intermediárias
+
+- resultado da análise semântica, antes da geração de código
+    - representação final para linguagens interpretadas
+- requisitos
+    - independência de linguagem e máquina (MxN)
+    - fácil tradução das ASTs e para os alvos
+    - otimizável
+- vantages
+    - portabilidade
+    - otimizações
+    - reflexão
+    - segurança
+- complicações em comparação com AST
+    - cada instrução representa uma operação fundamental
+        - RISC
+    - modos de endereçamento
+    - instrução call, sem parâmetros
+    - sem controle de fluxo complexo
+- exemplos
+    - RISC
+        - independente de linguagem
+        - LLVM
+            - parecido com assembly
+            - tipado
+            - vetores (SIMD)
+        - GCC
+            - RTL, register transfer language
+            - listas de LISP
+    - CISC
+        - para linguagem específica
+        - lua (closure)
+        - java (monitorenter, invokevirtual)
+- representação intermediária
+    - DAG/flow graph
+    - 3-addr code
+- grafos acíclicos direcionados para expressões
+    - folhas: operandos
+    - nós:    operadores
+    - implementação por índices em um vetor (ou tabela hash)
+    - vantagens
+        - ordem topológica
+        - fatoração de expressões
+            - reuso de nós
+- código de três endereços (CTE)
+    - representação linear da AST
+    - atribuição, operando, +2 operandos
+    - labels, saltos, chamadas, indexação
+    - número ilimitado de registradores
+    - quadruplas e triplas
+        - 4: móvel, mais espaço
+        - 3: imóvel, menos espaço, igual a DAG, fonte implícita
+    - SSA
+        - variável atribuída uma única vez
+        - simplifica otimizações
+            - propagação de constantes
+                - if ... x=1 else x=2, x=(x1 ou x2)
+            - eliminação de código morto
+                - y1=1, y2=2, x=y2 (y1 é morto)
+- tipos e declarações
+    - checagem e tradução
+    - cálculo
+        - regiões de memória
+        - offsets
+            - arrays e structs
+        - alinhamento
+
+## Tradução de expressões e comandos
+
+- expressões
+    - a = b + -c
+        t1 = - c
+        t2 = b + t1
+         a = t2
+    - tradução incremental
+        - append vs concat
+    - arrays
+        - layout coluna/linha
+        - referência addr/array/type
+    - checagem de tipo
+        - AST possui tipos para cada componente
+            - checagem de erro
+        - conversão
+            - 1 + 1.0
+                t1 = (float) 1
+                t2 = t1 * 1.0
+            - máximo e alargamento
+        - sobrecarga
+            - 1+1, 1.0+1.0
+            - err(), err("msg")
+- controle de fluxo
+    - expressões booleanas
+        - alteração no controle de fluxo
+        - computar valores lógicos
+    - labels
+    - curto circuito
+    - if, if-else, while
+        - bool.code, bool.true, bool.false
+    - backpatching
+    - switch
+        - 10<: if-elseif-else
+        - 10>: hash table
+        - contínuo: array [l1..ln]
+- chamadas de função
+    - f(1,2)
+        param 1
+        param 2
+        v = call f 2
+
+
