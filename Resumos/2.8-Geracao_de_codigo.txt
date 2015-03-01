@@ -1,0 +1,221 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+# Resumo
+
+1. Introdução
+    1. o que é uma LP?
+    2. estrutura de um compilador
+    3. back end vs front end
+2. Linguagens Intermediárias
+    1. requisitos, vantagens, exemplos
+    2. DAG, 3-addr
+    3. declarações e tipos
+3. Geração de Código
+
+# Geração de Código
+
+## O que é uma linguagem de Programação?
+
+- uma notação formal para comandar a execução de instruções/algoritmos para uma 
+  máquina
+- a partir de uma sentença precisa descrita em uma linguagem de programação, a 
+  máquina irá executar o que aquela sentença significa
+- abcxyz -> |PL| -> 010101 -> |PC|
+- TODO: mais
+
+## Estrutura geral de um compilador e interpretador
+
+- compilador é um software que transforma o código fonte de um programa escrito 
+  em uma dada linguagem em uma outra linguagem alvo
+- tipicamente, a linguagem alvo é a linguagem binária de máquina na qual o 
+  programa deve executar
+- a transformação é feita em etapas bem definidas, cada uma se baseia em 
+  teorias e técnicas distintas:
+
+- Análise / Front-end:
+    - CARACTERES       --[analisador léxico]-->
+      TOKENS           --[analisador sintático]-->
+      ÁRVORE SINTÁTICA --[analisador semântico]-->
+      ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+- Síntese / Back-end:
+    - RI/CI             --[gerador de código]-->
+      CÓDIGO DE MÁQUINA --[otimizador de código]-->
+      CÓDIGO DE MÁQUINA --[ligador]-->
+      CÓDIGO DE MÁQUINA (não relocável)
+- Tabela de Símbolos
+    - preenchida e compartilhada por todas as fases
+- Execução
+    - CÓDIGO DE MÁQUINA --[carregador]--> EXECUÇÃO
+    - entrada --[execução]--> saída
+
+- as fases são divididas entre análise e síntese, também conhecidas como "front 
+  end" e "back end" do compilador
+- o back end do compilador lida com a geração de código para uma arquitetura 
+  específica
+    - envolve conhecimentos "baixo nível"
+    - interpretação vs compilação
+- idealmente, a divisão bem definida entre front end e back end permite 
+  "plugar" a análise de diferentes linguagens para uma dada arquitetura
+  (trocando apenas o front end)
+  ou gerar código de uma linguagem para diferentes arquiteturas (trocando
+  apenas o back end)
+    - GCC e LLVM são exemplos de ferramentas com esse fim
+
+## Linguagens intermediárias
+
+- resultado da análise semântica, antes da geração de código
+    - representação final para linguagens interpretadas
+- requisitos
+    - independência de linguagem e máquina (MxN)
+    - fácil tradução das ASTs e para os alvos
+    - otimizável
+- vantages
+    - portabilidade
+    - otimizações
+    - reflexão
+    - segurança
+- complicações em comparação com AST
+    - cada instrução representa uma operação fundamental
+        - RISC
+    - modos de endereçamento
+    - instrução call, sem parâmetros
+    - sem controle de fluxo complexo
+- exemplos
+    - RISC
+        - independente de linguagem
+        - LLVM
+            - parecido com assembly
+            - tipado
+            - vetores (SIMD)
+        - GCC
+            - RTL, register transfer language
+            - listas de LISP
+    - CISC
+        - para linguagem específica
+        - lua (closure)
+        - java (monitorenter, invokevirtual)
+- representação intermediária
+    - DAG/flow graph
+    - 3-addr code
+- grafos acíclicos direcionados para expressões
+    - folhas: operandos
+    - nós:    operadores
+    - implementação por índices em um vetor (ou tabela hash)
+    - vantagens
+        - ordem topológica
+        - fatoração de expressões
+            - reuso de nós
+- código de três endereços (CTE)
+    - representação linear da AST
+    - atribuição, operando, +2 operandos
+    - labels, saltos, chamadas, indexação
+    - número ilimitado de registradores
+    - quadruplas e triplas
+        - 4: móvel, mais espaço
+        - 3: imóvel, menos espaço, igual a DAG, fonte implícita
+    - SSA
+        - variável atribuída uma única vez
+        - simplifica otimizações
+            - propagação de constantes
+                - if ... x=1 else x=2, x=(x1 ou x2)
+            - eliminação de código morto
+                - y1=1, y2=2, x=y2 (y1 é morto)
+- tipos e declarações
+    - checagem e tradução
+    - cálculo
+        - regiões de memória
+        - offsets
+            - arrays e structs
+        - alinhamento
+
+## Geração de Código
+
+- requisitos
+    - preservar a semântica original
+    - usar recursos efetivamente
+        - registradores limitados
+- código ótimo é indecidível
+    - alocação de registradores
+- geração
+    - seleção de instruções
+        - nível de abstração do CI
+            - baixo: 1x1
+            - alto: templates
+        - conjunto de instruções da máquina
+            - inc vs load,add-1,store
+        - qualidade do código a gerar
+    - alocação e atribuição de registradores
+    - ordem de execução das instruções
+        - pipeline
+
+- máquina alvo
+    - RISC
+        - muitos registradores, instruções 3 endereços, endereçamento simples
+    - CISC
+        - poucos registradores, instruções 2 endereços, endereçamento complexo
+        - classes de registradores, instruções de tamanho variável, efeitos 
+          colaterais
+    - máquina de pilha ou registradores
+        - JVM/JIT, CPU/Lua
+- código alvo
+    - endereço realocável ou absoluto
+    - assembly ou binário
+- linguagem alvo
+    - load, store
+    - add, sub, inc, etc
+    - saltos
+    - número de registradores
+    - modos de endereçamento
+        - índice, indireto, imediato
+    - custos de execução
+        - critérios
+            - tempo de compilação
+            - execução do programa
+                - tempo
+                - tamanho
+                - energia
+- endereços no código alvo
+    - código
+        - estático
+    - dados
+        - estático: constantes, globais
+        - heap: objetos
+        - pilha: registros de ativação
+    - alocação na pilha
+        - endereços relativos ao SP
+    - mapeamento de nomes para endereços
+
+- blocos básicos e grafos de execução
+    - análise
+    - sequência máxima
+        - uma entrada
+        - uma saída
+    - blocos são nós no grafo
+    - "atomicidade"
+        - todas as instruções são executadas uma única vez, em ordem
+    - algoritmo
+        1. escolha de líder
+            - primeira instrução
+            - alvo de saltos
+            - instrução seguinte a lider
+        2. siga até próximo líder
+    - otimizações / alocação de registradores
+        - se x é atribuído em i, e usado em j, então registrador deve ser 
+          mantido
+        - se x é reatribuído dentro de bloco, registrador antigo pode ser 
+          reaproveitado
+        - temporárias dentro de bloco podem ser reaproveitados
+        - sub epressões comuns
+            - loop do a=v[i] + v[i] end
+            - v[i] => v+4*i
+    - grafo direcionado
+        - elimina blocos não alcançáveis a partir do bloco-0
+        - blocos em paralelo
+        - reordenar blocos sem dependência
+    - DAG dentro de bloco
+        - elimina sub expressões comuns
+        - elimina código morto
+        - reordenação de instruções não dependentes
+- geração de código
