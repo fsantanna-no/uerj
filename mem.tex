@@ -30,11 +30,11 @@ rmargin=2.0cm,tmargin=2.0cm,bmargin=2.0cm]{geometry}
 Brasileiro, nascido no Rio de Janeiro em 1979, Doutor em Ciência da Computação 
 pela PUC--Rio em 2014.
 %
-O meu interesse por computação veio durante a juventude, em meados da década de 
-90, quando ganhei um PC com modem, no auge do período das BBSs.
-
-Minha vida acadêmica teve início no CAp--UERJ, onde estudei desde o primário 
-até o vestibular.
+%O meu interesse por computação veio durante a juventude, em meados da década 
+%de 90, quando ganhei um PC com modem, no auge do período das BBSs.
+%
+Estudei do primário até o vestibular no CAp--UERJ.
+%, onde estudei desde o primário até o vestibular.
 %
 Em 1997, ingressei na turma de Engenharia da Computação da UFRJ e cursei os 
 dois primeiros anos, me transferindo em 1999 para a PUC--Rio, onde me formei em 
@@ -44,21 +44,21 @@ Em paralelo à universidade trabalhei em diversas empresas, nas áreas de
 segurança de redes, desenvolvimento Web, e sistemas embarcados.
 %
 Após terminar a faculdade, atuei por três anos na área de jogos e aplicativos 
-para celulares.
+para celular.
+%
+Em 2007 retornei à PUC--Rio, onde fiz o mestrado e doutorado na área de 
+linguagens de programação com o professor Roberto Ierusalimschy.
 
-Em 2007 retornei à faculdade para o mestrado em linguagens de programação com o 
-professor Roberto Ierusalimschy.
+Meu interesse por linguagens de programação iniciou-se na graduação, cursando 
+disciplinas específicas com o professor Roberto, e seguindo com o projeto 
+final, uma linguagem para simular circuitos digitais.
 %
-Meu interesse por linguagens de programação iniciou-se na graduação, após fazer 
-algumas disciplinas específicas com o professor Roberto, e culminou com o 
-projeto final que foi uma linguagem para simular circuitos digitais.
+No mestrado desenvolvi uma extensão que faz a linguagem Lua funcionar de forma 
+reativa, com aplicações guiadas exclusivamente por estímulos externos.
 %
-No mestrado desenvolvi uma extensão para Lua funcionar de forma reativa, na 
-qual aplicações são guiadas por estímulos externos.
-%
-Além da pesquisa da dissertação, também atuei no desenvolvimento do padrão de 
-TV Digital brasileira, mais especificamente na integração entre as linguagens 
-NCL e Lua.
+Além da pesquisa da dissertação, atuei no desenvolvimento do padrão de TV 
+Digital brasileiro, especificamente na integração entre as linguagens NCL e 
+Lua.
 %
 O doutorado continuou na linha de sistemas reativos, onde projetei a linguagem 
 \CEU com foco em verificações estáticas para sistemas concorrentes de tempo 
@@ -71,27 +71,27 @@ com o desenvolvimento de \CEU.
 
 Fui professor do Instituto de Tecnologia ORT (2\textsuperscript{o} grau e 
 escola técnica) por dois anos, tendo lecionado as disciplinas de Introdução à 
-Programação (1\textsuperscript{o} ano), Tópicos Especiais (Jogos e Redes de 
-Sensores sem Fio, 3\textsuperscript{o} ano) e Projeto Final 
+Programação (1\textsuperscript{o} ano), Tópicos Especiais em Programação (Jogos 
+e Redes de Sensores sem Fio, 3\textsuperscript{o} ano) e Projeto Final 
 (3\textsuperscript{o} ano).
 %
 Na PUC--Rio, planejei em parceria com a Professora Noemi Rodriguez a disciplina 
-Sistemas Reativos, que está sendo lecionada por mim pela segunda vez.
+Sistemas Reativos, que está sendo lecionada por mim pelo segundo semestre 
+consecutivo.
 
 \section*{Pesquisa}
 
-O foco principal da minha pesquisa é em linguagens concorrentes, mais 
-especificamente em linguagens para sistemas reativos.
+O foco de minha pesquisa é em linguagens reativas e concorrentes.
 %
 Em sistemas reativos, o controle de aplicações é predominantemente guiado por 
 interações contínuas e em tempo real com o mundo externo.
 %
-Interações com o ambiente têm natureza reativa: um estímulo externo gera uma 
-reação no programa que pode gerar um estímulo de volta ao ambiente.
+Interações com o ambiente têm natureza reativa: um estímulo externo 
+(\emph{input}) gera uma reação no programa que pode gerar um estímulo de volta 
+ao ambiente (\emph{output}).
 %
-Por exemplo, em um sistema de janelas, o movimento do mouse altera 
-instantanemente a posição do ponteiro na tela, enquanto que o clique sobre o 
-ícone \code{[X]} fecha a janela de aplicação.
+Por exemplo, em um sistema de janelas, o movimento do mouse (\emph{input}) 
+altera instantaneamente a posição do ponteiro na tela (\emph{output}).
 %
 Os principais desafios dentro desse contexto são o de manter o sistema 
 ``responsivo'' (i.e., com resposta idealmente imediata) e o de tratar estímulos 
@@ -99,14 +99,13 @@ simultâneos/concorrentes de forma correta.
 
 A área de sistemas reativos me acompanhou (e me desafiou) durante a trajetória 
 como programador e pesquisador:
-no estágio com sistemas embarcados, no projeto final com sistemas digitais, 
-como profissional na indústria de jogos, na pesquisa com TV Digital, e 
-finalmente, como objeto fim na pesquisa em linguagens reativas durante o 
-mestrado e doutorado.
+no estágio com sistemas embarcados, no projeto final com sistemas digitais, na 
+indústria de jogos, na pesquisa com TV Digital, e finalmente, como objeto fim 
+na pesquisa em linguagens reativas durante o mestrado e doutorado.
 
 Como pesquisador, vivenciei três projetos bem delimitados em escopo e 
 experiências: o padrão de TV Digital brasileiro, a linguagem \GVT, desenvolvida 
-no mestrado e a linguagem \CEU, desenvolvida no doutorado.
+no mestrado, e a linguagem \CEU, desenvolvida no doutorado.
 
 Entre 2007 e 2009, fui pesquisador do Laboratório Telemídia, coordenado pelo 
 professor Luiz Fernando Gomes Soares, idealizador do Sistema Brasileiro de TV 
@@ -127,21 +126,22 @@ declarativamente, tais como comunicação por TCP/IP e interações mais complex
 (e.g., jogos).
 %
 O principal artigo referente a esse período foi publicado no \emph{WebMedia} em 
-2008~\cite{nclua.webmedia}, simpósio nacional onde muitos trabalhos 
-relacionados ao Ginga são publicados.
+2008~\cite{nclua.webmedia}, simpósio nacional onde trabalhos relacionados ao 
+Ginga são geralmente publicados.
 Além do artigo, fui co-autor do capítulo sobre \emph{NCLua} do livro de 
-NCL~\cite{nclua.book} (baseado no conteúdo de um mini-curso dado no 
-\emph{WebMedia} de 2009~\cite{nclua.shortcourse}).
+NCL~\cite{nclua.book}.
+% (baseado no conteúdo de um mini-curso dado no \emph{WebMedia} de 2.
+%009~\cite{nclua.shortcourse}).
 Também escrevi a parte da norma ABNT referente ao 
 \emph{NCLua}~\cite{nclua.abnt}.
 Finalmente, escrevemos um artigo com viés mais teórico para a conferência 
 \emph{DocEng} em 2009~\cite{nclua.doceng}.
 
-O mesmo período entre 2007 e 2009 constituiu o mestrado sob orientação do 
+O mesmo período entre 2007 e 2009 constituiu o mestrado sob a orientação do 
 professor Roberto.
 %
-O mestrado foi uma experiência transformativa de ``assimilação'' do modo de 
-operação da academia.
+O mestrado foi uma experiência de ``assimilação'' do modo de operação da 
+academia.
 %
 A abrangência e o rigor da literatura acadêmica foram fundamentais para a 
 formulação e reflexão sobre os problemas encontrados em sistemas reativos, 
@@ -151,15 +151,16 @@ assim como para o levantamento do estado da arte da área.
 Com o decorrer da pesquisa, identificamos duas abordagens complementares que 
 visavam facilitar o desenvolvimento e verificação de sistemas reativos:
 o estilo imperativo da linguagem Esterel e
-o estilo declarativo das linguagens functionais reativas (FRP).
+o estilo declarativo das linguagens funcionais reativas.
 %
 A dissertação de mestrado discutiu essas duas abordagens com base no design da 
 linguagem \GVT, uma extensão em tempo de execução para a linguagem Lua.
 %
-Com o \GVT é possível escrever comandos em paralelo tais como \code{await E} 
-para bloquear uma linha de execução até que o evento \code{E} ocorra (estilo 
-imperativo), ou ainda expressões como \code{a=b+c} em que a mudança em \code{b} 
-ou \code{c} atualiza o valor de \code{a} automaticamente (estilo FRP).
+Com \GVT é possível escrever, de maneira imperativa, comandos reativos tais 
+como \code{await E} para bloquear uma linha de execução até que o evento 
+\code{E} ocorra, ou ainda, de maneira declarativa, expressões tais como 
+\code{a=b+c} em que mudanças em \code{b} ou \code{c} atualizam o valor de 
+\code{a} automaticamente.
 %
 O trabalho com o \GVT foi publicado no \emph{SBLP} de 
 2009~\cite{luagravity.sblp} e apresentado no \emph{Lua workshop} de 2009.
@@ -167,41 +168,44 @@ O trabalho com o \GVT foi publicado no \emph{SBLP} de
 O período entre 2009 e os dias de hoje compreende o doutorado e o 
 desenvolvimento da linguagem \CEU.
 %
-Resultado do mestrado, \GVT teve um caráter mais exploratório, não tão 
-preocupado com um design de linguagem completo e robusto.
+%Sendo resultado do mestrado, \GVT teve um caráter mais exploratório, não tão 
+%preocupado com um design de linguagem completo e robusto.
 %
-\GVT é uma extensão carregada em tempo de execução e, portanto,
-atrelada à semântica de Lua, por exemplo, o uso de coleta de lixo é obrigatório 
-e não existe acesso ao código fonte original ou à árvore sintática (para 
-verificações estáticas).
+%\GVT é uma extensão carregada em tempo de execução e, portanto,
+%atrelada à semântica de Lua que não é originalmente pensada para sistemas 
+%reativos.
+%, por exemplo, o uso de coleta de lixo é obrigatório e não existe acesso ao 
+%código fonte original ou à árvore sintática (para verificações estáticas).
 %
-Dessa maneira, vi a necessidade de recomeçar, ``dar um passo atrás, para dar 
-dois a frente''.
+%Dessa maneira, vi a necessidade de recomeçar, ``dar um passo atrás, para dar 
+%dois a frente''.
 %
-\CEU nasceu com requisitos mais rigorosos: eficiência no uso de recursos, 
-garantias estáticas para concorrência e apoio em uma semântica precisa.
+\CEU nasceu com requisitos mais rigorosos que \GVT: eficiência no uso de 
+recursos, garantias estáticas para concorrência e apoio em uma semântica 
+reativa precisa.
 %
-Como consequência, também direcionei os casos de uso a aplicações onde
-eficiência e garantias estáticas tornam-se diferencais, mesmo com alguma 
+Como consequência, também direcionei os casos de uso para aplicações nas quais
+eficiência e garantias estáticas tornam-se diferenciais, mesmo com alguma 
 limitação em expressividade:
-Redes de sensores sem fio (RSSF) executam em hardware bastante restrito, 
-dependem de bateria para funcionar e são instalados em locais de acesso físico 
-difícil (florestas, vulcões, etc.).
+Redes de sensores sem fio (RSSF) executam em hardware bastante restrito e 
+dependem de parcimônia no uso de bateria, já que são instalados em locais de 
+acesso físico difícil (florestas, vulcões, etc.).
 %
 Utilizamos \CEU para desenvolver drivers e protocolos já existentes para RSSFs, 
-com recursos equivalentes aos desenvolvidos originalmente em C.
-No entanto, as implementações em \CEU têm garantias teóricas de responsividade 
-e de ausência de condições de corrida em variáveis compartilhadas.
+com resultados equivalentes aos desenvolvidos originalmente em C (e.g., uso de 
+CPU e memória).
+Como melhorias, as implementações em \CEU têm garantias teóricas de 
+responsividade e de ausência de condições de corrida em variáveis 
+compartilhadas.
 %
-O design de \CEU com os casos de uso foi publicado em 2013 no 
-\emph{SenSys}~\cite{ceu.sensys13}, a conferência de maior prestígio na área de 
-RSSFs.
+O design de \CEU foi publicado em 2013 no \emph{SenSys}~\cite{ceu.sensys13}, a 
+conferência de maior prestígio na área de RSSFs.
 %
 Com o fim do doutorado, o foco foi em expandir o poder de expressividade de 
 \CEU, em particular no suporte a aplicações com alocação dinâmica.
-Como resultado, a nova abstração de \emph{organismos} unifica objetos e linhas 
-de execução em uma mesma construção, sem abrir mão das garantias estáticas do 
-design original de \CEU.
+Como resultado, a nova abstração de \emph{organismos} unifica objetos e 
+\emph{threads} em uma mesma construção, sem abrir mão das garantias estáticas 
+do design original de \CEU.
 %
 Esse conceito foi apresentado no \emph{Future Programming Workshop} e 
 \emph{Workshop on Reactive and Event-based Languages \& Systems} que 
@@ -210,7 +214,7 @@ O artigo completo será publicado na conferência \emph{Modularity/AOSD} em
 2015~\cite{ceu.mod15}.
 
 \CEU é um projeto de longo prazo, com diversas opções de continuidade em 
-pesquisa, ensino e também para o mercado de programadores (``indústria'').
+pesquisa, ensino e também para o mercado de programadores.
 %
 Esse ano, fui convidado a apresentar \CEU no encontro anual do \emph{Working 
 Group on Language Design}, grupo de trabalho vinculado ao \emph{IFIP 
@@ -219,13 +223,13 @@ Group on Language Design}, grupo de trabalho vinculado ao \emph{IFIP
 No ano passado apresentei \CEU no \emph{StrangeLoop}, conferência não acadêmica 
 voltada para programadores profissionais.
 %
-No que diz respeito a ensino, \CEU faz parte do programa de algum curso ou 
-disciplina desde 2011:
+Com relação a ensino, \CEU faz parte do programa de algum curso ou disciplina 
+desde 2011:
 lecionei RSSF para o 3\textsuperscript{o} ano técnico da escola ORT por dois 
 anos;
 na PUC--Rio, planejei a disciplina eletiva \emph{Sistemas Reativos}, que esse 
 ano
-estará sendo dada pela segunda vez.
+está sendo dada pela segunda vez.
 %
 Fui informado (por e-mail, de maneira informal) sobre o uso de \CEU na 
 disciplina de RSSF de 
@@ -234,84 +238,89 @@ Compiladores em
 Berkeley\footnote{\url{https://www.youtube.com/watch?v=hC5i-Wr4FuA}}.
 %
 \CEU particiou do \emph{Google Summer of Code} em 2014 com um estudante da 
-Índia em parceria com o LabLua (onde trabalho atualmente).
+Índia em parceria com o 
+LabLua\footnote{\url{https://www.google-melange.com/gsoc/org2/google/gsoc2014/lablua}}.
 %
-Também estamos estabelecendo uma comunidade de 
-\CEU\footnote{\url{http://www.ceu-lang.org/}}, com website,
-documentação, wiki, vídeos, lista de discussão, e implementação open 
-source\footnote{\url{http://github.com/fsantanna/ceu/}} para Arduino, redes de 
-sensores, smarthphones e desktops.
+Finalmente, estamos estabelecendo uma comunidade de \CEU, com website,
+documentação, wiki, vídeos, lista de discussão, e implementação open source 
+para Arduino, redes de sensores, smartphones e desktops.%
+\footnote{\url{http://www.ceu-lang.org/}}%
+\footnote{\url{http://github.com/fsantanna/ceu/}}
 
 \newpage
 \section*{Títulos e Trabalhos (para análise da banca)}
 
-\subsection*{Qualificação Acadêmica}
+\subsection*{Qualificação Acadêmica (QUADRO 1a)}
 
 \begin{itemize}
 \item
 Graduação em Engenharia de Computação, 2003, PUC--Rio.
---- [Anexo--XXX (diploma)]
+--- [Anexo--1 (diploma)]
 \item
 Mestrado em Informática, 2009, PUC--Rio.
---- [Anexo--XXX (diploma)]
+--- [Anexo--2 (diploma)]
 \item
 Doutorado em Informática, 2013, PUC--Rio.
---- [Anexo--XXX (diploma)]
+--- [Anexo--3 (diploma)]
 \item
 Pós-Doutorado em Informática, 2013--2018 (2\textsuperscript{o} ano em 
 andamento), PUC--Rio.
---- [Anexo--XXX (comprovação do departamento)]
+--- [Anexo--4 (comprovação do departamento)]
 \end{itemize}
 
-\subsection*{Publicações e Produção Científica}
+\subsection*{Publicações e Produção Científica (QUADRO 2)}
+
+%Com exceção da publicação no DocEng'09, fui primeiro autor em todos os artigos 
+%abaixo.
 
 \begin{itemize}
 
 \item Modularity 2015 (AOSD até 2011, Qualis-A1, \textbf{a ser publicado})
 ``Structured Synchronous Reactive Programming with Céu''~\cite{ceu.mod15}
---- [Anexo--XXX (primeira página, programa)]
+--- [Anexo--5 (primeira página, programa)]
 
 \item ACM SenSys 2013 (Qualis-A1)
-``Safe system-level concurrency on resource-constrained 
+``Safe System-Level Concurrency on Resource-Constrained 
 nodes''~\cite{ceu.sensys13}
---- [Anexo--XXX (primeira página, página na biblioteca digital da ACM)]
+--- [Anexo--6 (primeira página, página na biblioteca digital da ACM)]
 
 \item ACM DocEng 2009 (Qualis-B1)
-``Relating declarative hypermedia objects and imperative objects through the 
-NCL glue language''~\cite{nclua.doceng}
---- [Anexo--XXX (primeira página, página na biblioteca digital da ACM)]
+``Relating Declarative Hypermedia Objects and Imperative Objects through the 
+NCL Glue Language''~\cite{nclua.doceng}
+--- [Anexo--7 (primeira página, página na biblioteca digital da ACM)]
 
 \item SBLP 2009 (Qualis-B3)
 ``LuaGravity, a Reactive Language Based on Implicit 
 Invocation''~\cite{luagravity.sblp}
---- [Anexo--XXX (primeira página, publicações sobre a linguagem Lua no site 
+--- [Anexo--8 (primeira página, publicações sobre a linguagem Lua no site 
 oficial)]
 
 \item WebMedia 2008 (Qualis-B3)
-``NCLua: objetos imperativos lua na linguagem declarativa 
+``NCLua: Objetos Imperativos Lua na Linguagem Declarativa 
 NCL''~\cite{nclua.webmedia}
---- [Anexo--XXX (primeira página, página na biblioteca digital da ACM)]
+--- [Anexo--9 (primeira página, página na biblioteca digital da ACM)]
 
 \item Capítulo de livro 2009
 ``Programando com Objetos NCLua. Programando em NCL''~\cite{nclua.book}
---- [Anexo--XXX (capa do livro, primeira página do capítulo)]
+--- [Anexo--10 (capa do livro, primeira página do capítulo)]
 
 \item Capítulo de livro 2009 (minicurso)
 ``Desenvolvimento de Aplicações Híbridas para TV Digital Interativa no 
 Middleware Ginga''~\cite{nclua.shortcourse}
---- [Anexo--XXX (primeira página, site)]
+--- [Anexo--11 (primeira página, site)]
 
 \end{itemize}
 
-Sobre os critérios de pontuação para produção científica (edital, Anexo II, 
-Quadro 2, página 17), solicito analisar/reconsiderar se a separação entre 
-publicações em periódicos e conferências acadêmicas deve ser seguida à risca,
-uma vez que o documento de área da Capes para Ciência da Computação%
+Sobre os critérios de pontuação para produção científica do edital (Anexo II, 
+Quadro 2, página 17), sugiro analisar a separação entre publicações em 
+periódicos e conferências acadêmicas, uma vez que, segundo o documento de área 
+da Capes para Ciência da Computação, os dois meios de publicação são 
+considerados como equivalentes na avaliação trienal de departamentos%
 \footnote{\url{
 http://www.capes.gov.br/images/stories/download/avaliacaotrienal/Docs_de_area/
 },
 Ciência da Computação, Seção IV, páginas 15--16.
-} considera os dois meios igualmente importantes:
+}:
 \begin{quote}
 ``Durante os três últimos períodos de Avaliação Trienal (2004, 2007 e 2010) a 
 área de Ciência da Computação trabalhou com publicações em conferências e 
@@ -329,48 +338,30 @@ Como o conjunto de publicações em conferências e periódicos é essencial par
 avaliação da área em qualquer parte do mundo, a avaliação da produção 
 bibliográfica compreende os veículos chamados tradicionalmente de periódicos e 
 de anais de conferências.''
-(--- [Anexo--XXX)]
+(--- [Anexo--12)]
 \end{quote}
 
-O critério do edital pontua periódicos e congressoes de maneira desproporcional 
+O critério do edital pontua periódicos e congressos de maneira desproporcional 
 (máximo de 60 e 10 pontos, respectivamente) e desconsidera por completo a 
 qualidade dos congressos.
-Por exemplo, artigos de 12 páginas em congressos Qualis A têm a
-mesma pontuação que artigos de 5 páginas em congressos sem avaliação Qualis.
+Por exemplo, artigos completos de 12 páginas em congressos Qualis-A valem 2 
+vezes menos que artigos em periódicos Qualis-B5.
+Minha produção se concentra em conferências de qualidade, por exemplo, a ACM 
+SenSys e Modularity são ambas Qualis-A1.
 
-Como exemplos dentro da minha produção, a conferência SenSys tem média 
-histórica de 17\% de aceitação%
-\footnote{\url{
-http://dl.acm.org/citation.cfm?id=2517360&preflayout=flat#source
-}}, enquanto que o Modularity passa por duas fases de revisão%
-\footnote{\url{http://www.aosd.net/2015/rrtrack}}:
-\begin{quote}
-``Modularity'15 is deeply committed to publishing works of the highest caliber.  
-To this aim, two separate paper submission deadlines and review stages are 
-offered. A paper accepted in any round will be published in the proceedings and 
-presented at the conference. Promising papers submitted in the first round that 
-are not accepted may be invited to be revised and resubmitted for review by the 
-same reviewers in the second round. Authors of such invited resubmissions are 
-asked to also submit a letter explaining the revisions made to the paper to 
-address the reviewers' concerns. While there is no guarantee that an invited 
-resubmission will be accepted, this procedure (similar to major revisions 
-requested by journals) is designed to help authors of promising work get their 
-papers into the conference.''
-\end{quote}
-
-\subsection*{Docência e Atividade Profissional}
+\subsection*{Docência e Atividade Profissional (QUADRO 4)}
 
 \begin{itemize}
 \item
 Professor do Instituto de Tecnologia ORT, 2010--2012 (2 anos)
---- [Anexo--XXX (carteira de trabalho)]
+--- [Anexo--13 (carteira de trabalho)]
 \item
-Professor da disciplina \emph{Sistemas Reativos} na PUC--Rio, 2014--2015 (2 
-semestres)
---- [Anexo--XXX (e-mail para os alunos da graduação)]
+Professor da disciplina \emph{Sistemas Reativos} na PUC--Rio, 2014--2015 (1 
+semestre)
+--- [Anexo--14 (e-mail para os alunos da graduação)]
 \item
-Programador de jogos para celulares, Wiz Technologies, 2004--2007 (2 anos)
---- [Anexo--XXX (carteira de trabalho)
+Programador de jogos para celular, Wiz Technologies, 2004--2007 (2 anos)
+--- [Anexo--13 (carteira de trabalho)
 \end{itemize}
 
 \newpage

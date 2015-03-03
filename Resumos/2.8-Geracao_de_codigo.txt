@@ -13,6 +13,9 @@
     2. DAG, 3-addr
     3. declarações e tipos
 3. Geração de Código
+    1. registradores
+    2. instruções
+    3. peephole
 
 # Geração de Código
 
@@ -219,3 +222,82 @@
         - elimina código morto
         - reordenação de instruções não dependentes
 - geração de código
+    - registradores
+        - descritores
+            - de registradores
+                - quais endereços estão no registrador
+            - de endereços
+                - quais locações estão no endereço
+                    - memória, registradores, pilha
+        - getreg(i)
+            - getreg(x=y+z) => Rx,Ry,Rz
+        - instruções
+            - operações: x=y+z
+                - se Ry/z não possui y/z
+                    - LOAD Ry/z y/z
+                - ADD Rx, Ry, Rz
+            - cópia: x=y
+                - se Ry não possui y
+                    - LOAD Ry y
+                - atualiza Ry para também conter x
+        - administração dos descritores
+            - LD R, x
+                - R guarda somente x
+                - x também é guardado por R
+            - ST x, R
+                - R também guarda x
+                - x é guardado somente por R
+                - x está atualizado
+            - OP Rx, Ry, Rz
+                - Rx guarda somente x
+                - x só é guardado por Rx
+                - ninguém além de x é guardado por Rx
+                - x não está atualizado
+            - Rx = Ry
+                - Ry também guarda x
+                - x só é guardado por Rx e Ry
+        - getreg(i)
+            - TODO
+            - x = y+z
+                - procurar somente Ry,Rz
+                    - duas opções de sucesso
+                        - se y está em qualquer Ri, Ry=Ri
+                        - se Rj é vazio, Ry=Rj
+                        - para todo v no novo Ri/j antigo
+                            - v também está em Ry
+        - coloração de grafos (K)
+            - problema equivalente
+                - grande número de variáveis a pequeno número de registradores
+            - nem todas as variáveis estão em uso ao mesmo tempo
+                - alguns registradores podem ser compartilhados entre variáveis
+            - cada vértice é uma variável
+                - arestas ligam variáveis vivas ao mesmo tempo
+            - K é o número de registradores da máquina
+            - NP-completo
+        - algoritmo linear
+            - guloso
+            - lista de liveness ordenado por início
+            - itera sobre a lista alocando e desalocando registradores conforme 
+              tempo passa
+    - seleção de instrução
+        - por leitura e escrita na árvore
+            - reduz sub-árvores a nós
+                - Ri = (+ Ri Rj) { ADD, Ri, Ri, Rj }
+            - casamento de padrões com sub-árvores
+            - natural com bottom up
+        - número de ershov
+- otimização "peephole"
+    - melhorias locais
+        - janela deslizante
+        - múltiplas passadas
+    - LD/ST redundantes
+        - LD R, a
+        - ST a, R
+    - código não alcançável
+        - if debug==1 then  // debug=0 por propagação de constante
+            ...
+    - salto para salto
+    - operações desnecessárias
+        - x+0, y*1
+    - idiomas da máquina
+        - x=x+1 => x++

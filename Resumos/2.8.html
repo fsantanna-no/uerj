@@ -1,0 +1,513 @@
+<p><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head></p>
+
+<h1>Resumo</h1>
+
+<ol>
+<li>Introdução
+<ol>
+<li>o que é uma LP?</li>
+<li>estrutura de um compilador</li>
+<li>back end vs front end</li>
+</ol></li>
+<li>Linguagens Intermediárias
+<ol>
+<li>requisitos, vantagens, exemplos</li>
+<li>DAG, 3-addr</li>
+<li>declarações e tipos</li>
+</ol></li>
+<li>Geração de Código
+<ol>
+<li>registradores</li>
+<li>instruções</li>
+<li>peephole</li>
+</ol></li>
+</ol>
+
+<h1>Geração de Código</h1>
+
+<h2>O que é uma linguagem de Programação?</h2>
+
+<ul>
+<li>uma notação formal para comandar a execução de instruções/algoritmos para uma 
+máquina</li>
+<li>a partir de uma sentença precisa descrita em uma linguagem de programação, a 
+máquina irá executar o que aquela sentença significa</li>
+<li>abcxyz -> |PL| -> 010101 -> |PC|</li>
+<li>TODO: mais</li>
+</ul>
+
+<h2>Estrutura geral de um compilador e interpretador</h2>
+
+<ul>
+<li>compilador é um software que transforma o código fonte de um programa escrito 
+em uma dada linguagem em uma outra linguagem alvo</li>
+<li>tipicamente, a linguagem alvo é a linguagem binária de máquina na qual o 
+programa deve executar</li>
+<li><p>a transformação é feita em etapas bem definidas, cada uma se baseia em 
+teorias e técnicas distintas:</p></li>
+<li><p>Análise / Front-end:</p>
+
+<ul>
+<li>CARACTERES       --[analisador léxico]-->
+TOKENS           --[analisador sintático]-->
+ÁRVORE SINTÁTICA --[analisador semântico]-->
+ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI</li>
+</ul></li>
+<li>Síntese / Back-end:
+<ul>
+<li>RI/CI             --[gerador de código]-->
+CÓDIGO DE MÁQUINA --[otimizador de código]-->
+CÓDIGO DE MÁQUINA --[ligador]-->
+CÓDIGO DE MÁQUINA (não relocável)</li>
+</ul></li>
+<li>Tabela de Símbolos
+<ul>
+<li>preenchida e compartilhada por todas as fases</li>
+</ul></li>
+<li><p>Execução</p>
+
+<ul>
+<li>CÓDIGO DE MÁQUINA --[carregador]--> EXECUÇÃO</li>
+<li>entrada --[execução]--> saída</li>
+</ul></li>
+<li><p>as fases são divididas entre análise e síntese, também conhecidas como "front 
+end" e "back end" do compilador</p></li>
+<li>o back end do compilador lida com a geração de código para uma arquitetura 
+específica
+<ul>
+<li>envolve conhecimentos "baixo nível"</li>
+<li>interpretação vs compilação</li>
+</ul></li>
+<li>idealmente, a divisão bem definida entre front end e back end permite 
+"plugar" a análise de diferentes linguagens para uma dada arquitetura
+(trocando apenas o front end)
+ou gerar código de uma linguagem para diferentes arquiteturas (trocando
+apenas o back end)
+<ul>
+<li>GCC e LLVM são exemplos de ferramentas com esse fim</li>
+</ul></li>
+</ul>
+
+<h2>Linguagens intermediárias</h2>
+
+<ul>
+<li>resultado da análise semântica, antes da geração de código
+<ul>
+<li>representação final para linguagens interpretadas</li>
+</ul></li>
+<li>requisitos
+<ul>
+<li>independência de linguagem e máquina (MxN)</li>
+<li>fácil tradução das ASTs e para os alvos</li>
+<li>otimizável</li>
+</ul></li>
+<li>vantages
+<ul>
+<li>portabilidade</li>
+<li>otimizações</li>
+<li>reflexão</li>
+<li>segurança</li>
+</ul></li>
+<li>complicações em comparação com AST
+<ul>
+<li>cada instrução representa uma operação fundamental
+<ul>
+<li>RISC</li>
+</ul></li>
+<li>modos de endereçamento</li>
+<li>instrução call, sem parâmetros</li>
+<li>sem controle de fluxo complexo</li>
+</ul></li>
+<li>exemplos
+<ul>
+<li>RISC
+<ul>
+<li>independente de linguagem</li>
+<li>LLVM
+<ul>
+<li>parecido com assembly</li>
+<li>tipado</li>
+<li>vetores (SIMD)</li>
+</ul></li>
+<li>GCC
+<ul>
+<li>RTL, register transfer language</li>
+<li>listas de LISP</li>
+</ul></li>
+</ul></li>
+<li>CISC
+<ul>
+<li>para linguagem específica</li>
+<li>lua (closure)</li>
+<li>java (monitorenter, invokevirtual)</li>
+</ul></li>
+</ul></li>
+<li>representação intermediária
+<ul>
+<li>DAG/flow graph</li>
+<li>3-addr code</li>
+</ul></li>
+<li>grafos acíclicos direcionados para expressões
+<ul>
+<li>folhas: operandos</li>
+<li>nós:    operadores</li>
+<li>implementação por índices em um vetor (ou tabela hash)</li>
+<li>vantagens
+<ul>
+<li>ordem topológica</li>
+<li>fatoração de expressões
+<ul>
+<li>reuso de nós</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>código de três endereços (CTE)
+<ul>
+<li>representação linear da AST</li>
+<li>atribuição, operando, +2 operandos</li>
+<li>labels, saltos, chamadas, indexação</li>
+<li>número ilimitado de registradores</li>
+<li>quadruplas e triplas
+<ul>
+<li>4: móvel, mais espaço</li>
+<li>3: imóvel, menos espaço, igual a DAG, fonte implícita</li>
+</ul></li>
+<li>SSA
+<ul>
+<li>variável atribuída uma única vez</li>
+<li>simplifica otimizações
+<ul>
+<li>propagação de constantes
+<ul>
+<li>if ... x=1 else x=2, x=(x1 ou x2)</li>
+</ul></li>
+<li>eliminação de código morto
+<ul>
+<li>y1=1, y2=2, x=y2 (y1 é morto)</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>tipos e declarações
+<ul>
+<li>checagem e tradução</li>
+<li>cálculo
+<ul>
+<li>regiões de memória</li>
+<li>offsets
+<ul>
+<li>arrays e structs</li>
+</ul></li>
+<li>alinhamento</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2>Geração de Código</h2>
+
+<ul>
+<li>requisitos
+<ul>
+<li>preservar a semântica original</li>
+<li>usar recursos efetivamente
+<ul>
+<li>registradores limitados</li>
+</ul></li>
+</ul></li>
+<li>código ótimo é indecidível
+<ul>
+<li>alocação de registradores</li>
+</ul></li>
+<li><p>geração</p>
+
+<ul>
+<li>seleção de instruções
+<ul>
+<li>nível de abstração do CI
+<ul>
+<li>baixo: 1x1</li>
+<li>alto: templates</li>
+</ul></li>
+<li>conjunto de instruções da máquina
+<ul>
+<li>inc vs load,add-1,store</li>
+</ul></li>
+<li>qualidade do código a gerar</li>
+</ul></li>
+<li>alocação e atribuição de registradores</li>
+<li>ordem de execução das instruções
+<ul>
+<li>pipeline</li>
+</ul></li>
+</ul></li>
+<li><p>máquina alvo</p>
+
+<ul>
+<li>RISC
+<ul>
+<li>muitos registradores, instruções 3 endereços, endereçamento simples</li>
+</ul></li>
+<li>CISC
+<ul>
+<li>poucos registradores, instruções 2 endereços, endereçamento complexo</li>
+<li>classes de registradores, instruções de tamanho variável, efeitos 
+colaterais</li>
+</ul></li>
+<li>máquina de pilha ou registradores
+<ul>
+<li>JVM/JIT, CPU/Lua</li>
+</ul></li>
+</ul></li>
+<li>código alvo
+<ul>
+<li>endereço realocável ou absoluto</li>
+<li>assembly ou binário</li>
+</ul></li>
+<li>linguagem alvo
+<ul>
+<li>load, store</li>
+<li>add, sub, inc, etc</li>
+<li>saltos</li>
+<li>número de registradores</li>
+<li>modos de endereçamento
+<ul>
+<li>índice, indireto, imediato</li>
+</ul></li>
+<li>custos de execução
+<ul>
+<li>critérios
+<ul>
+<li>tempo de compilação</li>
+<li>execução do programa
+<ul>
+<li>tempo</li>
+<li>tamanho</li>
+<li>energia</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>endereços no código alvo</p>
+
+<ul>
+<li>código
+<ul>
+<li>estático</li>
+</ul></li>
+<li>dados
+<ul>
+<li>estático: constantes, globais</li>
+<li>heap: objetos</li>
+<li>pilha: registros de ativação</li>
+</ul></li>
+<li>alocação na pilha
+<ul>
+<li>endereços relativos ao SP</li>
+</ul></li>
+<li>mapeamento de nomes para endereços</li>
+</ul></li>
+<li><p>blocos básicos e grafos de execução</p>
+
+<ul>
+<li>análise</li>
+<li>sequência máxima
+<ul>
+<li>uma entrada</li>
+<li>uma saída</li>
+</ul></li>
+<li>blocos são nós no grafo</li>
+<li>"atomicidade"
+<ul>
+<li>todas as instruções são executadas uma única vez, em ordem</li>
+</ul></li>
+<li>algoritmo
+<ol>
+<li>escolha de líder
+<ul>
+<li>primeira instrução</li>
+<li>alvo de saltos</li>
+<li>instrução seguinte a lider</li>
+</ul></li>
+<li>siga até próximo líder</li>
+</ol></li>
+<li>otimizações / alocação de registradores
+<ul>
+<li>se x é atribuído em i, e usado em j, então registrador deve ser 
+mantido</li>
+<li>se x é reatribuído dentro de bloco, registrador antigo pode ser 
+reaproveitado</li>
+<li>temporárias dentro de bloco podem ser reaproveitados</li>
+<li>sub epressões comuns
+<ul>
+<li>loop do a=v[i] + v[i] end</li>
+<li>v[i] => v+4*i</li>
+</ul></li>
+</ul></li>
+<li>grafo direcionado
+<ul>
+<li>elimina blocos não alcançáveis a partir do bloco-0</li>
+<li>blocos em paralelo</li>
+<li>reordenar blocos sem dependência</li>
+</ul></li>
+<li>DAG dentro de bloco
+<ul>
+<li>elimina sub expressões comuns</li>
+<li>elimina código morto</li>
+<li>reordenação de instruções não dependentes</li>
+</ul></li>
+</ul></li>
+<li>geração de código
+<ul>
+<li>registradores
+<ul>
+<li>descritores
+<ul>
+<li>de registradores
+<ul>
+<li>quais endereços estão no registrador</li>
+</ul></li>
+<li>de endereços
+<ul>
+<li>quais locações estão no endereço
+<ul>
+<li>memória, registradores, pilha</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>getreg(i)
+<ul>
+<li>getreg(x=y+z) => Rx,Ry,Rz</li>
+</ul></li>
+<li>instruções
+<ul>
+<li>operações: x=y+z
+<ul>
+<li>se Ry/z não possui y/z
+<ul>
+<li>LOAD Ry/z y/z</li>
+</ul></li>
+<li>ADD Rx, Ry, Rz</li>
+</ul></li>
+<li>cópia: x=y
+<ul>
+<li>se Ry não possui y
+<ul>
+<li>LOAD Ry y</li>
+</ul></li>
+<li>atualiza Ry para também conter x</li>
+</ul></li>
+</ul></li>
+<li>administração dos descritores
+<ul>
+<li>LD R, x
+<ul>
+<li>R guarda somente x</li>
+<li>x também é guardado por R</li>
+</ul></li>
+<li>ST x, R
+<ul>
+<li>R também guarda x</li>
+<li>x é guardado somente por R</li>
+<li>x está atualizado</li>
+</ul></li>
+<li>OP Rx, Ry, Rz
+<ul>
+<li>Rx guarda somente x</li>
+<li>x só é guardado por Rx</li>
+<li>ninguém além de x é guardado por Rx</li>
+<li>x não está atualizado</li>
+</ul></li>
+<li>Rx = Ry
+<ul>
+<li>Ry também guarda x</li>
+<li>x só é guardado por Rx e Ry</li>
+</ul></li>
+</ul></li>
+<li>getreg(i)
+<ul>
+<li>TODO</li>
+<li>x = y+z
+<ul>
+<li>procurar somente Ry,Rz
+<ul>
+<li>duas opções de sucesso
+<ul>
+<li>se y está em qualquer Ri, Ry=Ri</li>
+<li>se Rj é vazio, Ry=Rj</li>
+<li>para todo v no novo Ri/j antigo
+<ul>
+<li>v também está em Ry</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>coloração de grafos (K)
+<ul>
+<li>problema equivalente
+<ul>
+<li>grande número de variáveis a pequeno número de registradores</li>
+</ul></li>
+<li>nem todas as variáveis estão em uso ao mesmo tempo
+<ul>
+<li>alguns registradores podem ser compartilhados entre variáveis</li>
+</ul></li>
+<li>cada vértice é uma variável
+<ul>
+<li>arestas ligam variáveis vivas ao mesmo tempo</li>
+</ul></li>
+<li>K é o número de registradores da máquina</li>
+<li>NP-completo</li>
+</ul></li>
+<li>algoritmo linear
+<ul>
+<li>guloso</li>
+<li>lista de liveness ordenado por início</li>
+<li>itera sobre a lista alocando e desalocando registradores conforme 
+tempo passa</li>
+</ul></li>
+</ul></li>
+<li>seleção de instrução
+<ul>
+<li>por leitura e escrita na árvore
+<ul>
+<li>reduz sub-árvores a nós
+<ul>
+<li>Ri = (+ Ri Rj) { ADD, Ri, Ri, Rj }</li>
+</ul></li>
+<li>casamento de padrões com sub-árvores</li>
+<li>natural com bottom up</li>
+</ul></li>
+<li>número de ershov</li>
+</ul></li>
+</ul></li>
+<li>otimização "peephole"
+<ul>
+<li>melhorias locais
+<ul>
+<li>janela deslizante</li>
+<li>múltiplas passadas</li>
+</ul></li>
+<li>LD/ST redundantes
+<ul>
+<li>LD R, a</li>
+<li>ST a, R</li>
+</ul></li>
+<li>código não alcançável
+<ul>
+<li>if debug==1 then  // debug=0 por propagação de constante
+...</li>
+</ul></li>
+<li>salto para salto</li>
+<li>operações desnecessárias
+<ul>
+<li>x+0, y*1</li>
+</ul></li>
+<li>idiomas da máquina
+<ul>
+<li>x=x+1 => x++</li>
+</ul></li>
+</ul></li>
+</ul>
