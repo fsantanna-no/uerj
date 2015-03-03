@@ -1,0 +1,84 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+# Resumo
+
+1. Introdução
+    1. o que é uma LP?
+    2. expressões e comandos
+2. Estrutuas de controle
+    1. rotinas
+    2. exceções
+    3. concorrência
+
+# Estruturas de Controle
+
+## O que é uma linguagem de Programação?
+
+- uma notação formal para comandar a execução de instruções/algoritmos para uma 
+  máquina
+- a partir de uma sentença precisa descrita em uma linguagem de programação, a 
+  máquina irá executar o que aquela sentença significa
+- abcxyz -> |PL| -> 010101 -> |PC|
+
+- a natureza da linguagem vai determinar que tipo de notação é aceita (sintaxe) 
+  e o que a linguagem pode expressar de forma a controlar a
+  máquina (semântica)
+
+- Propriedades de LPs:
+    - genericidade
+        - linguagens genéricas
+        - linguagens de domínio específico
+            - como centralizar um texto em SQL
+            - como fazer uma consulta a um banco de dados em HTML
+    - nível
+        - linguagens de baixo nível
+            - detalhes/concreto, próximo a arquitetura, mapeamento 1:1
+        - linguagens de alto nível
+            - intenção/abstrato, matemática
+    - poder de expressividade
+        - turing complete
+    - cada design de LP deve escolher de forma criteriosa entre as diversas 
+      alternativas, oferecendo uma maneira diferenciada para o programador
+      controlar a máquina:
+        -  a language that doesn't affect the way you think about programming, 
+           is not worth knowing.
+            - Alan Perlis, conhecido por ALGOL, 1o ganhador do prêmio Turing
+    - exemplos:
+        - C: genérico, baixo nível, turing completa
+        - Java: genérico, médio nível (no ptrs, jumps), turing completa
+        - LISP: genérico, alto nível, turing completa
+        - BlooP: loops limitados (funções primitivas recursivas)
+            - garantias estáticas
+            - problema da parada
+
+## Dados e Controle
+
+TODO
+
+## Estruturas de controle
+
+- expressões e comandos
+    - 1: combinam valores com operandos
+        - literais, rvals
+        - operadores
+            - aridade
+            - infixo, prefixo, posfixo
+            - precedência
+            - sobrecarga
+        - expressões como programas
+        - expressões como atribuições
+            - i++
+    - 2: combinam instruções
+        - sequências ordenadas
+        - composições e blocos
+- condicionais
+    - if-then-else
+    - switch-case
+- repetição
+    - for, while, repeat
+    - variáveis de controle
+    - break, continue
+    - iteradores
+        - start, hasMore, next

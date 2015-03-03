@@ -1,0 +1,384 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+# Resumo
+
+1. Introdução
+    1. o que é uma LP?
+    2. sintaxe e semântica
+    3. linguagens estáticas e dinâmicas
+2. Estrutuação clássicas
+    1. construções e amarração de nomes
+    2. variáveis
+    3. rotinas e passagem de parâmetro
+3. Tempo de execução
+    1. pilha
+    2. heap
+
+# Estruturas Clássicas de Linguagens de Programação
+
+## O que é uma linguagem de Programação?
+
+- uma notação formal para comandar a execução de instruções/algoritmos para uma 
+  máquina
+- a partir de uma sentença precisa descrita em uma linguagem de programação, a 
+  máquina irá executar o que aquela sentença significa
+- abcxyz -> |PL| -> 010101 -> |PC|
+
+- a natureza da linguagem vai determinar que tipo de notação é aceita (sintaxe) 
+  e o que a linguagem pode expressar de forma a controlar a
+  máquina (semântica)
+
+- Propriedades de LPs:
+    - genericidade
+        - linguagens genéricas
+        - linguagens de domínio específico
+            - como centralizar um texto em SQL
+            - como fazer uma consulta a um banco de dados em HTML
+    - nível
+        - linguagens de baixo nível
+            - detalhes/concreto, próximo a arquitetura, mapeamento 1:1
+        - linguagens de alto nível
+            - intenção/abstrato, matemática
+    - poder de expressividade
+        - turing complete
+    - cada design de LP deve escolher de forma criteriosa entre as diversas 
+      alternativas, oferecendo uma maneira diferenciada para o programador
+      controlar a máquina:
+        -  a language that doesn't affect the way you think about programming, 
+           is not worth knowing.
+            - Alan Perlis, conhecido por ALGOL, 1o ganhador do prêmio Turing
+    - exemplos:
+        - C: genérico, baixo nível, turing completa
+        - Java: genérico, médio nível (no ptrs, jumps), turing completa
+        - LISP: genérico, alto nível, turing completa
+        - BlooP: loops limitados (funções primitivas recursivas)
+            - garantias estáticas
+            - problema da parada
+
+
+## Sintaxe e Semântica
+
+- existem dois conceitos complementares ligados a natureza de uma linguagem de 
+  programação
+
+- Sintaxe:
+    - a sintaxe define a estrutura ou a forma da linguagem de programação
+    - para linguagens textuais, a sintaxe define regras para combinar letras, 
+      dígitos, etc.  para formar palavras (ou tokens), para então
+      combinar palavras para formar frases completas (ou sentenças)
+
+    - como exemplo, as sentenças em C devem terminar com ';'
+        - a=1 b=2;
+
+    - a syntaxe não lida com o sentido dessas palavras ou frases
+
+    - como uma analogia às linguagens naturais, a frase
+        - "as duas cores dessa cadeira são preto, branco e vermelho."
+        - apesar da forma estar correta (sujeito, verbo, predicado), a frase 
+          possui um erro semântico
+
+    - NOTA: nem todas as linguagens são textuais,
+      linguagens gráficas
+      exemplo LabView
+      menos margem a erros sintáticos
+
+- Semântica:
+    - a semântica lida com o conteúdo, sentido ou interpretação em uma 
+      linguagem de programação
+    - o problema semântico exemplificado acima pode ser comparado ao problema 
+      semântico de passagem de parâmetros para funções:
+        - em alguma parte do programa (def cadeira (cor1, cor2))
+        - em outra parte (cadeira(PRETO,BRANCO,VERMELHO))
+        - o analisador semântico iria detectar que a definição e uso de 
+          "cadeira" não são compatíveis
+
+- Sintaxe diferente, mesma semântica:
+    - x += y        // C
+    - x := x + y    // Algol, Pascal, ML, Ada
+
+- Sintaxe igual, semântica diferente:
+    - s.f = 1;      // C, estrutura estática pré declarada
+    - s.f = 1;      // Lua, tabela dinâmica, polimorfico, meta método
+
+
+## Estruturas Clássicas
+
+### construções e amarração de nomes
+
+- entidades
+    - variáveis, expressões, comandos, rotinas, tipos
+    - entidades têm atributos
+        - variáveis: nome, tipo, alocação, valor
+        - rotinas: parâmetros, convenções de passagem, corpo
+        - tipos: nome, valores
+    - atributos têm que ser conhecidos antes do uso
+        - amarração
+    - tempo de amarração
+        - estático
+            - definição da linguagem (int é um tipo)
+            - implementação da linguagem (int tem 4 bytes)
+            - compilação de programas (novos tipos)
+        - dinâmico
+            - execução: atribuição de variável (v=1)
+    - apelidos e sobrecarga
+        - nome 1:1 entidade
+        - sobrecarga
+            - 1+1, 1.0+1.0
+            - nome 1:N entidades
+        - apelidos
+            - int x; int*p1,p2 = &x
+            - nome N:1 entidade
+    - tudo isso relacionado à semântica
+- variáveis
+    - células de memória com um endereço
+    - nome abstrai o endereço
+    - atribuições alteram conteúdo
+    - <nome,escopo,tipo,lval,rval>
+        - tempo de amarração para cada um desses parâmetros
+            - para linguagens estáticas e dinâmicas
+    - nome e escopo
+        - declaração introduz um nome
+        - declaração tem uma delimitação sintática que define um escopo
+        - escopo: limites do ciclo de vida, visibilidade
+        - regras de amarração
+            - escopo léxico/estático
+            - escopo dinâmico
+    - tipos
+        - conjunto de valores
+        - operações de manipulação
+        - novos tipos
+            - vetores, estruturas, classes
+        - tipo abstrato de dados
+            - representação escondida
+            - operações visíveis
+        - tipagem estática
+            - amarração não muda
+                - usos podem ser checados
+            - declaração explícita ou por inferência
+        - tipagem dinâmica
+            - amarração pode mudar
+            - variáveis polimórficas
+                - tipo depende do valor
+            - depende de operações polimórficas
+        - sem tipo
+            - asm, C
+    - lval, rval
+        - área de armazenamento
+        - valor do armazenamento
+        - acompanha o escopo
+            - área pode ser usada novamente
+        - amarração entre lval e rval é dinâmica
+            - mas defines, consts, etc.
+        - valores iniciais
+            - bss, 0, não especificado
+            - ponteiros pendentes/null
+        - referências e ponteiros
+            - rval é um outro lval
+        - variáveis anônimas
+            - malloc
+- rotinas
+    - unidades de execução
+        - surotinas, funções, procedimentos, métodos
+    - <nome,escopo,tipo,lval,rval>
+        - declaração
+                    - assinatura
+                        - área de código
+                             - instruções
+    - escopo
+        - local, declarações aninhadas
+        - global, estática
+    - assinatura
+        - chamadas e corpo devem respeitar
+        - parâmetros de entrada
+        - valor de retorno
+    - funções de 1a classe
+        - amarração dinâmica
+            - lval->rval
+    - declaração vs definição
+        - protótipos
+        - implementações
+    - chamada
+        - instanciação
+        - fixo: código
+        - variável: registro de ativação
+            - lval para locais
+            - parâmetros e retorno
+                - rval ou lval (passagem por valor ou nome)
+            - ambiente
+                - globais e locais de fora, upvalues
+        - recursão
+            - novo registro de ativação
+            - amarração dinâmica necessária (vs FORTRAN)
+        - passagem de parâmetros
+            - globais
+            - locais
+                - parâmetros formais e real
+                - amarração por posição ou nome
+            - política
+                - valor/cópia
+                    - lazy vs eager
+                    - avalia parâmetro e copia rval
+                    - sem informação de volta
+                - referência
+                    - passa ponteiro
+                    - acesso indireto
+                    - pode alterar entrada
+                - nome
+                    - substituição textual
+                    - semântica dúbia
+    - rotinas genéricas
+        - polimorfismo de tipo
+        - templates
+            - pilha de inteiros
+- alocação dinâmica
+    - pilha
+        - locais, temporárias, chamadas de função
+        - ponteiro para o topo da pilha (SP)
+            - operações de push, pop
+    - chamadas de função
+        - múltiplas chamadas, chamadas reentrantes
+        - chamada e retorno
+            - empilha instrução seguinte na chamada
+            - desempilha instrução e pula para ela
+        - árvores de ativação
+            - DFS
+                - a menos de exceções ou erros
+                - chamadas em pré ordem, retornos em pós ordem
+        - convenções de chamada
+        - registros de ativação
+            - layout
+            - endereço de retorno, parâmetros, locais, temporárias
+            - FP: ponteiro para o frame
+                - FP = SP logo após chamada
+                    - para stack trace, FP atual deve ser copiado antes
+                - SP = FP logo antes do retorno
+            - chamada
+                - empilha argumentos            [var]
+                - empilha FP                    [fixo]
+                - empilha endereço de retorno   [fixo]
+                - empilha outros registradores  [fixo]
+            - prólogo
+                - FP = SP
+                - reserva espaço para locais    [fixo]
+            - epílogo
+                - SP = FP
+                - recupera outros registradores
+                - recupera endereço de retorno
+                - desempilha FP
+                - empilha valor de retorno
+                - pula para endereço de retorno
+            - link de acesso
+                - uplink léxico
+                - acesso a locais de funções aninhadas (acima)
+                - ALGOL, Pascal, ML
+        - stack unwinding
+        - otimização de chamada de cauda
+            - fundamental em linguagens funcionais
+            - reaproveitamento da pilha
+                - chamada que não usa retornos
+                    - altera argumentos
+                    - e dá goto, em vez de call
+                - quebra debugging
+    - heap
+        - dados que vivem indefinidamente
+        - gerenciador de memória
+            - rastreia espaço livre
+                - alocação e desalocação (liberação)
+            - dificuldades
+                - variação do tamanhos dos blocos
+                - ordem de alocação e desalocação arbitrária
+            - propriedades
+                - localidade, fragmentação, execução
+            - localidade
+                - programas tendem a executar uma pequena fração do código 
+                  mexendo em uma pequena fração da memória
+                    - hierarquia de memória
+                        - disparidade em ordem de grandeza de disco, ram, 
+                          cache, registradores
+                - TODO: MRU?
+            - fragmentação
+                - buracos livres entre blocos usados
+                    - TODO
+                    - best fit
+                    - first fit
+                - pools de memória
+                    - fragmentação 0 para blocos de mesmo tamanho
+            - execução
+                - TODO
+        - desalocação
+            - manual
+                - C / C++
+                - problemas
+                    - vazamento de memória (memory leaks)
+                    - ponteiros pendentes (dangling pointers)
+                - valgrind
+            - automático, coleta de lixo
+                - lixo: dados que não podem ser referenciados
+                    - desalocados quando descobertos
+                - LISP'58
+                - does not work with type-unsafe languages C/C++
+                    - aritmética de ponteiros, casts
+                - métricas de performance
+                    - tempo total de execução
+                    - tempo de pausa
+                    - uso de espaço
+                    - localidade
+                        - TODO
+                - referências com acesso
+                    - conjunto raíz
+                        - variáveis estáticas
+                        - variáveis na pilha
+                    - uma vez não referenciáveis, nunca mais referenciáveis
+                - modificador (mutator)
+                    - alocação
+                    - passagem e retorno de função
+                    - atribuições
+                    - término de funções
+                - abordagens
+                    - acompanhamento do modificador
+                        - contagem de referência
+                    - percorrimento periódico
+                        - coletor por rastreamento
+                - contagem de referência
+                    - alocação: ref=1
+                    - passagem: ref++
+                    - atribuição: to--; fr++
+                    - término: ref(i)--;
+                    - vantagens
+                        - simples
+                        - imediato e incremental
+                    - desvantagens
+                        - sem ciclos
+                        - caro: dados e CPU
+                - coletor por rastreamento
+                    - executa periodicamente
+                        - ex., quando alcança um limiar
+                    - mark-and-sweep
+                        - MARK:
+                            - a partir do conjunto raiz, percorre todas as 
+                              referências recursivamente, marcando-as
+                        - SWEEP:
+                            - coleta as referências não marcadas
+                    - tri-color mark-and-sweep
+                        - incremental
+                        - branco: candidatos à coleta
+                        - cinza: alcançáveis pela raiz, mas com algum filho 
+                          ainda branco
+                            - inicialmente=conjunto-raiz
+                        - pretos: alcançáveis e sem filhos brancos
+                            - incialmente=vazio
+                        - continuamente remova ref do cinza, seta filhos de ref 
+                          para cinza e seta ref para preto
+                        - coleta brancos quando cinza está vazio
+                    - generacional
+                        - objetos morrem jovens (80-98% até 1M de instruções 
+                          após o nascimento)
+                        - divide a heap em partições (gerações)
+                        - quando uma geração enche, move objetos vivos para 
+                          próxima geração
+                    - compactação
+                        - ao detectar objeto vivo, move vivos para nova área
+                            - não precisa desalocar mortos
+                            - zero fragmentação (maior localidade)

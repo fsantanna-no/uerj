@@ -1,0 +1,207 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+# Resumo
+
+1. Introdução
+    1. o que é uma LP?
+    2. dados e controle
+2. Estrutuação de dados
+    1. tipos primitivos
+    2. tipos compostos
+    3. tipos definidos pelo usuário
+3. Sistemas de tipos
+4. Implementação
+
+# Estruturação de dados
+
+## O que é uma linguagem de Programação?
+
+- uma notação formal para comandar a execução de instruções/algoritmos para uma 
+  máquina
+- a partir de uma sentença precisa descrita em uma linguagem de programação, a 
+  máquina irá executar o que aquela sentença significa
+- abcxyz -> |PL| -> 010101 -> |PC|
+
+- a natureza da linguagem vai determinar que tipo de notação é aceita (sintaxe) 
+  e o que a linguagem pode expressar de forma a controlar a
+  máquina (semântica)
+
+- Propriedades de LPs:
+    - genericidade
+        - linguagens genéricas
+        - linguagens de domínio específico
+            - como centralizar um texto em SQL
+            - como fazer uma consulta a um banco de dados em HTML
+    - nível
+        - linguagens de baixo nível
+            - detalhes/concreto, próximo a arquitetura, mapeamento 1:1
+        - linguagens de alto nível
+            - intenção/abstrato, matemática
+    - poder de expressividade
+        - turing complete
+    - cada design de LP deve escolher de forma criteriosa entre as diversas 
+      alternativas, oferecendo uma maneira diferenciada para o programador
+      controlar a máquina:
+        -  a language that doesn't affect the way you think about programming, 
+           is not worth knowing.
+            - Alan Perlis, conhecido por ALGOL, 1o ganhador do prêmio Turing
+    - exemplos:
+        - C: genérico, baixo nível, turing completa
+        - Java: genérico, médio nível (no ptrs, jumps), turing completa
+        - LISP: genérico, alto nível, turing completa
+        - BlooP: loops limitados (funções primitivas recursivas)
+            - garantias estáticas
+            - problema da parada
+
+
+## Dados e Controle
+
+TODO
+
+## Estruturação de dados
+
+- todo dado tem um tipo
+    - conjunto de valores e operações
+        - bool
+            - true e false
+            - not, and, or
+
+- tipos primitivos
+    - reflete o comportamento da máquina
+    - como os bits são interpretados
+        - cada tipo de uma maneira
+    - bool, char, int, float
+        - 1 vs 1.0
+
+- para que tipos?
+    - classificação
+        - organização
+        - documentação
+        - operações
+    - proteção
+        - acessos não intencionais
+    - tipo indica que operações são permitidas
+- vantagens
+    - esconde a representação
+        - facilidade de programação
+        - pode ser alterada
+    - checagem estática
+    - sobrecarga estática
+        - qual operação real escolher dado o mesmo operador
+    - controle de precisão vs eficiência
+        - float vs double
+
+- tipos compostos
+    - mapeamento finito
+        - f: domínio para contra-domínio
+        - vetores
+            - domínio: enumerável e finito
+            - int v[10], new int[10]
+        - mapas associativos
+            - linguagens dinâmicas
+                - união de todos os tipos
+    - produto cartesiano
+        - struct, record
+        - T1 x T2 = (t1 E T1, t2 E T2)
+        - campos são explícitos
+        - acesso por casamento ou notação de ponto
+    - união
+        - "tagged" union
+        - T1 U T2
+    - conjunto potência
+        - bitflags
+    - sequências infinitas
+        - listas
+            - cons, car, cdr
+    - recursão
+        - definição de T usa T
+        - árvores binárias
+        - ponteiros em C
+    - tipos algébricos
+        - linguagens funcionais
+        - produto + união + sequências + recursão
+    - valores compostos
+        - construtores
+        - {} em C
+        - açucar sintático
+
+- tipos definidos pelo usuário
+    - organização e proteção
+    - tipos abstratos de dados (proteção)
+    - classes
+        - structs com campos públicos e privados
+        - funções
+        - construtores
+            - new
+            - clone
+    - ADTs em Eiffel
+        - condições pre/pos
+
+- sistemas de tipos
+    - conjunto de regras para organizar os tipos
+    - operações válidas
+    - objetivos é impedir usos inseguros
+    - tipagem estática e dinâmica
+    - tipagem forte e fraca
+    - compatibilidade de tipos
+        - nominal
+        - estrutural
+        - subtipagem
+    - conversão de tipos
+        - automática (coersão)
+        - manual (cast)
+    - sistema de tipos vs testes
+        - programa incorreto nunca executa
+        - programa correto nunca falha
+        - diagrama
+    - subtipagem
+        - tipo: conjunto de valores
+        - subtipo: subconjunto desses valores
+        - intervalos ([1..2]
+    - sistemas monomórficos
+        - cada entidade tem um tipo único
+        - operações requerem tipos exatos
+    - sistemas polimórficos
+        - entidades podem possuir mais de um tipo
+        - polimorfismo
+            - universal (infinitos tipos polimórficos)
+                - paramétrico (genéricos)
+                - inclusão (subclasse)
+            - ad-hoc (finitos/pequeno número de tipos polimórficos)
+                - sobrecarga (+,*)
+                - coersão (1+1.0)
+    - exemplos:
+        - C: fraco
+            - aritmética de ponteiros
+        - Lua: tags
+        - Java: forte
+        - ML: polimórfico
+            - inferência
+
+- implementação
+    - primitivos
+        - inteiros, reais
+            - tipos da plataforma
+        - enumeráveis: bool, char
+            - mapeiam para int
+    - compostos
+        - produto cartesiano
+            - offset a partir do início
+        - mapeamento finito
+            - limites
+                - campo para verificação
+        - união
+            - tamanho do maior
+            - campo com tag
+        - conjunto potência
+            - bit flags
+        - sequências
+            - heap (cabeça e cauda)
+    - classes
+        - produto cartesiano
+        - rotinas
+            - tabela virtual de ponteiros
+        - instâncias
+            - heap
