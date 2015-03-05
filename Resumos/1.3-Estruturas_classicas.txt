@@ -122,12 +122,12 @@
             - compilação de programas (novos tipos)
         - dinâmico
             - execução: atribuição de variável (v=1)
-    - apelidos e sobrecarga
+    - aliasing e sobrecarga
         - nome 1:1 entidade
         - sobrecarga
             - 1+1, 1.0+1.0
             - nome 1:N entidades
-        - apelidos
+        - aliasing
             - int x; int*p1,p2 = &x
             - nome N:1 entidade
     - tudo isso relacionado à semântica

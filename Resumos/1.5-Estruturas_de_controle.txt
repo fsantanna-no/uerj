@@ -76,9 +76,105 @@ TODO
 - condicionais
     - if-then-else
     - switch-case
+    - casamento de padrões
+        - tipos de dados -> controle
 - repetição
     - for, while, repeat
     - variáveis de controle
     - break, continue
     - iteradores
         - start, hasMore, next
+- rotinas
+    - decomposição de programas
+    - operações abstratas
+    - procedimentos e funções
+    - parâmetros de entrada e saída
+    - recursão
+    - genéricos
+    - efeitos colaterais
+        - comunicação entre a função e o programa
+        - complexidade
+            - que funções mexem em que globais
+        - usar parâmetros sempre que possível
+    - aliasing
+        - TODO (evita otimizações)
+- exceções
+    - separação entre normal e excepcional
+    - confiabilidade
+    - exemplos
+        - acesso for dos limites
+        - divisão por zero
+        - falta de memória
+    - design
+        - quais são as exceções e como definí-las
+            - pré definidas (\0)
+            - explícito (raise)
+            - implícito (contratos)
+        - o que pode gerar execeções
+            - pré definido (\0)
+            - explícito (throw)
+            - implícito (contratos)
+        - como e onde tratá-las
+            - any block (catch)
+        - amarração entre exceção e tratador
+            - controle de fluxo
+                - terminação
+                - resumo
+        - o que fazer em sguida
+            - continuar, retornar
+    - implementação
+        - TODO
+- não determinismo e backtracking
+    - solvers
+    - PROLOG, Icon
+    - TODO
+- programação orientada a eventos
+    - sistemas reativos
+        - sistemas de janelas
+        - jogos
+    - inversão de controle
+        - ausência de pilha
+    - callbacks
+        - não determinismo
+        - cores
+    - diagrama
+        - fila
+        - dispatcher
+        - tratadores
+    - VB, Tcl/Tk
+- programação concorrente
+    - execução em paralelo
+        - físico: multi CPU, distrbuído
+        - lógico: processador único
+    - comunicação
+        - memória compartilhada
+        - troca de mensagens
+    - processos
+    - threads
+        - mesmo espaço de endereçamento
+    - corotinas
+        - transferência explícita
+    - mecanismos de sincronismo
+        - controla a ordem de execução
+        - semáforos
+            - P(s), < (s>0)?s--:suspend >
+            - V(s), < s++; (any-susp)?awake >
+            - fila de prioridades
+        - mutex, locks, semáforos
+        - monitores
+            - Java, Concurrent Pascal
+            - ADTs
+            - métodos sincronizados em um objeto
+        - rendezvous
+            - ADA
+            - entries, métodos
+            - comunicação síncrona
+            - TODO
+    - implementação
+        - máquina de estados
+            - READY, RUNNING, WAITING
+        - descritor de processos
+            - PC, regs, status
+        - escalonador
+            - READY <=> RUNNING
+                - interrupção de relógio

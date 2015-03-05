@@ -351,7 +351,7 @@ r = s*
             - DFA processa string x em O(|x|)
             - NFA simula DFA em O(|x||r|) (r=size of expression)
             - NFA -> DFA em O(2^n) (n=numero de estados)
-                - caso típico é O(|r|^3)
+                - caso típico é O(|n|^3)
             - RE -> NFA em O(|r|)
         - Dúvida entre simular NFA ou gerar um DFA
             - NFA caso, |r|^2 < |x|
@@ -490,6 +490,7 @@ Exp ::= Exp '+' Exp
     - lookahead necessário/não necessário
     - recursão à esquerda
     - classe de linguagens
+    - notação polonesa
 
 - geradores de parser
     - yacc: LALR (ruby, php, go)
