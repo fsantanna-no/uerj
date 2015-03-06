@@ -1,15 +1,12 @@
-# Sintaxe e Semântica
+# 1.1 Sintaxe e Semântica
 
 ## Introdução
 
 ### O que é uma LP?
 
-Linguagens de programação (LPs) são notações formais usadas para comandar a 
-execução de computadores.
-
-Como computadores somente são capazes de executar instruções muito simples e 
-que não refletem a maneira como os seres humanos se comunicam, praticamente 
-todo software é escrito em uma LP.
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
 
 De maneira geral, LPs oferecem construções linguísticas mais próximas às 
 linguagens naturais que, após serem combinadas em um programa por um humano, 
@@ -19,10 +16,6 @@ processo conhecido como compilação.
     [TRADUÇÃO ENTRE LP E MÁQUINA]
     abcxyz  -> |tradutor| -> 010101 -> |execução|
     (humano)                 (máquina)
-
-O termo "formal" usado para definir LPs, sugere que, diferentemente de 
-linguagens naturais, não há margens para ambiguidades na comunicação com 
-computadores.
 
 A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
 é possível expressar com essa notação de maneira a controlar a máquina 
@@ -627,8 +620,155 @@ Quando comparada à semântica denotacional, a semântica operacional é mais
 custos de execução, uso de memória, etc.
 
 ===============================================================================
+===============================================================================
+===============================================================================
 
-# Estrutura da Programação
+# 1.2 Compilação e Interpretação de Linguagens de Programação
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+Existem duas abordagens para a tradução de linguagens de programação para 
+linguagens de máquina.
+Na compilação, o código fonte é traduzido por completo para a representação 
+binária antes da máquina executá-lo.
+Na interpretação, o código fonte é traduzido incrementalmente, durante a 
+execução do programa.
+Em geral, a escolha por compilação resulta em maior velocidade (assumindo que a 
+compilação pode ser feita com antecedência à execução), enquanto que a 
+interpretação traz maior flexibilidade.
+
+## Separação entre Interpretação e Compilação
+
+Na prática, não existe um consenso sobre uma linha bem definida que separe 
+compliação e interpretação, sendo preciso entender melhor os "trade-offs" entre 
+as duas abordagens:
+
+INTERPRETAÇÃO PURA                     COMPILAÇÃO PURA
+Shell,REPL          VM-din ||| VM-sta  C/C++
+sh    DrScheme      Lua,JS     Java/C#
+
+Na interpretação pura, por exemplo em "shells" de linha de comando e ambientes 
+de programação REPL ("read-eval-print-loop"), cada linha digitada é traduzida e 
+executada antes da seguinte, mas mantendo o estado global entre as execuções.
+
+O surgimento de máquinas virtuais introduzu um intermediário entre a tradução e 
+execução de programas:
+
+    código  -> (tradução) -> bytecodes -> (VM) -> execução
+    fonte
+
+Com essa abordagem, a máquina real agora interpreta "bytecodes" de uma máquina 
+virtual, mas o código fonte continua precisando ser traduzido (compilado) para 
+bytecodes em uma etapa anterior.
+
+Considerando a fronteira entre os bytecodes e a máquina real, linguagens como 
+Java e C# devem ser consideradas interpretadas.
+Alguns autores, no entanto, ponderam que para uma linguagem ser considerada 
+interpretada, é necessário que ela oferece uma primitiva "eval" que permite 
+traduzir novos trechos de código durante a execução do programa:
+
+    código  -> (tradução) -> bytecodes -> (VM) -> execução
+    fonte
+                    \-------------------------------/
+
+Em outras palavras, é necessário que o tradutor esteja embutido no próprio 
+programa.
+Essa definição exlcui as linguagens tipadas estaticamente, mas inclui as 
+linguagens dinâmicas, mesmo as que são traduzidas para bytecode antes da 
+execução.
+
+## Estrutura Geral de Compiladores e Interpretadores
+
+O processo de tradução de programas é dividio em diversas fases, como ilustra o 
+diagrama a seguir:
+
+    ESTRUTURA GERAL DE UM TRADUTOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[gerador de código]-->
+          CÓDIGO DE MÁQUINA --[otimizador de código]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O "front end" (análise) lida com a sintaxe e semântica estática da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+
+Em linguagens compiladas, grande parte do esforço se concentra na "back-end", 
+onde ocorrem todas otimizações e a geração para a arquitetura final.
+Já em linguagens interpretadas, se a representação intermediária já são os 
+bytecodes da máquina virtual, o "front end" pode ser eliminado por completo.
+Note que o "back end" deve estar disponível durante toda a execução de 
+programas interpretados.
+
+## Ambientes de Execução
+
+O ambiente de execução de uma linguagem controla o estado global da memória, 
+I/O, registradores e CPU.
+É ele que vai colocar a máquina em um estado consistente para iniciar a 
+execução do programa, determinar as chamadas de entrada e saída disponíveis, 
+administrar funcionalidades como alocação e coleta de memória e escalonar 
+linhas de execução no caso de linguagens concorrentes.
+Durante a execução normal, a CPU basicamente entra em um ciclo de buscar a 
+próxima instrução, decodificá-la e executá-la.
+
+Mesmo linguagens compiladas básicas como C possuem um ambiente de execução 
+("crt0.o", c-run-time) que é embutido no programa de maneira a inicializar a 
+pilha, preencher o vetor de interrupção, zerar a memória BSS antes de chamar a 
+"main" do programa.
+
+No caso da interpretação, além do ambiente de execução também embutir o front 
+end de tradução, o ciclo de busca/decodificação/execução é simulado pela 
+máquina virtual, sendo o principal custo de execução associado à 
+virtualização.
+
+A virtualização traz o benefício de portabilidade, uma vez que um bytecode 
+compilado para uma certa máquina virtual pode executar em diferentes 
+implementações para arquiteturas finais.
+
+Uma outra vantagem da interpretação de bytecodes é a possível 
+interoperabilidade entre linguagens com paradigmas antagônicos.
+Como exemplo, o mesmo bytecode gerado por Java para executar na JVM, também é 
+gerado por Clojure, uma linguagem funcional com tipagem dinâmica.
+Essa tendência também pode ser observada no mundo da Web, com novas linguagens 
+que enchergam os browsers como máquina virtuais que executam "bytecodes em 
+JavaScript" (ClojureScript, CoffeeScript, Elm, entre outras).
+
+Uma variação para a interpretação é o uso de JITs ("just-in-time-compilation"), 
+que compilam o código durante a execução do programa.
+Para códigos que executam com muita frequência (e.g., loops), a latência
+inicial de compilação pode ser compensada no longo prazo, se o trecho é 
+executado muitas vezes.
+Em teoria, JIT podem até ser mais rápidos que a pré-compilação, pois podem 
+tirar proveito do máquina em que estão executando no momento e usarem intruções 
+específicas.
+
+===============================================================================
+===============================================================================
+===============================================================================
+
+# 1.6 Estrutura da Programação
 
 A concepção de um software, desde sua especificação até implementação, deve 
 passar por um rigoroso processo de desenvolvimento dividido em etapas, conforme 
@@ -765,8 +905,10 @@ JavaScript" (ClojureScript, CoffeeScript, Elm, entre outras).
 TODO: CORBA, COM, distr.systems
 
 ===============================================================================
+===============================================================================
+===============================================================================
 
-# Linguagens e Paradigmas não Convencionais de Programação
+# 1.7 Linguagens e Paradigmas não Convencionais de Programação
 
 Paradigmas de programação se referem a estilos de programação que favorecem ou 
 impõem o uso de certas contruções ou técnicas, além de influenciarem a forma de 
