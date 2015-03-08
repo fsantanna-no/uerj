@@ -1,0 +1,290 @@
+# 2.4 Esquemas de Tradução em Linguagens de Programação
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como compilação.
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+Linguagens de "baixo nível", são linguagens com semântica mais próxima a da 
+máquina, em que o programador deve manipular diretamente registradores, 
+memória, e instruções específicas da máquina.
+Como contraste, linguagens de "alto nível" escondem os detalhes de 
+funcionamento da máquina, oferecendo, por exemplo, uma semântica para manipular 
+abstrações matemáticas (funções, valores e variáveis).
+
+- Assembly é um exemplo de linguagem de baixo nível, uma vez que oferece apenas 
+  mnemônicos que mapeiam palavras em inglês para instruções de máquina 
+(praticamente numa relação um para um).
+  Por exemplo, a sentença "MOV R1 10" copia o valor 10 para o um registrador da 
+máquina.
+- A linguagem C já oferece comandos de mais alto nível que se traduzem para 
+  várias instruções de máquina.
+  Por exemplo, a sentença "repeat { remove() } until(empty());" é mais 
+inteligível para um ser humano e não expõe detalhes sobre o funcionamento 
+interno da máquina.
+No entanto, programadores C ainda precisam manipular a memória da máquina 
+diretamente e compreender, por exemplo, como os dados são fisicamente 
+organizados na memória.
+- A linguagem LISP se coloca no espectro oposto ao assembly, provendo uma 
+  semântica de manipulação de listas e operações sobre símbolos matemáticos, 
+abstraindo por completo os detalhes sobre operações e uso de memória numa 
+máquina real.
+
+    [LINGUAGENS DE BAIXO E ALTO NÍVEL]
+    baixo       médio       alto
+    assembly    C           LISP
+
+## Diferença entre Sintaxe e Semântica
+
+A sintaxe de uma LP define sua a estrutura ou forma.
+Para linguagens textuais, a sintaxe define regras sobre como combinar letras 
+para formar paralvras (tokens, no contexto de LPs), para então combinar 
+palavras para formar sentenças (ou comandos, no contexto de LPs).
+
+O conjunto de regras para a formação de tokens é conhecido como o *léxico* da 
+linguagem, e vai reconhecer, por exemplo, que o caracter 1 seguido de 0 forma o 
+número 10 e que qualquer sequência de caracteres que não começam por um dígito 
+formam um identificador:
+
+    10              (token numérico)
+    minha_variavel  (token para um identificador)
+
+Já o conjunto de regras para a formação de comandos a partir de tokens é 
+conhecido como a *sintaxe* da linguagem, e vai determinar, por exemplo, que uma 
+expressão pode ser formada por números ou identificadores separados por um 
+operador (um outro tipo de token):
+
+    10 + minha_variavel     (expressão)
+
+Tão importante quanto reconhecer formas aceitas pela linguagem, é reconhecer 
+por completo formas *não* são aceitas pela linguagem.
+Por exemplo, em C identificadores não podem começar com um dígito:
+
+    0minha_variavel     (não é nem um número nem um identificador)
+
+A sintaxe não lida com o sentido de palavras ou frases.
+Como uma analogia às linguagens naturais, a sentença "as duas cores dessa 
+cadeira são preto, branco e vermelho" está sintaticamente correta, mas possui 
+um erro semântico.
+
+Já a semântica de uma LP lida com o conteúdo, sentido ou interpretação de suas
+sentenças sintaticamente corretas.
+Pensando no exemplo anterior, o valor resultante da expressão "10 + 
+minha_variavel" será entendido como "a soma aritmética entre 10 e o conteúdo da 
+memória referente ao identificador minha_variavel".
+
+TODO: mais algo sobre semântica
+
+É comum LPs terem sintaxes diferentes para construções comuns com semântica 
+similares, como por exemplo na atribuição de variáveis:
+
+    [SINTAXE DIFERENTE, MESMA SEMÂNTICA]
+    x += y;       // C
+    x := x + y;   // Algol, Pascal, ML, Ada
+
+Também é comum linguagens de programação terem sintaxes iguais para construções 
+com semântica distintas:
+
+    [MESMA SINTAXE, SEMÂNTICA DIFERENTE]
+    s.f = 1;      // C, estrutura estática pré declarada
+    s.f = 1;      // Lua, tabela dinâmica, polimorfico, meta método
+
+## Estrutura de um Compilador
+
+Durante o processo de tradução dos programas escritos em uma LP para intruções 
+de máquina, sintaxe e semântica são tratadas em fases diferentes, já que se 
+baseiam em teorias e técnicas distintas:
+
+    ESTRUTURA GERAL DE UM COMPILADOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O compilador é o software responsável pela tradução do código fonte para o 
+código de máquina e é dividio em duas grandes partes.
+O "front end" (análise) lida com a sintaxe e semântica da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária (e.g., assembly), com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
+ends" com diferente "front ends", permitindo compilar diferentes linguagens 
+para diferentes máquinas (LxM combinações).
+Essa arquitetura é seguida por ferramentas bem sucedidas, tais como o GCC e o 
+LLVM, que permitem que diferentes linguagens sejam compiladas para diferentes 
+plataformas.
+
+## Sintaxe
+
+As duas primeiras fases do "front end", análise léxica e sintática, lidam com a 
+forma da LP.
+O objetivo dessas fases é o de reconhecer e transformar a entrada textual 
+"concreta" em uma forma abstrata, padronizada, de mais fácil manipulação para 
+as fases seguintes.
+Tipicamente o programa de entrada é transformado em uma árvore sintática 
+abstrata (AST).
+Como exemplo, independentemente da sintaxe concreta para somar dois números 
+("2+1" em C ou "(+ 2 1)" em LISP), a representação abstrata será a mesma:
+        +
+       / \
+      2   1
+
+Note que em geral uma LP pode descrever infinitos programas, dado que suas 
+construções permitem repetições ou composições:
+
+    [IDENTIFICADORES E COMANDOS POSSÍVEIS]
+    x, xx, xxx, ...                 (infinitos identificadores)
+    while(1) { while(1) { ... } }   (infinitos comandos while)
+
+Dessa maneira, as regras que descrevem o léxico e a sintaxe devem ser 
+expressadas em "meta-linguages" capazes de exprimir todas as infinitas 
+possibilidades através de uma forma finita.
+As duas meta-linguagens mais comuns são as expressões regulares, para o léxico, 
+e as BNFs (Backus-Naur form), para a sintaxe.
+
+### Análise sintática (parsing)
+
+A toda LP está associada uma gramática que descreve as construções aceitas pela 
+linguagem.
+A notação BNF é usada para esse fim e é composta pelos seguintes elementos:
+
+    - terminais:       representam os tokens vindo do scanner
+    - não terminais:   representam as regras de composição
+    - produções:       descrevem as regras de composição
+    - símbolo inicial: um não terminal representando programas válidos (em
+                       geral o que aparece em primeiro na gramática)
+
+A BNF a seguir ilustra uma gramática com aninhamento e recursão:
+
+    Exp := Exp '+' Exp      (regra com recursão)
+        | '(' Exp ')'       (regra com aninhamento)
+        |  <id>             (regra básica)
+
+A partir do símbolo inicial, essa gramática pode gerar expressões como "v", 
+"((v))" e "v+(v)".
+
+BNFs descrevem gramáticas livres de contexto (CFGs), sendo que o lado esquerdo 
+de cada produção só pode conter um único símbolo não terminal (e nenhum 
+terminal).
+
+## Semântica
+
+Após a fase de análise sintática, o front end de um compilador prossegue para a 
+fase de análise semântica, na qual tipicamente cria uma árvore sintática 
+abstrata (AST) (caso ainda não exista) e a anota com informações semânticas que 
+impõem novas restrições ao programa.
+
+CFGs não são suficientemente poderosas para descrever restrições necessárias a 
+sintaxe de uma LP.
+Por exemplo, se identificadores são declarados antes de seus usos e se o número 
+de argumentos passados a uma função corresponde ao que sua declaração 
+especifica.
+
+### Esquemas de Tradução
+
+Esquemas de tradução fazem a ligação entre fase sintática e semântica, 
+permitindo, por exemplo, a construção de ASTs anotadas.
+
+Na definição orientada a sintaxe, a cada produção da gramática está associada 
+uma denotação, ou seja, um valor construído a partir das suas sub-partes.
+O exemplo a seguir faz a transformação de expressões infixas para expressões 
+posfixas:
+
+    E -> E1 + T     E.code = E1.code || T.code || '+'
+
+Denotações puras são como funções matemáticas, mapeando valores para valores, 
+sem o uso de efeitos colaterais.
+
+Já na tradução orientada por sintaxe (SDT), é permitido associar ações 
+semânticas a regras da CFG, executando um trecho de código sempre que a regra 
+for derivada.
+
+Tipicamente, a SDT pode criar uma AST extendendo uma CFG com ações semânticas:
+
+    Exp = Exp + Exp { $$.node = new Node('+', $1.node, $3.node); }
+
+A notação é originada da ferramenta "yacc" e executa o trecho de código entre 
+chaves sempre que a regra associada for reduzida, gerando dinamicamente a AST 
+da derivação em curso.
+Os símbolos $$, $1 e $3 representam, respectivamente, o não terminal sendo 
+reduzido e dois dos três elementos que compõem a regra e estão no topo da 
+pilha.
+
+No exemplo acima, o atributo "node" do não terminal sendo reduzido é construído 
+a partir dos atributos "node" de seus filhos no topo da pilha.
+Essa forma de atribuir atributos aos símbolos é conhecida como sintetizada 
+(S-attributes) e é a mais comum em parsers bottom up.
+A árvore de derivação abaixo mostra como os atributos fluem dos filhos para os 
+pais:
+
+        E
+       / \      (setas para cima)
+      E   E
+
+A outra forma de atribuição é conhecida como herdada, na qual os filhos podem 
+herdar atributos de seus pais.
+Parsers top down usam uma variação conhecida como L-attributes que permite
+o uso de atributos herdados e sintetizados.
+Note que para parsers top down, o uso de atributos herdados é dificultado, dado 
+que a redução da regra ocorre quando os filhos já foram tratados.
+Isso não acontece no método preditivo, que já sabe que vai derivar os filhos a 
+partir de um pai.
+
+A sintaxe a seguir permite a definição de tipos array na forma id[][]:
+
+    Type = id Tail
+    Tail = [] Tail | epsilon
+
+O uso de atributos sintetizados para essa gramática permite que o tipo seja 
+construído durante a derivação da árvore, como ilustrado a seguir:
+
+            Type
+           /    \
+          id     Tail
+                 /  \
+                []  Tail
+                    /  \
+                   []   epsilon
+
+No caso atributos sintetizados, o tipo poderia ser construído somente na raíz 
+da árvore, com todo o estado necessário tendo que ser mantido através da 
+derivação da árvore.
+
+As regras de dependência entre as atribuições e o conseqüente fluxo de 
+informações na árvore implica na existência de um grafo direcionado.
+Note que devido com as restrições impostas de S-atribuições ou L-atribuições 
+esse grafo é necessariamente acíclico (DAG), garantindo que existe uma ordem 
+segura de avaliar as atribuições, bastando escolher uma dentre as posíveis 
+ordens topológicas do grafo.
+
+Além da AST, a tabela de símbolos também pode ser preenchida durante a SDT, uma 
+vez que as ações semânticas permitem efeitos colaterais globais.
+Como exemplo, sempre que uma regra de declaração de variáveis for derivada, a 
+tabela de símbolos associada ao identificador pode ser aumentada com o tipo 
+declarado.
+Assim, toda vez que o identificador for usado em comandos e expressões, a 
+análise semântica pode verificar se o uso está compatível com o seu tipo.
+
+

@@ -1,0 +1,269 @@
+# 2.6 Ambientes de Tempo de Execução para Linguagens de Programação
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+Existem duas abordagens para a tradução de linguagens de programação para 
+linguagens de máquina.
+Na compilação, o código fonte é traduzido por completo para a representação 
+binária antes da máquina executá-lo.
+Na interpretação, o código fonte é traduzido incrementalmente, durante a 
+execução do programa.
+Em geral, a escolha por compilação resulta em maior velocidade (assumindo que a 
+compilação pode ser feita com antecedência à execução), enquanto que a 
+interpretação traz maior flexibilidade.
+Tipicamente, linguagens interpretadas possuem ambientes de execução mais 
+complexos, dado que muitas decisões são tomadas somente nessa fase.
+
+O surgimento de máquinas virtuais para linguagens interpretadas introduziu um 
+intermediário entre a tradução e execução de programas:
+
+    código  -> (tradução) -> bytecodes -> (VM) -> execução
+    fonte
+
+Com essa abordagem, a máquina real agora interpreta "bytecodes" de uma máquina 
+virtual, mas o código fonte continua precisando ser traduzido (compilado) para 
+bytecodes em uma etapa anterior.
+No caso de linguagens dinâmicas que oferecem uma primitiva "eval" permitindo
+traduzir novos trechos de código durante a execução do programa, é necessário 
+que o tradutor também esteja embutido no ambiente de execução da linguagem:
+
+    código  -> (tradução) -> bytecodes -> (VM) -> execução
+    fonte
+                    \-------------------------------/
+
+## Estrutura Geral de Compiladores e Interpretadores
+
+O processo de tradução de programas é dividio em diversas fases, como ilustra o 
+diagrama a seguir:
+
+    ESTRUTURA GERAL DE UM TRADUTOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O "front end" (análise) lida com a sintaxe e semântica estática da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária (e.g., assembly), com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+
+Em linguagens compiladas, grande parte do esforço se concentra na "back-end", 
+onde ocorrem todas otimizações e a geração para a arquitetura final.
+Já em linguagens interpretadas, se a representação intermediária já forem
+bytecodes para uma máquina virtual, o "front end" pode ser eliminado por 
+completo.
+Note que o "back end" deve estar disponível durante toda a execução de 
+programas interpretados.
+
+## Ambientes de Tempo de Execução
+
+O ambiente de execução de uma linguagem controla o estado global da memória, 
+I/O, registradores e CPU.
+É ele que vai colocar a máquina em um estado consistente para iniciar a 
+execução do programa, determinar as chamadas de entrada e saída disponíveis, 
+administrar funcionalidades como alocação e coleta de memória e escalonar 
+linhas de execução no caso de linguagens concorrentes.
+Durante a execução normal, a CPU basicamente entra em um ciclo de buscar a 
+próxima instrução, decodificá-la e executá-la.
+
+Mesmo linguagens compiladas básicas como C possuem um ambiente de execução 
+("crt0.o", c-run-time) que é embutido no programa de maneira a inicializar a 
+pilha, preencher o vetor de interrupção, zerar a memória BSS antes de chamar a 
+"main" do programa.
+
+No caso da interpretação, além do ambiente de execução também embutir o front 
+end de tradução, o ciclo de busca/decodificação/execução é simulado pela 
+máquina virtual, sendo o principal custo de execução associado à 
+virtualização.
+
+### Chamadas de Subrotinas e a Pilha
+
+Praticamente qualquer linguagem de programação possui algum mecanismo de 
+chamadas de funções, procedimentos ou subrotinas.
+Para permitir chamadas de rotina aninhadas ou recursivas, os ambientes de 
+execução dependem da região de memória conhecida como pilha para guardar os 
+registros de ativação de subrotinas (com seu estado completo), que vão sendo 
+sobrepostas respeitando a ordem natural de que a subrotina chamada por último 
+será a primeira a terminar ("last in, first out").
+
+Tipicamente, o ambiente de execução configura a região da pilha para iniciar no 
+último endereço de memória disponível (e.g., 0xFFFF), crescendo na direção do 
+início da memória (0x0000):
+
+-- início
+0x0000  CÓDIGO
+        ...                 // tamanho conhecido
+0xnnnn  DADOS ESTÁTICOS
+        ...                 // tamanho conhecido
+0xmmmm  HEAP
+        ... v               // tamanho desconhecido
+        ... ^
+0xFFFF  PILHA
+-- fim
+
+TODO: árvores de ativação
+
+Registros de ativação devem conter diversas informações que somente são 
+conhecidas durante a execução do programa: parâmetros de entrada, variáveis 
+locais e valor e endereço de retorno.
+A criação do registro de ativação deve seguir um protocolo conhecido, de 
+maneira que trechos que chamam subrotinas e trechos que executam dentro de 
+subrotinas saibam exatamente como proceder nas chamadas e retornos.
+Como regra geral, o máximo de trabalho deve ser feito pela subrotina chamada, 
+evitando a multiplicação desse trabalho entre todas as chamadas do programa.
+A figura a seguir ilustra dois registros de ativação encadeados em que "f()" 
+chamando "g()", destacando as responsabilidades envolvidas entre quem chama e 
+que é chamado:
+
+ ---    ---                         SP
+ c      link de controle                ----\   (3)
+ h      status dos registradores            |   (2)
+ a      variáveis locais                    |   (1)
+ m  g() =========================== FP      |
+ a      valor de retorno                    |
+ d      parâmetros da nova chamada          |
+ a--    ----                                |
+        link de controle             ----\  |
+        status dos registradores         |  |
+        variáveis locais                 |  /
+    f() =========================== FP <----
+                                         |
+                                         |
+                                         v (para frame anterior)
+
+No exemplo acima, a subrotina chamada aloca espaço na pilha para suas locais 
+(1), guarda o estado atual dos registradores da subrotina que a chamou (2), e 
+cria um link que aponta para o início da subrotina que a chamou (3).
+No momento da chamada, esse valor é mantido em um registrador especial 
+conhecido como "frame pointer" (FP) e logo em seguida é redirecionado para o 
+novo frame.
+O FP se coloca entre as variáveis locais e os parâmetros de entrada, que são 
+ambos acessados a partir dele (com offsets negativos e positivos, 
+respectivamente).
+O topo da pilha deve ser mantido sempre pelo registrador "stack pointer" (SP), 
+que pode ser usado pela subrotina em execução para guardar valores temporários.
+No momento do retorno, o valor de retorno de ser atribuído e o topo da pilha SP 
+pode ser reconfigurado com o valor atual de FP.
+Além disso, as operações inversas à entrada devem ser efetuadas: o link de 
+controle restaurado para o valor anterior, assim como o status dos 
+registradores.
+
+### Alocação na Heap
+
+O uso da pilha pra armazenar dados de subrotinas só é efetivo devido ao fato do 
+que a execução de subrotinas são bem comportadas, sendo seguro liberar todas as 
+locais de um subrotina no momento de seu retorno.
+A região da heap deve ser usada para dados que são dinâmicos e que devem 
+sobreviver ao término do escopo onde foram criados.
+
+Como o ciclo de vida para cada dado na heap é indeterminado e depende da 
+execução do programa, algum mecanismo para gerenciar a memória deve ser 
+disponibilizado.
+As maiores dificuldades são em lidar com a variação do tamanho dos dados e com 
+a ordem de alocação e desalocação em que ocorrem.
+Três propriedades devem ser consideradas no gerenciador de memória:
+
+- Localidade: quanto mais distantes os dados estiverem entre eles, mais erros 
+  de acesso ao cache ocorrerão.
+- Fragmentação: quanto mais buracos existirem entre dados, maior é o 
+  desperdício de espaço útil para novas alocações.
+- Execução: quanto mais complexo for o gerenciador de memória for, maior é o 
+  desperdício de ciclos de CPU.
+
+Dentre as políticas de "first fit", "best fit" e "worst fit" para alocação de 
+blocos de memória, isto é, primeiro bloco encontrado, bloco de tamanho mais 
+próximo encontrado ou bloco de tamanho mais distante encontrado, a política de 
+"best fit" é a que se mostrou mais eficaz e é usada no "malloc" do GCC e no 
+"kmalloc" do kernel de Linux.
+
+Já a desalocação de memória pode ser feita manualmente ou de forma automática, 
+com o auxílio de um coletor de lixo que executa juntamente com o programa 
+buscando blocos não mais referenciados.
+
+Na desalocação manual, o programador é responsável por invocar uma primitiva 
+para liberar a memória apontada por uma referência (ponteiro) ao bloco alocado 
+anteriormente.
+Essa abordagem é eficiente, pois não exige custos extras associados ao 
+gerenciador de memória, no entanto é bastante insegura pois permite dois tipos 
+comuns de erros de programação: vazamentos de memória e acesso a ponteiros 
+pendentes (danrling pointers).
+Vazamentos de memória ocorrem quando o programador nunca desaloca um bloco de 
+memória que não é mais necessário e acessível, seja por esquecimento ou por 
+algum erro de lógica de programação.
+Para aplicações que executam por longos períodos e fazem muitas alocações, pode 
+acontecer da memória acabar.
+Acessos a ponteiros pendentes acontecem quando o programador desaloca um bloco 
+mas continua usando-o como se ele ainda estivesse vivo.
+Quando o mesmo bloco é alocado e usado novamente em outro trecho de código, as 
+consequências podem serão indeterminadas e possivelmente catastróficas.
+
+O uso do coletor de lixo (GC) libera o programador de tratar a desalocação de 
+memória e elimina por design tanto vazamentos de memória, quanto acessos a 
+ponteiros pendentes.
+A idéia básica de um GC é o de considerar como lixo quaisquer dados que não 
+possam mais ser referenciados pelo programa e assim desalocá-los da memória.
+Como o uso de um GC implica em um custo adicional, é preciso analisar o seu 
+overhead total de execução, tempo de latência (pausa para a coleta), assim como 
+o uso de espaço com metadados necessários para o seu funcionamento.
+
+No coletor por contagem de referência, cada bloco alocado possui um campo extra 
+com um contador de ponteiros para si, que ao chegar a zero, implica que o bloco 
+pode ser desalocado.
+Para manter o contador atualizado, cada operação que adiciona ou remove 
+referências ao bloco deve ser modificado para incrementar ou decrementar o 
+contador.
+Como exemplo, sempre que um ponteiro é copiado para outra variável ou passado 
+como parâmetro para uma função, o contador deve ser incrementado.
+O gerenciamento de memória por contagem de referência é bastante simples e não 
+involve longas pausas para detectar e coletar as referências mortas.
+No entanto, o custo de execução total e uso de memória é alto, dado que o 
+contador deve ser mantido atualizado e ocupa bytes extras para cada bloco 
+alocado.
+Outra desvantagem é que a abordagem não funciona para ciclos entre blocos 
+alocados, já que as referências mútuas vão manter o contador positivo.
+
+O coletor por "mark and sweep" funciona em duas fases que, de tempos em tempos 
+(e.g., quando a memória atinge um limiar mínimo), são intercaladas com a 
+execução do programa.
+Na fase de marcação ("mark"), partindo do conjunto raíz formado por todas as 
+referências globais e locais em escopo, o coletor percorre todas as referências 
+ativas da aplicação, recursivamente, marcando-as como vivas.
+Na fase de coleta ("sweep"), todas as referências que não foram marcadas como 
+vivas são desalocadas.
+Essa abordagem trata ciclos corretamente e tem um custo menor do uso de 
+memória.
+No entanto, as pausas longas para coleta são um obstáculo para a adoção do 
+"mark and sweep" para aplicações de tempo real.
+Na variação "tri-color mark and sweep", o algoritmo funciona de forma 
+incremental, com o auxílio de um conjunto de objetos "cinza" que ainda têm 
+referências pendentes a serem visitadas na próxima varredura.
+Outra variação é separar as regiões de memória em gerações, visitando as novas 
+gerações mais frequentemente, dado que objetos novos tendem a morrer antes.
+
+GCs não funcionam em linguagens com tipagem fraca, tais como C e C++, nas quais 
+o uso de aritmética de ponteiros e "type casts", já que o coletor pode 
+considerar alguns dados ainda referenciados como lixo.
+
+

@@ -1339,400 +1339,6 @@ tipo "syncrhonized".
 ===============================================================================
 ===============================================================================
 
-# 2.3 Análise Sintática
-
-Computadores somente são capazes de executar instruções muito simples e que não 
-refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
-todo software é escrito em uma linguagem de programação.
-
-De maneira geral, LPs oferecem construções linguísticas mais próximas às 
-linguagens naturais que, após serem combinadas em um programa por um humano, 
-são automaticamente traduzidas para instruções entendidas pela máquina, num 
-processo conhecido como compilação.
-
-    [TRADUÇÃO ENTRE LP E MÁQUINA]
-    abcxyz  -> |tradutor| -> 010101 -> |execução|
-    (humano)                 (máquina)
-
-A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
-é possível expressar com essa notação de maneira a controlar a máquina 
-(semântica).
-
-## Diferença entre Sintaxe e Semântica
-
-A sintaxe de uma LP define sua a estrutura ou forma.
-Para linguagens textuais, a sintaxe define regras sobre como combinar letras 
-para formar paralvras (tokens, no contexto de LPs), para então combinar 
-palavras para formar sentenças (ou comandos, no contexto de LPs).
-
-O conjunto de regras para a formação de tokens é conhecido como o *léxico* da 
-linguagem, e vai reconhecer, por exemplo, que o caracter 1 seguido de 0 forma o 
-número 10 e que qualquer sequência de caracteres que não começam por um dígito 
-formam um identificador:
-
-    10              (token numérico)
-    minha_variavel  (token para um identificador)
-
-Já o conjunto de regras para a formação de comandos a partir de tokens é 
-conhecido como a *sintaxe* da linguagem, e vai determinar, por exemplo, que uma 
-expressão pode ser formada por números ou identificadores separados por um 
-operador (um outro tipo de token):
-
-    10 + minha_variavel     (expressão)
-
-Tão importante quanto reconhecer formas aceitas pela linguagem, é reconhecer 
-por completo formas *não* são aceitas pela linguagem.
-Por exemplo, em C identificadores não podem começar com um dígito:
-
-    0minha_variavel     (não é nem um número nem um identificador)
-
-A sintaxe não lida com o sentido de palavras ou frases.
-Como uma analogia às linguagens naturais, a sentença "as duas cores dessa 
-cadeira são preto, branco e vermelho" está sintaticamente correta, mas possui 
-um erro semântico.
-
-Já a semântica de uma LP lida com o conteúdo, sentido ou interpretação de suas
-sentenças sintaticamente corretas.
-Pensando no exemplo anterior, o valor resultante da expressão "10 + 
-minha_variavel" será entendido como "a soma aritmética entre 10 e o conteúdo da 
-memória referente ao identificador minha_variavel".
-
-## Estrutura de um Compilador
-
-Durante o processo de tradução dos programas escritos em uma LP para intruções 
-de máquina, sintaxe e semântica são tratadas em fases diferentes, já que se 
-baseiam em teorias e técnicas distintas:
-
-    ESTRUTURA GERAL DE UM COMPILADOR
-    - Análise / Front-end:
-        - CARACTERES       --[analisador léxico]-->
-          TOKENS           --[analisador sintático]-->
-          ÁRVORE SINTÁTICA --[analisador semântico]-->
-          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
-    - Síntese / Back-end:
-        - RI/CI             --[montador]-->
-          CÓDIGO DE MÁQUINA --[otimizador]-->
-          CÓDIGO DE MÁQUINA --[ligador]-->
-          CÓDIGO DE MÁQUINA (não relocável)
-    - Tabela de Símbolos
-        - preenchida e compartilhada por todas as fases
-        - banco de dados com linha,tipo,escopo
-
-O compilador é o software responsável pela tradução do código fonte para o 
-código de máquina e é dividio em duas grandes partes.
-O "front end" (análise) lida com a sintaxe e semântica da linguagem, 
-verificando se o programa de entrada é válido e gerando uma representação 
-intermediária (e.g., assembly), com os detalhes sintáticos eliminados.
-Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
-específica, transformando a representação intermediária no código final.
-Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
-ends" com diferente "front ends", permitindo compilar diferentes linguagens 
-para diferentes máquinas (LxM combinações).
-Essa arquitetura é seguida por ferramentas bem sucedidas, tais como o GCC e o 
-LLVM, que permitem que diferentes linguagens sejam compiladas para diferentes 
-plataformas.
-
-## Sintaxe
-
-As duas primeiras fases do "front end", análise léxica e sintática, lidam com a 
-forma da LP.
-O objetivo dessas fases é o de reconhecer e transformar a entrada textual 
-"concreta" em uma forma abstrata, padronizada, de mais fácil manipulação para 
-as fases seguintes.
-Tipicamente o programa de entrada é transformado em uma árvore sintática 
-abstrata (AST).
-Como exemplo, independentemente da sintaxe concreta para somar dois números 
-("2+1" em C ou "(+ 2 1)" em LISP), a representação abstrata será a mesma:
-        +
-       / \
-      2   1
-
-Note que em geral uma LP pode descrever infinitos programas, dado que suas 
-construções permitem repetições ou composições:
-
-    [IDENTIFICADORES E COMANDOS POSSÍVEIS]
-    x, xx, xxx, ...                 (infinitos identificadores)
-    while(1) { while(1) { ... } }   (infinitos comandos while)
-
-Dessa maneira, as regras que descrevem o léxico e a sintaxe devem ser 
-expressadas em "meta-linguages" capazes de exprimir todas as infinitas 
-possibilidades através de uma forma finita.
-As duas meta-linguagens mais comuns são as expressões regulares, para o léxico, 
-e as BNFs (Backus-Naur form), para a sintaxe.
-
-## Análise léxica (scanning)
-
-A primeira fase do compilador lida com a transformação de um fluxo de 
-caracteres escritos na LP para um fluxo de tokens a ser repassado para a 
-análise sintática.
-Tipicamente os tokens representam números, identificadores, palavras reservadas 
-e operadores aceitos pela LP.
-Além do que ele representa, um token pode carregar atributos adicionais, tais 
-como o seu conteúdo completo (lexeme) e a linha onde aparece.
-
-O exemplo a seguir, em C, separa uma sequência de caracteres em tokens:
-
-    x = 1;  =>  <ID,"x",1>  <"=",1>  <NUM,"1",1> <";",1>
-
-O programa que reconhece a entrada como válida e a transforma em tokens é 
-conhecido como "scanner" e pode ser gerado automaticamente por uma ferramenta 
-"geradora de scanners".
-Essas ferramentas se baseiam na teoria de linguagens regulares (LRs) e sua 
-correspondência com autômatos finitos determinísticos (DFAs), ou seja, que 
-qualquer linguagem regular pode ser reconhecida por um DFA.
-
-## Análise sintática (parsing)
-
-As contruções sintáticas são consideravelmente mais complexas que as léxicas, 
-tipicamente descrevendo aninhamento e regras recursivas.
-Dessa forma, um formalismo mais poderoso que LRs se faz necessário, como por 
-exemplo as linguagens livre de contexto (CFL) e sua correspondência com 
-autômatos de pilha.
-
-A toda LP está associada uma gramática que descreve as construções aceitas pela 
-linguagem.
-A notação BNF é usada para esse fim e é composta pelos seguintes elementos:
-
-    - terminais:       representam os tokens vindo do scanner
-    - não terminais:   representam as regras de composição
-    - produções:       descrevem as regras de composição
-    - símbolo inicial: um não terminal representando programas válidos (em
-                       geral o que aparece em primeiro na gramática)
-
-A BNF a seguir ilustra uma gramática com aninhamento e recursão:
-
-    Exp := Exp '+' Exp      (regra com recursão)
-        | '(' Exp ')'       (regra com aninhamento)
-        |  <id>             (regra básica)
-
-A partir do símbolo inicial, essa gramática pode gerar expressões como "v", 
-"((v))" e "v+(v)".
-
-BNFs descrevem gramáticas livres de contexto (CFGs), sendo que o lado esquerdo 
-de cada produção só pode conter um único símbolo não terminal (e nenhum 
-terminal).
-
-O processo de gerar strings a partir da escolha de regras de uma CFG é 
-conhecido como derivação, que implicitamente forma uma árvore de derivação.
-Por exemplo, a string "v" é gerada com a escolha da regra 3 acima, enquanto que 
-a string "v+(v)", com a escolhas das regras 1,3,2,3:
-
-    Exp --(1)--> v
-    Exp --(1)--> Exp '+' Exp
-                  --(3)-->v
-                          --(2)--> '(' Exp ')'
-                                        --(3)-->v
-
-Em uma árvore de derivação, nós representam não terminais e folhas representam 
-terminais.
-
-TODO: derivações à esquerda e à direita
-
-É comum a árvore carregar informações que são irrelevantes para as fases 
-posteriores de compilação, tais como o nomes das regras derivadas, parênteses 
-de grupamento ou pontuações.
-No exemplo anterior, a árvore concreta pode ser simplificada para uma árvore 
-abstrata como a seguir:
-
-    v '+' v
-
-Quando uma string pode ser gerar mais de uma árvore de derivação, a gramática é 
-considerada ambígua, o que pode acarretar em inconsistências na semântica da 
-linguagem.
-Note que a gramática do exemplo anterior é ambígua, pois para duas somas em 
-sequência "v + v + v", pode gerar uma árvore desbalanceada para esquerda ou 
-para a direita:
-
-    (v + v) + v         v + (v + v)
-
-Como a soma é comutativa, essa ambiguidade não gera problemas semânticos.
-
-No entanto, há dois casos clássicos de ambiguidade na gramática da linguagem C.
-O primeiro, conhecido como "dangling else" deixa dúvidas sobre a qual "if" o 
-"else" deve casar:
-    if e1 then if e2 then s1 else s2
-               (                   )
-               (           )
-O segundo caso não distingue precisamente declarações de expressões e a string 
-"x * y" pode ter duas interpretações: "declaração de y como tipo ponteiro para 
-x" ou "multiplicação entre x e y com o resultado sendo ignorado".
-Essas ambiguidades são resolvidas com truques na implementação da linguagem, 
-por exemplo, o "dangling else" é resolvido dando prioridade ao "if" mais 
-próximo ao "else".
-
-TODO: retirar ambiguidade soma com termos, etc
-
-O programa que reconhece programas de entrada de acordo com uma CFG é conhecido 
-como "parser" e também pode ser gerado automaticamente por uma ferramenta 
-"geradora de parsers".
-
-Existem duas técnicas básicas para a construção de parsers, ambas usam um 
-algoritmo determinístico com o auxílio de um pilha.
-Na técnica top down, também conhecida como preditiva, o topo da pilha sempre 
-contém o não terminal da CFG que será reconhecido a seguir, começando pelo 
-símbolo inicial da CFG.
-Na técnica bottom up, o topo da pilha sempre contém o último símbolo 
-reconhecido, sempre terminando com o símbolo inicial da CFG (em caso de 
-sucesso).
-
-### Top down
-
-A técnica top down pode ser aplicada manualmente, sem o auxílio de ferramenta 
-geradoras de parsers.
-No parser recursivo descendente, a cada regra da CFG é associada uma função que 
-tenta casar a sua produção.
-Para uma regra como "While ::= <while> ( Exp ) Stmt", a função While pode ser 
-definida da seguinte maneira:
-
-    int While () {
-        return match("while")
-            && match("(")
-            && Exp()
-            && match(")"
-            && Stmt();
-    }
-
-Cada terminal é casado com a função "match" e cada não terminal chama a sua 
-função correspondente (a função retorna se sucedeu ou não).
-
-Note que para uma regra com duas ou mais produções (e.g., Stmt ::= While|If), o 
-uso da técnica descrita dependeria de backtracking, ou seja, se uma regra 
-falhar, a outra deve ser tentada.
-Algoritmos com backtracking são exponenciais e devem ser evitados.
-
-Note também que regras com recursão à esquerda (e.g., Exp ::= Exp '+' Exp) não 
-podem ser reconhecidas por parsers top down, uma vez que a máquina nunca iria 
-avançar com a entrada (e.g., sempre empilhando Exp sobre Exp sobre Exp).
-
-O componente preditivo do parser top down remove a necessidade de backtracking 
-do parser recursivo e se baseia na construção de uma tabela que prevê qual 
-regra escolher para uma determinada entrada:
-
-    T[A,a] = A -> alpha
-    -- (Se a entrada é "a" e o topo da pilha é "A", então escolha a regra "A -> alpha")
-
-Os parsers preditivos podem ser construidos automaticamente para uma classe de 
-CFGs conhecidas como LL(1).
-A construção da tabela se baseia na existência dos conjuntos FIRST(alpha) e 
-FOLLOW(A).
-FIRST(alpha) diz quais terminais podem aparecer no início de uma produção 
-alpha.
-FOLLOW(A) diz quais terminais pode vir após "A" ser casado dentro de qualquer 
-produção.
-Para montar a tabela, basta percorrer todas as produções "A -> alpha" da CFG:
-    - se "a" está em FIRST(alpha), então T[A,a]=alpha
-    - se @ está em FIRST(alpha) e para cada "b" em FOLLOW(A), então T[A,b]=alpha
-Campos vazios na tabela representam pontos em que o parser não tem como 
-prosseguir com a entrada, devendo gerar um erro de compilação (caso um programa
-alcance esse estado).
-
-Além de não lidar com recursões à esquerda, a classe LL(1) também não pode 
-lidar com CFGs que gerem tabelas onde um campo possui duas entradas, uma vez 
-que o algoritmo não saberá para onde prosseguir.
-
-TODO: construção de FIRST e FOLLOW
-TODO: eliminação de recursão à esquerda
-
-### bottom up
-
-A técnica bottom up é em geral aplicada por uma ferramenta geradora de parsers.
-Os parsers "shft-reduce" para gramáticas LR são os mais comuns.
-A classe LR é mais poderosa que LL consguindo tratar, por exemplo, gramáticas 
-com recursões à esquerda.
-
-Em contraste com a técnica top down, o reconhecimento de strings acontece a 
-partir das folhas (terminais/tokens) na direção da raíz (símbolo inicial).
-Esse processo, conhecido como redução, é exatamente o inverso de uma derivação 
-de gramática.
-
-O algoritmo "shift-reduce" é auxiliado por uma tabela de ações que, dado os 
-símbolos no topo da pilha e o próximo símbolo de entrada, diz se a entrada deve 
-ser empilhada ("shift") ou se os "N" elementos do topo da pilha devem ser 
-substituídos ("reduce") por um não terminal (de acordo com alguma regra da 
-gramática).
-Essa tabela é construída no momento da tradução da CFG de entrada para o 
-algoritmo de reconhecimento.
-
-O exemplo a seguir ilustra o reconhecimento da string "v + v" para a gramática
-
-    S -> E
-    E -> E + T
-       | T
-    T -> id
-
-    1: empilha v
-    2: reduz   v -> T
-    3: reduz   T -> E
-    4: empilha +
-    5: empilha v
-    6: reduz   v -> T
-    7: reduz   E+T -> E
-    8: reduz   E -> S
-
-A árvore de redução mostra a entrada na base e a ordem de execução das ações, 
-mostrando como ela é construída de baixo para cima.
-
-O processo de construção da tabela se baseia na análise de todos os possíveis 
-estados em que as regras de produção podem estar durante o reconhecimento da 
-entrada.
-Cada estado é formado por um conjunto de itens que estendem as produções com um 
-ponto "." para representar o quanto da regra já foi reconhecida.
-As funções CLOSURE e GOTO auxiliam a construção de um autômato finito a partir 
-dos itens em cada estado.
-
-Para a gramática acima, o estado inicial contém somente dois itens, indicando 
-que uma expressão precisa ser reconhecida:
-
-    S -> . E        // regra inicial
-    E -> . E + T    // adicionado por CLOSURE
-
-Como a regra inicial precisa reconhecer "E", a função CLOSURE irá detectar 
-todas a regras que possuem "E" à esquerda e incluí-las no mesmo estado (com o 
-"." no seu início).
-A função funciona de forma recursiva para as regras que forem sendo adicionadas 
-a um estado.
-
-A função GOTO(s,x) define as transições entre os estados (s) de acordo com a 
-entrada no topo da pilha (x).
-Baseado nos itens do estado inicial, somente a entrada "E" pode gerar uma 
-transição:
-
-    (1) --E-->  S -> E .
-                E -> E . + T
-
-O processo de construção dos estados e transições é repetido enquanto houver 
-transições para estados ainda não presentes no autômato.
-
-Com o autômato construído, a decisão entre ações se resume a dar um "shift" no 
-símbolo de entrada, caso exista uma transição para ele, ou aplicar um "reduce" 
-para a regra cujo item possui um "." totalmente à direita.
-Por exemplo, no estado (2) acima, se a entrada for '+', o autômato fará um 
-"shift" e transitará para o próximo estado, caso contrário irá reduzir a regra 
-"S -> E .", substituindo seu corpo inteiro do topo da pilha ("E") para o 
-símbolo à esquerda da regra ("S").
-
-O formato final da tabela de ações e a adoção ou não de lookaheads para 
-resolver conflitos vai determinar o tipo de parser LR.
-O parser mais simples, baseado no algoritmo acima é o SLR, que pode ser 
-estendido com lookaheads (LR(k)) e com compactação da tabela (LALR(k)).
-
-LR(k) > LALR(k) > SLR >
-      > LL(k)
-
-Conflitos em gramáticas LR são caracterizados por tabelas com duas ações 
-possíveis para um estado e um símbolo de entrada.
-No conflito "shift-reduce", o parser não sabe se empilha o próximo síbolo ou se 
-reduz os símbolos no topo da pilha.
-Um exemplo desse conflito é o "dangling else" discutido acima, isto é, o else 
-deve ser empilhado ou o if no topo deve ser reduzido?
-No conlito "reduce-reduce" há duas possíveis regras de redução no estado atual.
-Um exemplo desse conflito acontece com uma mesma sintaxe para chamadas de 
-função e indexação de array.
-
-===============================================================================
-===============================================================================
-===============================================================================
-
 # 1.6 Estrutura da Programação
 
 A concepção de um software, desde sua especificação até implementação, deve 
@@ -2689,6 +2295,400 @@ sintaxe de uma LP.
 Por exemplo, se identificadores são declarados antes de seus usos e se o número 
 de argumentos passados a uma função corresponde ao que sua declaração 
 especifica.
+
+===============================================================================
+===============================================================================
+===============================================================================
+
+# 2.3 Análise Sintática
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como compilação.
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+## Diferença entre Sintaxe e Semântica
+
+A sintaxe de uma LP define sua a estrutura ou forma.
+Para linguagens textuais, a sintaxe define regras sobre como combinar letras 
+para formar paralvras (tokens, no contexto de LPs), para então combinar 
+palavras para formar sentenças (ou comandos, no contexto de LPs).
+
+O conjunto de regras para a formação de tokens é conhecido como o *léxico* da 
+linguagem, e vai reconhecer, por exemplo, que o caracter 1 seguido de 0 forma o 
+número 10 e que qualquer sequência de caracteres que não começam por um dígito 
+formam um identificador:
+
+    10              (token numérico)
+    minha_variavel  (token para um identificador)
+
+Já o conjunto de regras para a formação de comandos a partir de tokens é 
+conhecido como a *sintaxe* da linguagem, e vai determinar, por exemplo, que uma 
+expressão pode ser formada por números ou identificadores separados por um 
+operador (um outro tipo de token):
+
+    10 + minha_variavel     (expressão)
+
+Tão importante quanto reconhecer formas aceitas pela linguagem, é reconhecer 
+por completo formas *não* são aceitas pela linguagem.
+Por exemplo, em C identificadores não podem começar com um dígito:
+
+    0minha_variavel     (não é nem um número nem um identificador)
+
+A sintaxe não lida com o sentido de palavras ou frases.
+Como uma analogia às linguagens naturais, a sentença "as duas cores dessa 
+cadeira são preto, branco e vermelho" está sintaticamente correta, mas possui 
+um erro semântico.
+
+Já a semântica de uma LP lida com o conteúdo, sentido ou interpretação de suas
+sentenças sintaticamente corretas.
+Pensando no exemplo anterior, o valor resultante da expressão "10 + 
+minha_variavel" será entendido como "a soma aritmética entre 10 e o conteúdo da 
+memória referente ao identificador minha_variavel".
+
+## Estrutura de um Compilador
+
+Durante o processo de tradução dos programas escritos em uma LP para intruções 
+de máquina, sintaxe e semântica são tratadas em fases diferentes, já que se 
+baseiam em teorias e técnicas distintas:
+
+    ESTRUTURA GERAL DE UM COMPILADOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O compilador é o software responsável pela tradução do código fonte para o 
+código de máquina e é dividio em duas grandes partes.
+O "front end" (análise) lida com a sintaxe e semântica da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária (e.g., assembly), com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
+ends" com diferente "front ends", permitindo compilar diferentes linguagens 
+para diferentes máquinas (LxM combinações).
+Essa arquitetura é seguida por ferramentas bem sucedidas, tais como o GCC e o 
+LLVM, que permitem que diferentes linguagens sejam compiladas para diferentes 
+plataformas.
+
+## Sintaxe
+
+As duas primeiras fases do "front end", análise léxica e sintática, lidam com a 
+forma da LP.
+O objetivo dessas fases é o de reconhecer e transformar a entrada textual 
+"concreta" em uma forma abstrata, padronizada, de mais fácil manipulação para 
+as fases seguintes.
+Tipicamente o programa de entrada é transformado em uma árvore sintática 
+abstrata (AST).
+Como exemplo, independentemente da sintaxe concreta para somar dois números 
+("2+1" em C ou "(+ 2 1)" em LISP), a representação abstrata será a mesma:
+        +
+       / \
+      2   1
+
+Note que em geral uma LP pode descrever infinitos programas, dado que suas 
+construções permitem repetições ou composições:
+
+    [IDENTIFICADORES E COMANDOS POSSÍVEIS]
+    x, xx, xxx, ...                 (infinitos identificadores)
+    while(1) { while(1) { ... } }   (infinitos comandos while)
+
+Dessa maneira, as regras que descrevem o léxico e a sintaxe devem ser 
+expressadas em "meta-linguages" capazes de exprimir todas as infinitas 
+possibilidades através de uma forma finita.
+As duas meta-linguagens mais comuns são as expressões regulares, para o léxico, 
+e as BNFs (Backus-Naur form), para a sintaxe.
+
+## Análise léxica (scanning)
+
+A primeira fase do compilador lida com a transformação de um fluxo de 
+caracteres escritos na LP para um fluxo de tokens a ser repassado para a 
+análise sintática.
+Tipicamente os tokens representam números, identificadores, palavras reservadas 
+e operadores aceitos pela LP.
+Além do que ele representa, um token pode carregar atributos adicionais, tais 
+como o seu conteúdo completo (lexeme) e a linha onde aparece.
+
+O exemplo a seguir, em C, separa uma sequência de caracteres em tokens:
+
+    x = 1;  =>  <ID,"x",1>  <"=",1>  <NUM,"1",1> <";",1>
+
+O programa que reconhece a entrada como válida e a transforma em tokens é 
+conhecido como "scanner" e pode ser gerado automaticamente por uma ferramenta 
+"geradora de scanners".
+Essas ferramentas se baseiam na teoria de linguagens regulares (LRs) e sua 
+correspondência com autômatos finitos determinísticos (DFAs), ou seja, que 
+qualquer linguagem regular pode ser reconhecida por um DFA.
+
+## Análise sintática (parsing)
+
+As contruções sintáticas são consideravelmente mais complexas que as léxicas, 
+tipicamente descrevendo aninhamento e regras recursivas.
+Dessa forma, um formalismo mais poderoso que LRs se faz necessário, como por 
+exemplo as linguagens livre de contexto (CFL) e sua correspondência com 
+autômatos de pilha.
+
+A toda LP está associada uma gramática que descreve as construções aceitas pela 
+linguagem.
+A notação BNF é usada para esse fim e é composta pelos seguintes elementos:
+
+    - terminais:       representam os tokens vindo do scanner
+    - não terminais:   representam as regras de composição
+    - produções:       descrevem as regras de composição
+    - símbolo inicial: um não terminal representando programas válidos (em
+                       geral o que aparece em primeiro na gramática)
+
+A BNF a seguir ilustra uma gramática com aninhamento e recursão:
+
+    Exp := Exp '+' Exp      (regra com recursão)
+        | '(' Exp ')'       (regra com aninhamento)
+        |  <id>             (regra básica)
+
+A partir do símbolo inicial, essa gramática pode gerar expressões como "v", 
+"((v))" e "v+(v)".
+
+BNFs descrevem gramáticas livres de contexto (CFGs), sendo que o lado esquerdo 
+de cada produção só pode conter um único símbolo não terminal (e nenhum 
+terminal).
+
+O processo de gerar strings a partir da escolha de regras de uma CFG é 
+conhecido como derivação, que implicitamente forma uma árvore de derivação.
+Por exemplo, a string "v" é gerada com a escolha da regra 3 acima, enquanto que 
+a string "v+(v)", com a escolhas das regras 1,3,2,3:
+
+    Exp --(1)--> v
+    Exp --(1)--> Exp '+' Exp
+                  --(3)-->v
+                          --(2)--> '(' Exp ')'
+                                        --(3)-->v
+
+Em uma árvore de derivação, nós representam não terminais e folhas representam 
+terminais.
+
+TODO: derivações à esquerda e à direita
+
+É comum a árvore carregar informações que são irrelevantes para as fases 
+posteriores de compilação, tais como o nomes das regras derivadas, parênteses 
+de grupamento ou pontuações.
+No exemplo anterior, a árvore concreta pode ser simplificada para uma árvore 
+abstrata como a seguir:
+
+    v '+' v
+
+Quando uma string pode ser gerar mais de uma árvore de derivação, a gramática é 
+considerada ambígua, o que pode acarretar em inconsistências na semântica da 
+linguagem.
+Note que a gramática do exemplo anterior é ambígua, pois para duas somas em 
+sequência "v + v + v", pode gerar uma árvore desbalanceada para esquerda ou 
+para a direita:
+
+    (v + v) + v         v + (v + v)
+
+Como a soma é comutativa, essa ambiguidade não gera problemas semânticos.
+
+No entanto, há dois casos clássicos de ambiguidade na gramática da linguagem C.
+O primeiro, conhecido como "dangling else" deixa dúvidas sobre a qual "if" o 
+"else" deve casar:
+    if e1 then if e2 then s1 else s2
+               (                   )
+               (           )
+O segundo caso não distingue precisamente declarações de expressões e a string 
+"x * y" pode ter duas interpretações: "declaração de y como tipo ponteiro para 
+x" ou "multiplicação entre x e y com o resultado sendo ignorado".
+Essas ambiguidades são resolvidas com truques na implementação da linguagem, 
+por exemplo, o "dangling else" é resolvido dando prioridade ao "if" mais 
+próximo ao "else".
+
+TODO: retirar ambiguidade soma com termos, etc
+
+O programa que reconhece programas de entrada de acordo com uma CFG é conhecido 
+como "parser" e também pode ser gerado automaticamente por uma ferramenta 
+"geradora de parsers".
+
+Existem duas técnicas básicas para a construção de parsers, ambas usam um 
+algoritmo determinístico com o auxílio de um pilha.
+Na técnica top down, também conhecida como preditiva, o topo da pilha sempre 
+contém o não terminal da CFG que será reconhecido a seguir, começando pelo 
+símbolo inicial da CFG.
+Na técnica bottom up, o topo da pilha sempre contém o último símbolo 
+reconhecido, sempre terminando com o símbolo inicial da CFG (em caso de 
+sucesso).
+
+### Top down
+
+A técnica top down pode ser aplicada manualmente, sem o auxílio de ferramenta 
+geradoras de parsers.
+No parser recursivo descendente, a cada regra da CFG é associada uma função que 
+tenta casar a sua produção.
+Para uma regra como "While ::= <while> ( Exp ) Stmt", a função While pode ser 
+definida da seguinte maneira:
+
+    int While () {
+        return match("while")
+            && match("(")
+            && Exp()
+            && match(")"
+            && Stmt();
+    }
+
+Cada terminal é casado com a função "match" e cada não terminal chama a sua 
+função correspondente (a função retorna se sucedeu ou não).
+
+Note que para uma regra com duas ou mais produções (e.g., Stmt ::= While|If), o 
+uso da técnica descrita dependeria de backtracking, ou seja, se uma regra 
+falhar, a outra deve ser tentada.
+Algoritmos com backtracking são exponenciais e devem ser evitados.
+
+Note também que regras com recursão à esquerda (e.g., Exp ::= Exp '+' Exp) não 
+podem ser reconhecidas por parsers top down, uma vez que a máquina nunca iria 
+avançar com a entrada (e.g., sempre empilhando Exp sobre Exp sobre Exp).
+
+O componente preditivo do parser top down remove a necessidade de backtracking 
+do parser recursivo e se baseia na construção de uma tabela que prevê qual 
+regra escolher para uma determinada entrada:
+
+    T[A,a] = A -> alpha
+    -- (Se a entrada é "a" e o topo da pilha é "A", então escolha a regra "A -> alpha")
+
+Os parsers preditivos podem ser construidos automaticamente para uma classe de 
+CFGs conhecidas como LL(1).
+A construção da tabela se baseia na existência dos conjuntos FIRST(alpha) e 
+FOLLOW(A).
+FIRST(alpha) diz quais terminais podem aparecer no início de uma produção 
+alpha.
+FOLLOW(A) diz quais terminais pode vir após "A" ser casado dentro de qualquer 
+produção.
+Para montar a tabela, basta percorrer todas as produções "A -> alpha" da CFG:
+    - se "a" está em FIRST(alpha), então T[A,a]=alpha
+    - se @ está em FIRST(alpha) e para cada "b" em FOLLOW(A), então T[A,b]=alpha
+Campos vazios na tabela representam pontos em que o parser não tem como 
+prosseguir com a entrada, devendo gerar um erro de compilação (caso um programa
+alcance esse estado).
+
+Além de não lidar com recursões à esquerda, a classe LL(1) também não pode 
+lidar com CFGs que gerem tabelas onde um campo possui duas entradas, uma vez 
+que o algoritmo não saberá para onde prosseguir.
+
+TODO: construção de FIRST e FOLLOW
+TODO: eliminação de recursão à esquerda
+
+### bottom up
+
+A técnica bottom up é em geral aplicada por uma ferramenta geradora de parsers.
+Os parsers "shft-reduce" para gramáticas LR são os mais comuns.
+A classe LR é mais poderosa que LL consguindo tratar, por exemplo, gramáticas 
+com recursões à esquerda.
+
+Em contraste com a técnica top down, o reconhecimento de strings acontece a 
+partir das folhas (terminais/tokens) na direção da raíz (símbolo inicial).
+Esse processo, conhecido como redução, é exatamente o inverso de uma derivação 
+de gramática.
+
+O algoritmo "shift-reduce" é auxiliado por uma tabela de ações que, dado os 
+símbolos no topo da pilha e o próximo símbolo de entrada, diz se a entrada deve 
+ser empilhada ("shift") ou se os "N" elementos do topo da pilha devem ser 
+substituídos ("reduce") por um não terminal (de acordo com alguma regra da 
+gramática).
+Essa tabela é construída no momento da tradução da CFG de entrada para o 
+algoritmo de reconhecimento.
+
+O exemplo a seguir ilustra o reconhecimento da string "v + v" para a gramática
+
+    S -> E
+    E -> E + T
+       | T
+    T -> id
+
+    1: empilha v
+    2: reduz   v -> T
+    3: reduz   T -> E
+    4: empilha +
+    5: empilha v
+    6: reduz   v -> T
+    7: reduz   E+T -> E
+    8: reduz   E -> S
+
+A árvore de redução mostra a entrada na base e a ordem de execução das ações, 
+mostrando como ela é construída de baixo para cima.
+
+O processo de construção da tabela se baseia na análise de todos os possíveis 
+estados em que as regras de produção podem estar durante o reconhecimento da 
+entrada.
+Cada estado é formado por um conjunto de itens que estendem as produções com um 
+ponto "." para representar o quanto da regra já foi reconhecida.
+As funções CLOSURE e GOTO auxiliam a construção de um autômato finito a partir 
+dos itens em cada estado.
+
+Para a gramática acima, o estado inicial contém somente dois itens, indicando 
+que uma expressão precisa ser reconhecida:
+
+    S -> . E        // regra inicial
+    E -> . E + T    // adicionado por CLOSURE
+
+Como a regra inicial precisa reconhecer "E", a função CLOSURE irá detectar 
+todas a regras que possuem "E" à esquerda e incluí-las no mesmo estado (com o 
+"." no seu início).
+A função funciona de forma recursiva para as regras que forem sendo adicionadas 
+a um estado.
+
+A função GOTO(s,x) define as transições entre os estados (s) de acordo com a 
+entrada no topo da pilha (x).
+Baseado nos itens do estado inicial, somente a entrada "E" pode gerar uma 
+transição:
+
+    (1) --E-->  S -> E .
+                E -> E . + T
+
+O processo de construção dos estados e transições é repetido enquanto houver 
+transições para estados ainda não presentes no autômato.
+
+Com o autômato construído, a decisão entre ações se resume a dar um "shift" no 
+símbolo de entrada, caso exista uma transição para ele, ou aplicar um "reduce" 
+para a regra cujo item possui um "." totalmente à direita.
+Por exemplo, no estado (2) acima, se a entrada for '+', o autômato fará um 
+"shift" e transitará para o próximo estado, caso contrário irá reduzir a regra 
+"S -> E .", substituindo seu corpo inteiro do topo da pilha ("E") para o 
+símbolo à esquerda da regra ("S").
+
+O formato final da tabela de ações e a adoção ou não de lookaheads para 
+resolver conflitos vai determinar o tipo de parser LR.
+O parser mais simples, baseado no algoritmo acima é o SLR, que pode ser 
+estendido com lookaheads (LR(k)) e com compactação da tabela (LALR(k)).
+
+LR(k) > LALR(k) > SLR >
+      > LL(k)
+
+Conflitos em gramáticas LR são caracterizados por tabelas com duas ações 
+possíveis para um estado e um símbolo de entrada.
+No conflito "shift-reduce", o parser não sabe se empilha o próximo síbolo ou se 
+reduz os símbolos no topo da pilha.
+Um exemplo desse conflito é o "dangling else" discutido acima, isto é, o else 
+deve ser empilhado ou o if no topo deve ser reduzido?
+No conlito "reduce-reduce" há duas possíveis regras de redução no estado atual.
+Um exemplo desse conflito acontece com uma mesma sintaxe para chamadas de 
+função e indexação de array.
 
 ===============================================================================
 ===============================================================================

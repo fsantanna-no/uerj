@@ -1,0 +1,214 @@
+# 2.7 Linguagens Intermediárias
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+Existem duas abordagens para a tradução de linguagens de programação para 
+linguagens de máquina.
+Na compilação, o código fonte é traduzido por completo para a representação 
+binária antes da máquina executá-lo.
+Na interpretação, o código fonte é traduzido incrementalmente, durante a 
+execução do programa.
+Em geral, a escolha por compilação resulta em maior velocidade (assumindo que a 
+compilação pode ser feita com antecedência à execução), enquanto que a 
+interpretação traz maior flexibilidade.
+Em ambos os casos, a linguagem de programação pode ser traduzida para uma 
+representação intermediária ("bytecodes") que pode ser mais facilmente 
+compilada ou interpretada.
+
+## Estrutura Geral de Tradutores
+
+O processo de tradução de programas é dividio em diversas fases, como ilustra o 
+diagrama a seguir:
+
+    ESTRUTURA GERAL DE UM TRADUTOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O "front end" (análise) lida com a sintaxe e semântica estática da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária, com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
+ends" com diferente "front ends", permitindo compilar diferentes linguagens 
+para diferentes máquinas (L x M combinações).
+Essa arquitetura é seguida por ferramentas bem sucedidas, tais como o GCC e o 
+LLVM, que permitem que diferentes linguagens sejam compiladas para uma 
+representação intermediária que pode em seguida ser compilada para diferentes 
+plataformas.
+
+Em linguagens compiladas, grande parte do esforço se concentra na "back-end", 
+onde ocorrem todas otimizações e a geração para a arquitetura final.
+Já em linguagens interpretadas, se a representação intermediária já forem 
+bytecodes para uma máquina virtual, o "front end" pode ser eliminado por 
+completo.
+
+## Representações Intermediárias
+
+Como principais requisitos, a linguagem ou representação intermediária (RIs) 
+deve ser
+(1) independente de arquitetura, i.e., com operações simples que não visam uma 
+arquitetura específica (e.g., instruções CISC que efetuam diversas operações);
+(2) facilmente geradas e traduzidas entre front ends e back ends, por exemplo 
+com uma forma regular (e.g., árvore ou código de 3 endereços);
+(3) otimizáveis, com o mínimo de dependência entre instruções (e.g., uso de 
+offsets ou referências), de maneira a permitir manipulações arbritárias no 
+código.
+
+RIs devem encontrar um balanço de expressividade entre as possíveis linguagens
+sendo compiladas e as possíveis arquiteturas alvo.
+Em geral, RIs eliminam estrutras complexas de controle (e.g., switch-case, 
+for), mas também não se limitam a recursos finitos de arquiteturas finais 
+(e.g., número fixo de registradores).
+
+As duas RIs intermediárias mais conuns usam grafos acíclicos direcionados 
+(DAGs, mais próximos da árvore sintática), ou código de 3 endereços (mais 
+próximos das linguagens de máquina).
+
+Em DAGs, expressões são quebradas em sub-grafos onde os nós representam 
+operações e as folhas seus operandos.
+Como exemplo, a expressão (1+3*5) pode ser representada da seguinte maneira:
+    +
+   / \      (direcionado)
+  1   *
+     / \
+    3   5
+
+Esse tipo de representação expõe claramente a dependência entre suas partes, 
+mas não força uma ordem específica de execução.
+A representação por DAGs, além de garantir que existe uma forma correta de 
+percorrer o grafo respeitando as relações de dependência, não limita a uma 
+*única* forma, já que tipicamente possuem mútliplas ordem topológicas.
+Dessa maneira, a geração de código final pode tirar proveito dessa propriedade 
+e gerar a ordem mais conveniente, por exemplo, explorando a localidade de 
+memória ou aproximando instruções que aproveitam o paralelismo de pipeline.
+
+Uma outra vantagem de DAGs é permitir a detecção de sub-expressões comuns e o 
+eventual reúso de nós.
+Como exemplo, o DAG natural para a expressão (a + a * (b-c) + (b-c)) pode ser 
+otimizado para o da versão à direita:
+
+          +
+         / \
+        +   (b-c)
+       / \
+      (a) *
+         / \
+        a   -
+           / \
+          b   c
+
+Sendo uma representação mais abstrata, DAGs têm a desvantagem de não serem 
+convenientes para intepretação "on-the-fly" (para uso em máquinas virtuais), 
+por exemplo, por necessitarem da construção de uma ordem topológica antes da 
+execução iniciar.
+
+A representação de três endereços oferece uma forma linear e regular da AST, na 
+qual no máximo uma operação pode manipular até três operandos (endereços), 
+sendo um deles para guardar o resultado.
+Assim, no comando (while (v<100) { v = a + (b-c)}), a atribuição deve 
+necessariamente ser quebrada em duas instruções de três endereços:
+
+    0: ^4  =  v >= 100  ; (salto condicional: "jump-greater-equal")
+    1: t1  =  b - c
+    2: v   =  a + t1
+    3: ^1               ; (salto incondicional)
+
+Os endereços podem ser constantes, offsets no código (e.g., ^4), símbolos do 
+programa original ("v") ou gerados sob demanda ("t1").
+
+Dentre as variações de estruturas de dados para representar instruções de três 
+endereços, as quádruplas guardam exatamente a operação e os três operandos 
+(como no exemplo acima), enquanto que as triplas omitem o endereço de 
+resultado, se referindo indiretamente a eles em instruções seguintes:
+    1: b - c
+    2: a + (0)
+
+A variação por quádruplas utiliza mais espaço em memória, mas permite que o 
+código seja reordenado mais facilmente;
+a variação por triplas utiliza menos espaço, mas depende de acessos indiretos a 
+posições do código, dificultando sua reordenação.
+Existe uma variação da representação triplas que adiciona mais um nível de 
+indireção no acesso aos endereços de instruções, através do uso de uma tabela 
+auxiliar com ponteiros para esses endereços que pode ser alterada dinamicamente 
+ao mover instruções de posição.
+
+Na otimização de SSA (static-single-assignment) para código de três endereços, 
+todas as atribuições são feitas para diferentes variáveis, ou seja, se a mesma 
+variável é atribuída duas vezes, duas versões da variável são mantidas pelo 
+compilador.
+Essa reconfiguração transpõe o mal hábito de programação de reutilizar a mesma 
+variável para diferentes fins, o que pode dificultar a alocação de 
+registradores na fase de geração de código final:
+
+    int a1 = ...     // uso da variavel para determinado fim
+    ...
+    a2 = ...         // reuso da variavel para outro fim
+                     // a1 e a2 representam diferentes valores
+
+Dentre outras simplificações da representação intermediária em comparação com a 
+linguagem fonte, estão a eliminação de tipos e acesso a vetores e registros, 
+que devem ser convertidos para instruções mais simples que levam em conta os 
+tamanhos dos tipos envolvidos (e.g., a "largura" de um "int" tem 4 bytes) e 
+utilizam offsets para acesso a campos de vetores e registros:
+
+    struct X {
+        int a;
+        short[5] b;
+    }
+    X x;
+    v = x.b[4];
+
+    Os acesso a x.b[4] deve levar em conta o deslocamento de "b" em relação ao 
+    início da estrutura, assim como o deslocamento interno do índice 4 dentro 
+do vertor:
+
+    t1 = 2 * 4    ; deslocamento dentro do array
+    t2 = 4 + t1   ; deslocamento dentro do registro + array
+    t3 = x + t2   ; deslocamento em relação a x
+    v  = *t3      ; acesso ao conteudo final
+
+TODO: calls são mantidas em alto, diferentes protocolos, usos de 
+pilha/mem-estática, em diferentes linguagens de alto nível e arquiteturas 
+(algumas possuem call, outras necessitam empilhamento/des manual)
+TODO: traducao
+
+## Máquinas Virtuais
+
+A independência de arquitetura de RIs e, como consequência direta, sua 
+portabilidade tornam atrativo o uso de máquinas virtuais para interpretação 
+direta da RI, sem a necessidade do passo adicional de geração de código.
+
+Uma vantagem da interpretação direta é a possível interoperabilidade entre 
+linguagens com paradigmas antagônicos.
+Como exemplo, o mesmo bytecode gerado por Java para executar na JVM, também é 
+gerado por Clojure, uma linguagem funcional com tipagem dinâmica.
+
+Essa tendência também pode ser observada no mundo da Web, com novas linguagens 
+que enchergam os browsers como máquina virtuais que executam "bytecodes em 
+JavaScript" (ClojureScript, CoffeeScript, Elm, entre outras).
+
+

@@ -1,0 +1,319 @@
+# 1.4 Estruturação de Dados em Linguagens de Programação
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como compilação.
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+
+Linguagens de "baixo nível", são linguagens com semântica mais próxima a da 
+máquina, em que o programador deve manipular diretamente registradores, 
+memória, e instruções específicas da máquina.
+Como contraste, linguagens de "alto nível" escondem os detalhes de 
+funcionamento da máquina, oferecendo, por exemplo, abstrações para estruturar 
+os dados na memória através de tipos primitivos ou definidos pelo usuário, 
+assim como mecanismos para gerenciar o uso da memória durante a execução do 
+programa:
+
+    int    a = 1;
+    char[] v = "ola mundo";
+
+As duas linhas do programa em C reservam espaço em memória para um inteiro, uma 
+string que é pré-alocada na região de dados, e um vetor com espaço suficiente 
+para a guardar a string que é copiada automaticamente na declaração.
+O exemplo ilustra não somente a economia em linhas de código, mas também o uso 
+de abstrações mais inteligíveis, como tipos e variáveis.
+
+## Tipos e Dados
+
+A todo dado manipulado em um programa está associado um tipo que lhe impõe um 
+conjunto de valores e operações disponíveis.
+Como exemplo, um dado com tipo "booleano" somente pode carregar os valores 
+"true" e "false" e somente pode operar sobre operações booleanas: negação 
+("not"), conjunção ("and") e disjunção ("or").
+
+Tipos são usados para organizar e documentar os dados de um programa.
+Também são usados para protegê-los de acessos não intencionais, como operações 
+inválidas (detectáveis por um sistema de tipos), ou intencionais, como em 
+quebra de regras de encapsulamento (evitados com tipos abstratos de dado).
+
+Tipos de dados em linguagens de programação podem ser primitivos, quando já 
+estão disponíveis previamente para uso, ou compostos, quando tipos primitivos 
+são combinados para formar tipos mais complexos.
+
+Tipos primitivos refletem o comportamento da arquitetura, mais especificamente 
+como os bits são interpretados pelo conjunto de instruções da CPU.
+Como exemplo, operações sobre inteiros em complemento a dois ou em ponto 
+flutuante são nativamente suportados pela maioria das arquiteturas modernas.
+
+### Tipos Compostos
+
+Tipos compostos podem ser divididos em várias classes:
+
+- Mapeamentos:
+    Quando funcionam como funções, mapeando valores de um domínio para outro.
+    Vetores mapeiam inteiros para um tipo qualquer (e.g., o vetor com tipo 
+"void*[]" mapeia inteiros para ponteiros).
+    Tabelas associativas, comuns em linguagens dinâmicas, são uma generalização 
+de vetores, permitindo o mapeamento de entre quaisquer domínios.
+- Produtos Cartesianos:
+    Representam a combinação de dois domínios (T1xT2) e são conhecidos como 
+    registros no jargão de linguagens de programação (ou "structs" em C).
+- União:
+    Representam a disjunção de dois domínios (T1UT2).
+    Em C podem ser criados através da declaração "union".
+- Conjunto Potência:
+    Representam o conjunto de todos os conjuntos de um dado tipo.
+    Em programação aparecem para descrever conjuntos de bitflags, geralmente 
+representados por um inteiro que é manipulado com operações bit-a-bit.
+- Tipos recursivos:
+    São tipos que se auto referenciam na sua definição.
+    Podem descrever listas encadeadas infinitas, árvores e grafos em geral.
+
+Linguagens funcionais oferecem um construtor de tipos mais elaborado, conhecido 
+como tipos algébricos, que pode descrever produtos, uniões e recursões em 
+conjunto.
+
+### Tipos Definidos pelo Usuário
+
+Programadores podem construir seus próprios tipos e modelar os dados de uma 
+aplicação combinando tipos primitivos e tipos compostos.
+
+Uma forma mais robusta de definir de novos tipos é através de tipos abstratos 
+de dados (ADTs), que escondem sua representação interna que não pode ser 
+manipulada diretamente por fora da definição do tipo.
+ADTs definem um conjunto de operações sobre si e somente podem ser manipulados 
+através delas, permitindo que detalhes internos de representação sejam 
+ajustados ou reprogramados sem que a abstração deixe de funcionar.
+Dessa maneira, ADTs são apresentados aos seus usuários de maneira parecida a 
+tipos primitivos, por exemplo, não importa qual é a representação interna de 
+inteiros se é já possível realizar todas as operações básicas esperadas sobre 
+eles.
+
+O trecho de código a seguir em C define um ADT para manipular pilhas de 
+inteiros através das operações "new", "push" e "pop":
+
+    typedef Stack struct internal_stack_representation_t;
+    Stack* new  (void);
+    void   push (Stack* stack, int v);
+    int    pop  (Stack* stack);
+
+Note que apenas os protótipos para o tipo e operações estão determinados, sem
+nenhum detalhe sobre que tipos e instruções compõem o ADT (e.g., vetores ou 
+listas encadeadas).
+Diferentes implementações podem ser usadas, bastando compilar um código 
+diferente que respeite os protótipos.
+
+Uma outra forma de definir tipos é através de programação orientada a objetos, 
+onde dados são estruturados em hierarquias de classes.
+Uma classe representa um modelo de funcionalidades que pode ser instanciado 
+múltiplas vezes, formando objetos daquela classe.
+Apesar de oferecerem a mesma funcionalidade, objetos de uma mesma classe vão 
+possui estados diferentes para seus dados, dependendo de como são manipulados 
+durante a execução do programa.
+Como exemplo, em um jogo de computador, uma classe Inimigo pode ser instanciada 
+múltiplas vezes, sendo que cada objeto é colocado em uma posição diferente da 
+tela, com movimentos em várias direções.
+A partir de uma classe pai (super-classe), novas classes filho (sub-classes) 
+podem ser derivadas, sendo que toda funcionalidade existente na super-classe é 
+automaticamente herdadada pela sub-classe.
+O modelo de classes encapsula todos os dados de suas instâncias, não permitindo 
+que objetos acessem diretamente os dados de outros.
+O encapsulamento é um pré-requisito para o polimorfismo, que permite que 
+objetos de diferentes classes sejam intercambiáveis entre si, bastando que 
+exportem o mesmo conjunto de funcionalidades (interfaces):
+
+    SetX x = new SetX(1,2,3);
+    SetY y = new SetY(4,5,6);
+    SetZ z = new SetZ();
+    z.add(y.all());   // 4,5,6
+    z.add(x.all());   // 1,2,3,4,5,6
+
+No exemplo anterior existem duas implementações para conjuntos que são 
+combinadas em uma terceira implementação.
+Independentemente da estrutura de dados interna utilizada em cada implementação 
+(e.g., array, lista ou hashmap), os objetos podem se relacionar através de seus 
+métodos.
+O polimorfismo é a principal distinção entre objetos e tipos abstratos de 
+dados.
+
+### Sistemas de Tipos
+
+Um sistema de tipos é um conjunto de regras que atribui tipos às partes do 
+programa e verifica se as conexões entre essas partes está consistente.
+Dentre as possíveis verificações, podemos destacar
+
+    - se variáveis são declaradas e tipadas antes de seus usos
+    - se o número de argumentos e seus tipos correspondem ao esperado pela 
+      assinatura da função
+    - se os operandos de uma operação possuem os tipos esperados
+
+O objetivo principal de um sistema de tipos é o de prevenir bugs sem a 
+necessidade de executar o programa.
+Em outras palavras, um sistema de tipos assegura que uma certa classe de 
+programas incorretos nunca será executada.
+Essa visão contrasta com um sistema de testes (TDD) que tenta assegurar que um 
+programa correto nunca falha, executando-o à exaustão.
+
+Além da detecção de bugs, um sistema de tipos também ajuda no entendimento e 
+documentação de programas e permite a otimização de trechos de código (e.g., 
+evitando checagens em tempo de execução).
+
+Sistemas de tipos são tão pervasivos em LPs que é comum categorizá-las de 
+acordo com o seus sistemas de tipos.
+Por exemplo, a separação entre linguagens estáticas e dinâmicas se dá 
+principalmente pela tipagem dos programas ser feita em tempo de compilação 
+(tipagem estática) ou em tempo de execução (tipagem dinâmica).
+Em linguagens dinâmicas, a verificação de operações é feita somente no momento 
+de executá-las, quando os tipos ("tags", nesse contexto) de seus operandos são 
+finalmente verificados.
+Como forma de unir a flexibilidade de linguagens dinâmicas com a confiabilidade 
+de linguagens estáticas, alguns projetos estendem linguagens dinâmicas com 
+sistemas de tipos graduais, nos quais é possível anotar partes do código com 
+tipos para verificação estática.
+Como exemplos, a Microsoft introduziu recentemente TypeScript que estende 
+JavaSript com tipagem gradual, enquanto que o Facebook introduziu Hack, uma 
+extensão à PHP com os mesmos objetivos.
+
+Algumas linguagens, mesmo tenho um sistema de tipos estático, não requerem 
+declarações explícitas de tipo no código, que podem ser inferidos 
+automaticamente pelo compilador.
+A linguagem ML introduziu esse conceito no fim da década de 70, que hoje é 
+adotado em outras linguagens como Haskell, Go e até (parcialmente) em versões 
+recentes de C++:
+
+    auto v = 1.0;     // (tipo de "v" é inferido como "float")
+
+Por outro lado, C e C++ são casos atípicos (mas extremamente populares) de 
+linguagens com sistemas de tipos e declarações explícitas, mas que não oferecem 
+garantias estáticas satisfatórias (possuem sistemas de tipos fracos).
+O uso de aritmética de ponteiros, casts explícitos de tipos e uniões sem tags 
+expõem o sistema de tipos a diversas "brechas" que podem acarretar em estouro 
+de buffers (buffer overflows) e acesso a regiões de memória não controlados 
+pelo programa.
+
+TODO: estrutural vs nominal
+TODO: tipos polimórficos
+
+Tarefas corriqueiras em programas podem exigir a conversão de um valor para um 
+novo tipo.
+Um exemplo comum, é o de ler uma entrada do teclado como string e tentar 
+reinterpretar esse valor como um número:
+
+    idade = io.read()
+    if idade > 18 then
+        ...
+    end
+
+Novamente, dependendo da LP e de seu sistema de tipos, existem diferentes 
+semânticas para a conversão de tipos.
+Em conversões implícitas (conhecidas como coersões), o compilador é responsável 
+por verificar e adicionar instruções de maneira a efetuar a conversão 
+automáticamente.
+Em conversões explícitas (conhecidas como casts), o sistema de tipos obriga que 
+o programador faça a conversão manualmente através de uma operação (e.g.  
+tonumber(idade)).
+
+Se em conversões os operandos se adaptam aos seus operadores, em sobrecarga de 
+operadores, são os operadores que se adaptam aos seus operandos.
+O exemplo típico é o operador de soma que se comporta de maneira diferente se 
+seu operandos são inteiros ou reais, gerando instruções diferentes para a 
+execução do programa.
+Muitas linguagens permitem que o programador adapte o uso de operadores e 
+funções de acordo com seus operandos (C++ com overloading e Lua com 
+metamétodos, por exemplo).
+
+## Alocação na Heap
+
+O uso de ADTs e objetos com ciclos de vida irregulares que se estendem além do 
+escopo no qual foram declarados requer o uso da região de memória heap.
+Como o ciclo de vida para cada dado na heap é indeterminado e depende da 
+execução do programa, algum mecanismo para gerenciar a memória deve ser 
+disponibilizado.
+As maiores dificuldades são em lidar com a variação do tamanho dos dados e com 
+a ordem de alocação e desalocação em que ocorrem.
+Três propriedades devem ser consideradas no gerenciador de memória:
+
+- Localidade: quanto mais distantes os dados estiverem entre eles, mais erros 
+  de acesso ao cache ocorrerão.
+- Fragmentação: quanto mais buracos existirem entre dados, maior é o 
+  desperdício de espaço útil para novas alocações.
+- Execução: quanto mais complexo for o gerenciador de memória for, maior é o 
+  desperdício de ciclos de CPU.
+
+Já a desalocação de memória pode ser feita manualmente ou de forma automática, 
+com o auxílio de um coletor de lixo que executa juntamente com o programa 
+buscando blocos não mais referenciados.
+
+Na desalocação manual, o programador é responsável por invocar uma primitiva 
+para liberar a memória apontada por uma referência (ponteiro) ao bloco alocado 
+anteriormente.
+Essa abordagem é eficiente, pois não exige custos extras associados ao 
+gerenciador de memória, no entanto é bastante insegura pois permite dois tipos 
+comuns de erros de programação: vazamentos de memória e acesso a ponteiros 
+pendentes (danrling pointers).
+Vazamentos de memória ocorrem quando o programador nunca desaloca um bloco de 
+memória que não é mais necessário e acessível, seja por esquecimento ou por 
+algum erro de lógica de programação.
+Para aplicações que executam por longos períodos e fazem muitas alocações, pode 
+acontecer da memória acabar.
+Acessos a ponteiros pendentes acontecem quando o programador desaloca um bloco 
+mas continua usando-o como se ele ainda estivesse vivo.
+Quando o mesmo bloco é alocado e usado novamente em outro trecho de código, as 
+consequências podem serão indeterminadas e possivelmente catastróficas.
+
+O uso do coletor de lixo (GC) libera o programador de tratar a desalocação de 
+memória e elimina por design tanto vazamentos de memória, quanto acessos a 
+ponteiros pendentes.
+A idéia básica de um GC é o de considerar como lixo quaisquer dados que não 
+possam mais ser referenciados pelo programa e assim desalocá-los da memória.
+Como o uso de um GC implica em um custo adicional, é preciso analisar o seu 
+overhead total de execução, tempo de latência (pausa para a coleta), assim como 
+o uso de espaço com metadados necessários para o seu funcionamento.
+
+No coletor por contagem de referência, cada bloco alocado possui um campo extra 
+com um contador de ponteiros para si, que ao chegar a zero, implica que o bloco 
+pode ser desalocado.
+Para manter o contador atualizado, cada operação que adiciona ou remove 
+referências ao bloco deve ser modificado para incrementar ou decrementar o 
+contador.
+Como exemplo, sempre que um ponteiro é copiado para outra variável ou passado 
+como parâmetro para uma função, o contador deve ser incrementado.
+O gerenciamento de memória por contagem de referência é bastante simples e não 
+involve longas pausas para detectar e coletar as referências mortas.
+No entanto, o custo de execução total e uso de memória é alto, dado que o 
+contador deve ser mantido atualizado e ocupa bytes extras para cada bloco 
+alocado.
+Outra desvantagem é que a abordagem não funciona para ciclos entre blocos 
+alocados, já que as referências mútuas vão manter o contador positivo.
+
+O coletor por "mark and sweep" funciona em duas fases que, de tempos em tempos 
+(e.g., quando a memória atinge um limiar mínimo), são intercaladas com a 
+execução do programa.
+Na fase de marcação ("mark"), partindo do conjunto raíz formado por todas as 
+referências globais e locais em escopo, o coletor percorre todas as referências 
+ativas da aplicação, recursivamente, marcando-as como vivas.
+Na fase de coleta ("sweep"), todas as referências que não foram marcadas como 
+vivas são desalocadas.
+Essa abordagem trata ciclos corretamente e tem um custo menor do uso de 
+memória.
+No entanto, as pausas longas para coleta são um obstáculo para a adoção do 
+"mark and sweep" para aplicações de tempo real.
+Na variação "tri-color mark and sweep", o algoritmo funciona de forma 
+incremental, com o auxílio de um conjunto de objetos "cinza" que ainda têm 
+referências pendentes a serem visitadas na próxima varredura.
+Outra variação é separar as regiões de memória em gerações, visitando as novas 
+gerações mais frequentemente, dado que objetos novos tendem a morrer antes.
+
+GCs não funcionam em linguagens com tipagem fraca, tais como C e C++, nas quais 
+o uso de aritmética de ponteiros e "type casts", já que o coletor pode 
+considerar alguns dados ainda referenciados como lixo.
+
+

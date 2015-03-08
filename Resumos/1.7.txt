@@ -1,0 +1,188 @@
+# 1.7 Linguagens e Paradigmas não Convencionais de Programação
+
+Paradigmas de programação se referem a estilos de programação que favorecem ou 
+impõem o uso de certas contruções ou técnicas, além de influenciarem a forma de 
+entender, modelar e analisar programas de computador.
+As linguagens imperativas, que representam o paradigma mais convencional de 
+programação, não oferecem abstrações muito diferentes do que a arquitetura 
+tradicional von Neumann oferece, isto é, execução em sequência (statements), 
+saltos (in)condicionais (if-else, loops) e registradores mutáveis (atribuição a 
+variáveis).
+
+Os paradigmas não convencionais afastem a maneira de programar da arquitetura 
+da máquina e oferecem abstrações alternativas, tais como funções matemáticas 
+(paradigma funcional), dados hierárquicos e encapsulados (paradigma orientado a 
+objetos) e resolvedores lógicos (paradigma lógico).
+
+## Programação Orientada a Objetos
+
+No paradigma de "programação orientada a objetos", programas são estruturados 
+em hierarquias de classes.
+Uma classe representa um modelo de funcionalidades que pode ser instanciado 
+múltiplas vezes para formar objetos daquela classe.
+A partir de uma classe pai (super-classe), novas classes filho (sub-classes) 
+podem ser criadas e toda funcionalidade existente na super-classe é 
+automaticamente herdadada pela sub-classe.
+Sub-classes podem alterar funcionalidades existentes ou criar novas 
+funcionalidades para si.
+O modelo de classes encapsula todo o estado de seus objetos, não permitindo que 
+outros objetos acessem diretamente esse estado.
+A idéia fundamental é que objetos se comuniquem somente através de mensagens 
+(métodos), que por sua vez representam toda a funcionalide disponível em 
+objetos.
+O encapsulamento é um pré requisito para o polimorfismo, que permite que 
+objetos de diferentes classes sejam intercambiáveis entre si, bastando que 
+exportem o mesmo conjunto de funcionalidades (interfaces):
+
+    SetX x = new SetX(1,2,3);
+    SetY y = new SetY(4,5,6);
+    SetZ z = new SetZ();
+    z.add(x.all());   // 1,2,3
+    z.add(y.all());   // 4,5,6
+
+No exemplo anterior existem duas implementações diferentes para conjuntos que 
+são combinadas em uma terceira implementação.
+Independentemente da estrutura de dados utilizada em suas implementações, os 
+objetos podem se relacionar através de seus métodos.
+O polimorfismo é a principal distinção entre objetos e tipos abstratos de 
+dados.
+Smalltalk é considerada a primeira linguagem fundamentalmente orientada a 
+objetos, sendo seguida por Eiffel, C++, Java, entre outras.
+
+<!--
+TODO: herança, polimorfismo, dynamic dispatch
+TODO: prototipagem
+TODO: variância e contra variância
+-->
+
+## Programação Funcional
+
+No paradigma de "programação funcional", introduzido por LISP no fim dos anos 
+50, a unidade básica de execução são funcões matemáticas que permitem chamadas 
+recursivas.
+Ao contrário de linguagens convencionais, funções são valores de primeira 
+classe e podem ser passados a outras funções (funções de alta ordem), 
+retornados, ou até mesmo criados dinamicamente (closures).
+Além disso, as funções chamadas "puras" não podem ter efeitos colaterais sobre 
+outras partes do programa (e.g., globais).
+Dessa maneira, assim como funções matemáticas, chamadas repetidas com os mesmos 
+parâmetros sempre retornam o mesmo valor, propriedade conhecida como 
+transparência referencial.
+Essa propriedade facilita o entendimento e análise do programa, uma vez que 
+funções sempre tem o mesmo comportamento, mesmo quando combinadas 
+irrestritamente em diferentes partes do programa.
+Haskell segue à risca o paradigma funcional puro, enquanto que algumas 
+linguagens impuras, também suportam o paradigma imperativo (e.g., Lua e Scala).
+
+TODO: recursao, caso base
+
+Como linguagens funcionais evitam efeitos colaterais, o uso de estruturas de 
+dados convencionais de acesso direto/aleatório (como vetores e tabelas hash) é 
+proibitivo.
+Virtualmente todas as linguagens funcionais oferecem listas como o principal 
+mecanismo de dados.
+Listas possuem três operações básicas: lista vazia ([]), construção (cons) e 
+decomposição (cabeça/rabo):
+
+    l = cons(1, cons(2, cons(3, []))    --> [1,2,3]
+    v = car(cdr(l))                     --> 2
+
+A operação de construção somente pode adicionar uma nova cabeça a uma lista já 
+existente, permitindo que ambas compartilhem a mesma memória:
+
+    l1 = cons(0, l)                     --> [0,1,2,3]
+
+Estruturas de dados funcionais têm a propriedade de persistência, ou seja, 
+múltiplas versões de um dado podem coexistir na memória com um overhead sub 
+linear (o exemplo acima teve um acréscimo de 25% com as duas versões de l).
+Árvores também possuem uma estrutura plana recursiva e funcionam de forma 
+parecida com listas.
+Estruturas persistentes permitem hot swapping de dados sem custos extras, 
+facilitando a implementação de funcionalidades como "undo/redo".
+O sistema manipulador de DOMs do Facebook usa estruturas persistentes para 
+cáculo dinâmico de diffs em árvores de maneira a minimizar o redesenho de 
+documentos.
+
+TODO: ordem de avaliação
+
+<!--
+    - matemática
+    - aplicação gera sempre mesmo resultado
+        - transparência referencial
+            - memoization
+    - composição
+    - estruturas de dados persistentes
+        - cópia para cima
+        - listas
+            - acesso linear
+            - principal estrutura (com sintaxe especial) em LISP, ML, Haskell
+            - LISP programas são listas
+        - tries
+            - sem ciclos
+            - acesso randômicao
+            - React
+                - diffs na árvore DOM
+            - free undo
+    - ordem de avaliação irrelevante
+        - tem a ver com transparência referencial
+        - lazy
+        - paralelo
+            - pmap
+    - linguagens impuras
+        - simulação de OO
+
+## Linguagens Reativas
+-->
+
+## Programação Lógica
+
+No paradigma de "programação lógica", programas constituem bases de 
+conhecimento descritas em sentenças lógicas de primeira ordem.
+A entrada do programa são consultas a essa base que disparam o resolvedor
+até encontrar uma resposta para consulta (ou uma inconsistência na base).
+
+A linguagem Prolog, que introduziu o paradigma de programação lógica, e é 
+baseado em três construções:
+- fatos são assertivas básicas sobre a base de conhecimento a ser construída 
+  (e.g., João gosta de futebol);
+- regras de inferência relacionam fatos e variáveis (e.g., amigos gostam do 
+  mesmo esporte)
+- perguntas fazem consultas a base de conhecimento (e.g., João e Maria são 
+  amigos?)
+
+O exemplo a seguir descreve uma base de conhecimento:
+
+    gosta(joao, futebol).
+    gosta(maria, basquete).
+    amigos(A,B) :- gosta(A,X) e gosta(B,X)
+
+Duas pessoas quaisquer são amigas (A e B são variáveis), se (separador :-) uma 
+delas gosta de qualquer esporte (X também é uma variável) que e a outra também 
+gosta (a mesma variável X precisa ser inferida).
+Uma consulta pode ser entendida como o percorrimento de uma árvore em DFS atrás 
+de todas as possibilidades que dêem uma resposta verdadeira à pergunta:
+
+    [ÁRVORE]
+
+Encontrar uma resposta verdadeira significa que o resolvedor conseguiu unificar 
+os fatos da pergunta com os fatos da base de conhecimento.
+Uma resposta falsa significa simplesmente que o resolvedor não conseguiu provar 
+os fatos.
+A programação lógica é uma forma declarativa de programação, na qual não são 
+especificados algoritmos para controlar a execução da máquina, o que fica a 
+cargo do resolvedor.
+
+Assim como a programação funcional, programação lógica também se baseia no 
+conceito de recursão para descrever relações indiretas:
+
+    pai(joao, joao_jr)
+    pai(joao_sn, joao)
+    ancestral(X,Y) :- pai(X,Y)
+    ancestral(X,Y) :- pai(X,Z), ancestral(Z,Y)
+
+Nesse exemplo, a regra para ancestral é recursiva, permitindo xxx o pai do pai
+TODO
+
+TODO: cut
+
+

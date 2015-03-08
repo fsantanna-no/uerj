@@ -1,0 +1,169 @@
+# 1.6 Estrutura da Programação
+
+A concepção de um software, desde sua especificação até implementação, deve 
+passar por um rigoroso processo de desenvolvimento dividido em etapas, conforme 
+ilustrado no diagrama a seguir:
+
+    ANÁLISE DE REQUISITOS   =>  DESIGN  => IMPLEMENTAÇÃO
+                    VERIFICAÇÃO E VALIDAÇÃO
+                    MANUTENÇÃO
+
+TODO: req, ver/val, man
+
+No que diz respeito à estrutura de programação, as fases de "design" e 
+"implementação" são especialmente relevantes.
+O "design" vai lidar com escolhas mais estratégicas sobre o desenvolvimento, 
+tais como a decomposição do processo em etapas e times, a escolha da linguagens 
+e técnicas de programação, e a especificação do software.
+A "implementação" trata de como tornar do design um artefato concreto, 
+basicamente através do desenvolvimento em separado de subprogramas e módulos 
+que serão finalmente recombinados.
+
+Como dois estilos gerais de estruturação de programas,
+a abordagem *top-down* parte de uma visão alto nível e abstrata da 
+especificação, decompondo o programa em sub-partes;
+já a abordagem *bottom-up* parte de requisitos e funcionalidades simples e vai 
+gradualmente construindo componentes mais complexos.
+A abordagem top-down é especialmente vantajosa na fase de design, quando os 
+detalhes da especificação ainda estão em aberto ou não totalmente 
+cirstalizados.
+A abordagem bottom-up facilita o desenvolvimento orientado a testes (TDD) já 
+nas fases iniciais do processo.
+Na prática, as duas abordagens podem ser usadas na concepção de um software.
+
+A escolha da linguagem de implementação é influenciada pela fase de design, uma 
+vez que diferentes linguagens seguem diferentes paradigmas e impõem diferentes 
+estratégias de desenvolvimento.
+
+Em "programação estruturada", comandos da LP executam passo-a-passo, um após o 
+outro, produzindo efeitos colaterais na memória que representa o estado geral 
+do programa.
+Além da execução em sequência, a programação estruturada depende de 
+condicionais e repetições para o controle de fluxa das aplicações.
+Blocos de comandos podem então ser combinados em rotinas, criando uma 
+abstrações que podem ser reusadas em outras partes da aplicação.
+Algol, C e Pascal são exemplos de linguagens que seguem esse paradigma.
+Apesar de sequências, condicionais e repetições serem amplamente difundidas e 
+entendidas, a programação estruturada foi um avanço em comparação com o uso 
+irrestrito de "gotos" para o controle de fluxo até a década de 60.
+
+TODO: topdown
+TODO: globais, locais, static
+
+Em "programação funcional", introduzida por LISP no fim dos anos 50, a unidade 
+básica de execução são funcões matemáticas que permitem chamadas recursivas.
+Ao contrário do suporte convencional nos outros paradigmas, funções são valores 
+de primeira classe e podem ser passados a outras funções (funções de alta 
+ordem), retornados, ou até mesmo serem criados dinamicamente (closures).
+Além disso, as funções chamadas "puras" não podem ter efeitos colaterais sobre 
+outras partes do programa (e.g., globais).
+Dessa maneira, assim como funções matemáticas, chamadas repetidas com os mesmos 
+parâmetros sempre retornam o mesmo valor, propriedade conhecida como 
+transparência referencial.
+Essa propriedade facilita o entendimento e análise do programa, uma vez que 
+funções sempre tem o mesmo comportamento, mesmo quando combinadas 
+irrestritamente em múltiplas partes do programa.
+Haskell segue à risca o paradigma funcional puro, enquanto que algumas 
+linguagens impuras, também suportam o paradigma estruturado (e.g., Lua e 
+Scala).
+
+Em "programação orientada a objetos", programas são estruturados em hierarquias 
+de classes.
+Uma classe representa um modelo de funcionalidades que pode ser instanciado 
+múltiplas vezes, formando objetos daquela classe.
+Apesar de oferecerem a mesma funcionalidade, objetos de uma mesma classe vão 
+guardar estados diferentes, dependendo de como são manipulados durante a 
+execução do programa.
+Como exemplo, em um jogo de computador, uma classe Inimigo pode ser instanciada 
+múltiplas vezes, sendo que cada objeto é colocado em uma posição diferente da 
+tela, com movimentos em várias direções.
+A partir de uma classe pai (super-classe), novas classes filho (sub-classes) 
+podem ser derivadas, sendo que toda funcionalidade existente na super-classe é 
+automaticamente herdadada pela sub-classe.
+Sub-classes podem modificar funcionalidades existentes ou criar novas 
+funcionalidades para si.
+Como exemplo, InimigoVoador pode herdar toda funcionalidade de Inimigo e ainda 
+exportar um método novo para voar.
+O modelo de classes encapsula todo o estado de suas instâncias, não permitindo 
+que objetos acessem diretamente o estado de outros.
+A idéia fundamental de POO é que objetos se comuniquem exclusivamente através 
+de mensagens (métodos), que por sua vez representam toda a funcionalide 
+disponível em objetos.
+O encapsulamento é um pré-requisito para o polimorfismo, que permite que 
+objetos de diferentes classes sejam intercambiáveis entre si, bastando que 
+exportem o mesmo conjunto de funcionalidades (interfaces):
+
+    SetX x = new SetX(1,2,3);
+    SetY y = new SetY(4,5,6);
+    SetZ z = new SetZ();
+    z.add(y.all());   // 4,5,6
+    z.add(x.all());   // 1,2,3,4,5,6
+
+No exemplo anterior existem duas implementações para conjuntos que são 
+combinadas em uma terceira implementação.
+Independentemente da estrutura de dados interna utilizada em cada implementação 
+(e.g., array, lista ou hashmap), os objetos podem se relacionar através de seus 
+métodos.
+O polimorfismo é a principal distinção entre objetos e tipos abstratos de 
+dados.
+Smalltalk é considerada a primeira linguagem fundamentalmente orientada a 
+objetos, sendo seguida por Eiffel, C++, Java, entre outras.
+
+O desenvolvimento de softwares complexos depende, não somente de construções de 
+linguagens de programação para organizar os dados e o controle de fluxo, mas 
+também de mecanismos para combinar partes desenvolvidas em separado.
+Um sistema de modularização efetivo deve permitir que subpartes de um programa 
+sejam especificadas, implementadas e testadas em separado, sem que a fase de 
+fusão entre as partes seja penosa.
+
+Novamente, diferentes linguagens e paradigmas vão prover diferentes mecanismos 
+para a separação entre especificação, implementação e implantação (deployment).
+Em muitos casos, as especificações podem (ou até mesmo devem) ser escritas em 
+separado de suas implementações.
+Esse é o caso de protótipos de funções em C, que podem ser escritos e agrupados 
+em um arquivo em separado representando uma biblioteca de funções (os arquivos 
+".h") e compartilhados entre os implementadores das funções e os usuários da 
+biblioteca.
+Mecanismos parecidos estão disponíveis em Java (com a separação entre 
+interfaces e classes), ML (assinaturas e estruturas), entre outras linguagens.
+
+Além da separação entre especificação e implementação, a fase de compilação e 
+execução também pode ser modularizada.
+Linguagens como C e Java permitem a compilação em separado de arquivos de 
+código fonte em arquivos objeto (.o e .class, respectivamente), que podem em 
+seguida serem religados em um executável ou pacote completo:
+
+    A.c --[compilador]--> A.o  \
+    B.c --[compilador]--> B.o   > --[ligador]--> ABC.exe
+    C.c --[compilador]--> C.o  /
+
+Isso evita que cada alteração em um único arquivo necessite da recompilação de 
+projeto inteiro, além de, em muitos casos, evitar a exposição pública de 
+códigos fonte.
+
+O processo de ligação pode ocorrer em tempo de compilação (ligação estática) ou 
+em tempo de execução (ligação dinâmica).
+Na ligação estática, todos os módulos são combinados antes da execução, gerando 
+um novo arquivo com todas as referências cruzadas resolvidas (definição e usos 
+de símbolos globais entre módulos).
+Na ligação dinâmica, o programa executável é compilado juntamente com um código 
+de "stub" responsável por encontrar as bibliotecas dinâmicas (e.g., ".dll" ou 
+".so"), carregá-las na memória e preencher as entradas aproprioadas na tabela 
+de símbolos globais de maneira a apontar para a biblioteca carregada.
+
+Com a geração de código objeto também é a possível a interoperabilidade entre 
+linguagens com paradigmas antagônicos.
+O arquivo objeto de Java (.class) é formado por bytecodes que têm a JVM como 
+alvo.
+Para tirar proveito do ambiente de execução de portável e interoperabilidade 
+com Java, as linguagens Clojure e Scala também geram código objeto para a JVM.
+O interessante é que essas linguagens têm características bastante distintas 
+entre si, formando um ecossistema fértil em torno da JVM.
+Para grandes projetos que envolvem aplicações do lado do servidor, cliente, 
+aplicações extensíveis através de scripts, etc. a ineteroperabilidade entre 
+linguagens pode ser fundamental.
+Essa tendência também pode ser observada no mundo da Web, com novas linguagens 
+que enchergam os browsers como máquina virtuais que executam "bytecodes em 
+JavaScript" (ClojureScript, CoffeeScript, Elm, entre outras).
+
+

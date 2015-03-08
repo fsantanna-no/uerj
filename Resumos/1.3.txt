@@ -1,0 +1,211 @@
+# 1.3 Estruturas Clássicas de Linguagens
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como compilação.
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+Linguagens de "baixo nível", são linguagens com semântica mais próxima a da 
+máquina, em que o programador deve manipular diretamente registradores, 
+memória, e instruções específicas da máquina.
+Como contraste, linguagens de "alto nível" escondem os detalhes de 
+funcionamento da máquina, oferecendo, por exemplo, nomes para referenciar 
+abstrações tais como variáveis e subrotinas.
+
+- Assembly é um exemplo de linguagem de baixo nível, uma vez que oferece apenas 
+  mnemônicos que mapeiam palavras em inglês para instruções de máquina 
+(praticamente numa relação um para um).
+  Por exemplo, a sentença "MOV R1 10" copia o valor 10 para o um registrador da 
+máquina.
+- A linguagem C já oferece comandos de mais alto nível que se traduzem para 
+  várias instruções de máquina.
+  Por exemplo, a sentença "repeat { remove() } until(empty());" é mais 
+inteligível para um ser humano e não expõe detalhes sobre o funcionamento 
+interno da máquina.
+
+## Amarrações de Nomes
+
+Em linguagens de alto nível qualquer entidade de programação, seja ela uma 
+variável, subrotina ou tipo terá sempre um conjunto de atributos fixos ou que 
+podem variar durante a execução do programa.
+Como exemplos, uma variável possui um nome, valor corrente e um tipo;
+já uma subrotina, além do nome, também possui uma lista de parâmetros e um 
+corpo de execução.
+
+Cada atributo de uma entidade tem que ser associado ("amarrado") a um valor 
+antes de seu uso.
+A tempo de amarração pode ser estático, quando acontece antes da execução do 
+programa, ou dinâmico, quando acontece durante a execução:
+
+    - estático
+        - definição da linguagem (int é um tipo)
+        - implementação da linguagem (int tem 4 bytes)
+        - compilação de programas (novos tipos definidos pelo usuário)
+    - dinâmico
+        - execução: atribuição de variável (v=1)
+
+Normalmente cada nome está associado a uma única entidade (1:1).
+Em algumas estruturas de linguagem, com "aliasing" é possível ter mais de um 
+nome referenciando a mesma entidade, como é o caso de múltiplos ponteiros para 
+a mesma variável (N:1).
+Também é possível a sobrecarga de nomes, na qual o mesmo nome faz referência a 
+diferentes entidades (1:N), como é o caso de operadores de soma em C/C++ 
+(dependendo operandos, eles realizam a soma inteira ou real).
+
+## Variáveis
+
+Variáveis estão presentes em virtualmente todas as linguagens de programação e 
+mapeiam um nome a uma célua de memória.
+Além do nome, variáveis possuem outros atributos, como escopo de vida, tipo do 
+valor que carrega, locação da memória (lval) e conteúdo atual (rval).
+A amarração de nome, tipo e lval ocorre durante a execução, no momento da 
+declaração, enquanto que a amarração com o valor pode ser alterada através de 
+novas atribuições.
+
+Em geral, a amarração entre a variável e o seu escopo é léxica (respeitando a 
+posição no código fonte), mas algumas linguagens (e.g., perl e LISP) também 
+suportam escopo dinâmico conforme ilustrado a seguir:
+
+    int a = 0;
+    function g () {
+        print(a);       // escopo léxico: sempre imprime 0
+    }                   // escopo dinâmico: imprime 1 caso seja chamada de f()
+    function f () {
+        int a = 1;
+        g();
+    }
+
+Em linguagens dinâmicas, a amarração do tipo da variável também pode variar 
+durante a execução, de acordo com o valor (rval) atual da variável.
+Em Lua, por exemplo, uma variável pode carregar valores de tipos diferentes 
+durante a execução:
+
+    local a = 1
+    ...
+    a = 'hello'
+
+## Subrotinas
+
+Assim como variáveis, o uso de subrotinas ou algum mecanismo que associe um 
+bloco de código a um nome para reúso está presente em todas as linguagens de 
+programação.
+Novamente, subrotinas possuem outros atributos, como escopo de vida, tipo dos 
+parâmetros (assinatura) e posição e conteúdo do corpo na memória.
+
+Em linguagens estáticas convencionais (não funcionais) as amarrações acontecem 
+em tempo de compilação, de acordo com a declaração da assinatura da função 
+(e.g., protótipos de C).
+Em linguagens funcionais, as amarrações podem ser dinâmicas, uma vez que 
+funções podem ser criadas em tempo de execução (closures).
+
+Em linguagens dinâmicas, não existe uma amarração obrigatória entre os 
+parâmetros formais de uma função com os valores reais passados como parâmetros 
+nas chamadas, sendo comum funções receberem mais ou menos parâmetros do que 
+esperam, resultando em erros de execução (caso o corpo da função ignore essas 
+possibilidades).
+
+Quando estão presentes, a amarração dos parâmetros formais aos respectivos 
+valores reais passados acontece dinamicamente, mas com diversas semânticas 
+possíveis:
+
+- passagem por valor/cópia
+    No momento da chamada, o valor do parâmetro (rval) é copiado como novo 
+    valor da variável local da função (rval).
+    Linguagens funcionais puras (e.g., Haskell) também possuem uma variação 
+semântica em que a cópia só acontece quando o valor local à função é de fato 
+utilizado.
+Essa semântica de avaliação "lazy" não traz dificuldades de entendimento do 
+programa, já que não existem efeitos colaterais e o valor do parâmetro não pode 
+mudar entre a chamada e o uso.
+
+- passagem por referência
+    No momento da chamada, a locação do parâmetro (lval) é atribuída à locação 
+da variável local da função (lval), criando um "alias" para o valor de entrada, 
+que dessa maneira, pode ser alterado de dentro da função.
+
+- passagem por nome
+    O texto passado como parâmetro substitui todos os usos do parâmetro formal 
+dentro da função.
+    Essa semântica é usada por macros em C (#define's).
+
+### Chamadas de Subrotinas e a Pilha
+
+Para permitir aninhamento e chamadas recursivas, subrotinas dependem da região 
+de memória conhecida como pilha para guardar os registros de ativação de 
+subrotinas (com seu estado completo), que vão sendo sobrepostas respeitando a 
+ordem natural de que a subrotina chamada por último será a primeira a terminar 
+("last in, first out").
+
+Tipicamente, o ambiente de execução configura a região da pilha para iniciar no 
+último endereço de memória disponível (e.g., 0xFFFF), crescendo na direção do 
+início da memória (0x0000):
+
+-- início
+0x0000  CÓDIGO
+        ...                 // tamanho conhecido
+0xnnnn  DADOS ESTÁTICOS
+        ...                 // tamanho conhecido
+0xmmmm  HEAP
+        ... v               // tamanho desconhecido
+        ... ^
+0xFFFF  PILHA
+-- fim
+
+Registros de ativação devem conter diversas informações que somente são 
+conhecidas durante a execução do programa: parâmetros de entrada, variáveis 
+locais e valor e endereço de retorno.
+A criação do registro de ativação deve seguir um protocolo conhecido, de 
+maneira que trechos que chamam subrotinas e trechos que executam dentro de 
+subrotinas saibam exatamente como proceder nas chamadas e retornos.
+Como regra geral, o máximo de trabalho deve ser feito pela subrotina chamada, 
+evitando a multiplicação desse trabalho entre todas as chamadas do programa.
+A figura a seguir ilustra dois registros de ativação encadeados em que "f()" 
+chamando "g()", destacando as responsabilidades envolvidas entre quem chama e 
+que é chamado:
+
+ ---    ---                         SP
+ c      link de controle                ----\   (3)
+ h      status dos registradores            |   (2)
+ a      variáveis locais                    |   (1)
+ m  g() =========================== FP      |
+ a      valor de retorno                    |
+ d      parâmetros da nova chamada          |
+ a--    ----                                |
+        link de controle             ----\  |
+        status dos registradores         |  |
+        variáveis locais                 |  /
+    f() =========================== FP <----
+                                         |
+                                         |
+                                         v (para frame anterior)
+
+No exemplo acima, a subrotina chamada aloca espaço na pilha para suas locais 
+(1), guarda o estado atual dos registradores da subrotina que a chamou (2), e 
+cria um link que aponta para o início da subrotina que a chamou (3).
+No momento da chamada, esse valor é mantido em um registrador especial 
+conhecido como "frame pointer" (FP) e logo em seguida é redirecionado para o 
+novo frame.
+O FP se coloca entre as variáveis locais e os parâmetros de entrada, que são 
+ambos acessados a partir dele (com offsets negativos e positivos, 
+respectivamente).
+O topo da pilha deve ser mantido sempre pelo registrador "stack pointer" (SP), 
+que pode ser usado pela subrotina em execução para guardar valores temporários.
+No momento do retorno, o valor de retorno de ser atribuído e o topo da pilha SP 
+pode ser reconfigurado com o valor atual de FP.
+Além disso, as operações inversas à entrada devem ser efetuadas: o link de 
+controle restaurado para o valor anterior, assim como o status dos 
+registradores.
+
+

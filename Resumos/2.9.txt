@@ -1,0 +1,155 @@
+# 2.9 Montadores e Ligadores em Linguagens de Programação
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+Linguagens de "baixo nível", são linguagens com semântica mais próxima a da 
+máquina, em que o programador deve manipular diretamente registradores, 
+memória, e instruções específicas da máquina.
+Como contraste, linguagens de "alto nível" escondem os detalhes de 
+funcionamento da máquina, oferecendo, por exemplo, uma semântica para manipular 
+abstrações matemáticas (funções, valores e variáveis).
+
+- Assembly é um exemplo de linguagem de baixo nível, uma vez que oferece apenas 
+  mnemônicos que mapeiam palavras em inglês para instruções de máquina 
+(praticamente numa relação um para um).
+  Por exemplo, a sentença "MOV R1 10" copia o valor 10 para o um registrador da 
+máquina.
+- A linguagem C já oferece comandos de mais alto nível que se traduzem para 
+  várias instruções de máquina.
+  Por exemplo, a sentença "repeat { remove() } until(empty());" é mais 
+inteligível para um ser humano e não expõe detalhes sobre o funcionamento 
+interno da máquina.
+
+    [LINGUAGENS DE BAIXO E ALTO NÍVEL]
+    baixo       alto
+    assembly    C
+
+## Estrutura de um Compilador
+
+O processo de tradução de programas é dividio em diversas fases, como ilustra o 
+diagrama a seguir:
+
+    ESTRUTURA GERAL DE UM COMPILADOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O compilador é o software responsável pela tradução do código fonte para o 
+código de máquina e é dividio em duas grandes partes.
+O "front end" (análise) lida com a sintaxe e semântica da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária (e.g., Assembly), com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+
+Quanto mais "alto nível" for a linguagem, mais trabalho será efetuado nas 
+diversas fase de compilação, principalmente no "back end".
+Como contraste, note que para programas escritos em Assembly, todo o "front 
+end" pode ser eliminado.
+
+O desenvolvimento de softwares complexos depende de mecanismos para combinar 
+partes desenvolvidas em separado.
+Um sistema de modularização efetivo deve permitir que sub-partes de um programa 
+sejam especificadas, implementadas e testadas em separado, sem que a fase de 
+fusão entre as partes seja penosa.
+Linguagens como C e Java permitem a compilação em separado de arquivos de 
+código fonte em arquivos objeto (.o e .class, respectivamente), que podem em 
+serguida serem ligados em um executável ou pacote completo.
+Isso evita que cada alteração em um único arquivo necessite da recompilação de 
+todo o projeto.
+
+    A.c --[compilador/montador]--> A.o  \
+    B.c --[compilador/montador]--> B.o   > --[ligador]--> ABC.exe
+    C.c --[compilador/montador]--> C.o  /
+
+## Montador
+
+O montador (assembler) é responsável por traduzir programas escritos em 
+Assembly para código objeto, basicamente mapeando cada mnemônico em
+Assembly para o respectivo código binário de instrução.
+Além dos mnemônicos para instruções, montadores também devem tratar nomes que 
+representam locações da memória e rótulo no código para saltos.
+O formato típico de uma instrução em assembly contém um rótulo, instrução e 
+operandos.
+Os operandos podem ser registradores, endereços de memória ou constantes, 
+dependendo da instrução e seu modo de endereçamento:
+
+    MOV R1 0xFF
+    LD  R1 0xFF
+
+Montadores de duas passadas usam uma tabela auxiliar rastrear usos e definições 
+de símbolos e rótulos e substituir os usos com seus valores finais na memória.
+Em montadores de passada única, a substituição é deixada para o ligador.
+O uso de variáveis e funções externas (e.g., anotados com "extern" em C), ainda 
+ficarão pendentes para serem resolvidas no ligador.
+Já símbolos globais exportados também devem ser mantidos pendentes para 
+eventual uso em outros módulos.
+
+Montadores podem efetuar otimizações de "peephole", com melhorias localizadas 
+através de uma janela deslizante sobre o código para detectar instruções 
+reduntantes:
+    - stores seguidos de loads:
+        LD R, a
+        ST a, R
+    - códigos não alcançáveis
+        LD R, #0
+        JZ LBL1
+        ...
+        LBL1
+    - saltos para saltos
+         JMP LBL1
+         ...
+    LBL1 JMP LBL2
+
+## Ligador
+
+O ligador (linker) combina arquivos compilados em separado em um único arquivo 
+pronto para ser executado ou armazenado como uma biblioteca para uso posterior.
+Durante o processo, o ligador deve resolver as referências cruzadas entre os 
+módulos, associando símbolos exportados a símbolos importados.
+Para a geração de executáveis, símbolos definidos mas não referenciados (e.g., 
+funções que nunca são chamadas) podem ser removidos juntamente com o código 
+associado.
+
+O ligador também deve relocar os endereços dos módulos combinados de maneira a 
+evitar que eles se sobreponham na memória, ou seja, se um módulo A ocupa 2K de 
+memória, um outro módulo B deve ser relocado para iniciar a partir de 2K.
+A relocação involve uma passada completa no código para recalcular os endereços 
+absolutos (e.g., saltos, loads e stores) partindo do novo offset.
+
+O processo de ligação pode ocorrer em tempo de compilação (ligação estática) ou 
+em tempo de execução (ligação dinâmica).
+Na ligação estática, todos os módulos são combinados antes da execução, gerando 
+um novo arquivo com todas as referências cruzadas resolvidas.
+Na ligação dinâmica, o programa executável é compilado juntamente com um código 
+de "stub" responsável por encontrar as bibliotecas dinâmicas (e.g., ".dll" ou 
+".so"), carregá-las na memória e preencher as entradas aproprioadas na tabela 
+de símbolos globais de maneira a apontar para a biblioteca carregada.
+
+TODO: JVM

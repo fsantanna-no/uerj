@@ -1,0 +1,275 @@
+# 2.2 Análise Léxica
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como compilação.
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+## Diferença entre Sintaxe e Semântica
+
+A sintaxe de uma LP define sua a estrutura ou forma.
+Para linguagens textuais, a sintaxe define regras sobre como combinar letras 
+para formar paralvras (tokens, no contexto de LPs), para então combinar 
+palavras para formar sentenças (ou comandos, no contexto de LPs).
+
+O conjunto de regras para a formação de tokens é conhecido como o *léxico* da 
+linguagem, e vai reconhecer, por exemplo, que o caracter 1 seguido de 0 forma o 
+número 10 e que qualquer sequência de caracteres que não começam por um dígito 
+formam um identificador:
+
+    10              (token numérico)
+    minha_variavel  (token para um identificador)
+
+Já o conjunto de regras para a formação de comandos a partir de tokens é 
+conhecido como a *sintaxe* da linguagem, e vai determinar, por exemplo, que uma 
+expressão pode ser formada por números ou identificadores separados por um 
+operador (um outro tipo de token):
+
+    10 + minha_variavel     (expressão)
+
+Tão importante quanto reconhecer formas aceitas pela linguagem, é reconhecer 
+por completo formas *não* são aceitas pela linguagem.
+Por exemplo, em C identificadores não podem começar com um dígito:
+
+    0minha_variavel     (não é nem um número nem um identificador)
+
+A sintaxe não lida com o sentido de palavras ou frases.
+Como uma analogia às linguagens naturais, a sentença "as duas cores dessa 
+cadeira são preto, branco e vermelho" está sintaticamente correta, mas possui 
+um erro semântico.
+
+Já a semântica de uma LP lida com o conteúdo, sentido ou interpretação de suas
+sentenças sintaticamente corretas.
+Pensando no exemplo anterior, o valor resultante da expressão "10 + 
+minha_variavel" será entendido como "a soma aritmética entre 10 e o conteúdo da 
+memória referente ao identificador minha_variavel".
+
+É comum LPs terem sintaxes diferentes para construções comuns com semântica 
+similares, como por exemplo na atribuição de variáveis:
+
+    [SINTAXE DIFERENTE, MESMA SEMÂNTICA]
+    x += y;       // C
+    x := x + y;   // Algol, Pascal, ML, Ada
+
+Também é comum linguagens de programação terem sintaxes iguais para construções 
+com semântica distintas:
+
+    [MESMA SINTAXE, SEMÂNTICA DIFERENTE]
+    s.f = 1;      // C, estrutura estática pré declarada
+    s.f = 1;      // Lua, tabela dinâmica, polimorfico, meta método
+
+### Estrutura de um Compilador
+
+Durante o processo de tradução dos programas escritos em uma LP para intruções 
+de máquina, sintaxe e semântica são tratadas em fases diferentes, já que se 
+baseiam em teorias e técnicas distintas:
+
+    ESTRUTURA GERAL DE UM COMPILADOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O compilador é o software responsável pela tradução do código fonte para o 
+código de máquina e é dividio em duas grandes partes.
+O "front end" (análise) lida com a sintaxe e semântica da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária (e.g., assembly), com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
+ends" com diferente "front ends", permitindo compilar diferentes linguagens 
+para diferentes máquinas (LxM combinações).
+Essa arquitetura é seguida por ferramentas bem sucedidas, tais como o GCC e o 
+LLVM, que permitem que diferentes linguagens sejam compiladas para diferentes 
+plataformas.
+
+## Sintaxe
+
+As duas primeiras fases do "front end", análise léxica e sintática, lidam com a 
+forma da LP.
+O objetivo dessas fases é o de reconhecer e transformar a entrada textual 
+"concreta" em uma forma abstrata, padronizada, de mais fácil manipulação para 
+as fases seguintes.
+Tipicamente o programa de entrada é transformado em uma árvore sintática 
+abstrata (AST).
+Como exemplo, independentemente da sintaxe concreta para somar dois números 
+("2+1" em C ou "(+ 2 1)" em LISP), a representação abstrata será a mesma:
+        +
+       / \
+      2   1
+
+Note que em geral uma LP pode descrever infinitos programas, dado que suas 
+construções permitem repetições ou composições:
+
+    [IDENTIFICADORES E COMANDOS POSSÍVEIS]
+    x, xx, xxx, ...                 (infinitos identificadores)
+    while(1) { while(1) { ... } }   (infinitos comandos while)
+
+Dessa maneira, as regras que descrevem o léxico e a sintaxe devem ser 
+expressadas em "meta-linguages" capazes de exprimir todas as infinitas 
+possibilidades através de uma forma finita.
+As duas meta-linguagens mais comuns são as expressões regulares, para o léxico, 
+e as BNFs (Backus-Naur form), para a sintaxe.
+
+### Análise léxica (scanning)
+
+A primeira fase do compilador lida com a transformação de um fluxo de 
+caracteres escritos na LP para um fluxo de tokens a ser repassado para a 
+análise sintática.
+Tipicamente os tokens representam números, identificadores, palavras reservadas 
+e operadores aceitos pela LP.
+Além do que ele representa, um token pode carregar atributos adicionais, tais 
+como o seu conteúdo completo (lexeme) e a linha onde aparece.
+
+O exemplo a seguir, em C, separa uma sequência de caracteres em tokens:
+
+    x = 1;  =>  <ID,"x",1>  <"=",1>  <NUM,"1",1> <";",1>
+
+O programa que reconhece a entrada como válida e a transforma em tokens é 
+conhecido como "scanner" e pode ser gerado automaticamente por uma ferramenta 
+"geradora de scanners".
+Essas ferramentas se baseiam na teoria de linguagens regulares (LRs) e sua 
+correspondência com autômatos finitos determinísticos (DFAs), ou seja, que 
+qualquer linguagem regular pode ser reconhecida por um DFA.
+
+Linguagens são formalmente definitas como um conjunto de strings, em outras 
+palavras, como o conjunto com todas as sequências de caracteres que a linguagem 
+reconhece.
+Já uma LR pode ser formalmente definida de maneira construtiva, com as 
+seguintes regras de base e de composição:
+    - base
+        - a string vazia @ é uma LR
+        - qualquer caractere "a" (em um dado alfabeto) é uma LR
+    - composição
+        - a concatenação (.) de duas LRs é uma LR
+        - a união (|) de duas LRs é uma LR
+        - a fecho ou repetição (*) de duas LRs é uma LR
+De maneira geral, o léxico de uma LP é uma LR, tornando essas ferramentas 
+convenientes para a construção de scanners.
+
+Finalmente, LRs podem ser descritas por expressões regulares (REs) com as 
+regras descritas acima e assim descrever regras do léxico de uma LP:
+
+    <while> = w.h.i.l.e         (LR que descreve a palavra reservada while)
+                                (o operador . de concatenação pode ser omitido)
+    <char>  = a|b|...|z         (descreve os caracteres)
+    <dig>   = 0|1|...|9         (descreve os algarismos)
+    <id>    = <char> (<char>|<dig>)*
+                                (descreve os identificadores)
+                                (os parênteses são usados como agrupamento)
+
+A ideia de um gerador de scanner é transformar um conjunto de REs que 
+especifica o léxico de uma LP em um DFA que reconhece esses padrões, 
+transformando-os em tokens, de maneira eficiente.
+
+Sabe-se que qualquer RE pode ser transformada em um DFA.
+Primeiramente, transformamos a RE em um atômato finito não determinístico (NFA) 
+seguindo os padrões a seguir:
+
+    - base
+        - r = @
+            --> (*i) --@--> (f*)
+        - r = a
+            --> (*i) --a--> (f*)
+    - composição
+        - r = st
+            --> (*i) --eps--> (s) --eps--> (t) --eps--> (f*)
+        - r = s|t
+                    /--eps--> (s) --\
+            --> (*i)                 --eps--> (f*)
+                    \--eps--> (t) --/
+        - r = s*
+            --> (*i) --eps--> (s) --eps--> (f*)
+                   \          \e/          /
+                    \--eps----------------/
+
+Essa transformação é linear no tamanho da expressão O(|r|).
+Apesar de a transformação de um DFA para um NFA ser em teoria exponencial, o 
+caso típico de transformação de uma RE para um DFA é O(|r|^3).
+
+Repare que esse processo é feito apenas na construção do scanner.
+A partir de então, com o DFA construído, o reconhecimento de qualquer entrada 
+será linear com o seu tamanho O(|s|).
+
+TODO: brancos e comentários
+
+### Análise sintática (parsing)
+
+As contruções sintáticas são consideravelmente mais complexas que as léxicas, 
+tipicamente descrevendo aninhamento e regras recursivas.
+Dessa forma, um formalismo mais poderoso que LRs se faz necessário, como por 
+exemplo as linguagens livre de contexto (CFL) e sua correspondência com 
+autômatos de pilha.
+
+A toda LP está associada uma gramática que descreve as construções aceitas pela 
+linguagem.
+A notação BNF é usada para esse fim e é composta pelos seguintes elementos:
+
+    - terminais:       representam os tokens vindo do scanner
+    - não terminais:   representam as regras de composição
+    - produções:       descrevem as regras de composição
+    - símbolo inicial: um não terminal representando programas válidos (em
+                       geral o que aparece em primeiro na gramática)
+
+A BNF a seguir ilustra uma gramática com aninhamento e recursão:
+
+    Exp := Exp '+' Exp      (regra com recursão)
+        | '(' Exp ')'       (regra com aninhamento)
+        |  <id>             (regra básica)
+
+A partir do símbolo inicial, essa gramática pode gerar expressões como "v", 
+"((v))" e "v+(v)".
+
+BNFs descrevem gramáticas livres de contexto (CFGs), sendo que o lado esquerdo 
+de cada produção só pode conter um único símbolo não terminal (e nenhum 
+terminal).
+
+O programa que reconhece programas de entrada de acordo com uma CFG é conhecido 
+como "parser" e também pode ser gerado automaticamente por uma ferramenta 
+"geradora de parsers".
+
+Existem duas técnicas básicas para a construção de parsers, ambas usam um 
+algoritmo determinístico com o auxílio de um pilha.
+Na técnica top down, também conhecida como preditiva, o topo da pilha sempre 
+contém o não terminal da CFG que será reconhecido a seguir, começando pelo 
+símbolo inicial da CFG.
+Na técnica bottom up, o topo da pilha sempre contém o último símbolo 
+reconhecido, sempre terminando com o símbolo inicial da CFG (em caso de 
+sucesso).
+
+## Semântica Estática
+
+Após a fase de análise sintática, o front end de um compilador prossegue para a 
+fase de análise semântica, na qual tipicamente cria uma árvore sintática 
+abstrata (AST) (caso ainda não exista) e a anota com informações semânticas que 
+impõem novas restrições ao programa.
+
+CFGs não são suficientemente poderosas para descrever restrições necessárias a 
+sintaxe de uma LP.
+Por exemplo, se identificadores são declarados antes de seus usos e se o número 
+de argumentos passados a uma função corresponde ao que sua declaração 
+especifica.
+
+

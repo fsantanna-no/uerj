@@ -1,0 +1,213 @@
+# 2.8 Geração de Código
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+Existem duas abordagens para a tradução de linguagens de programação para 
+linguagens de máquina.
+Na compilação, o código fonte é traduzido por completo para a representação 
+binária antes da máquina executá-lo.
+Na interpretação, o código fonte é traduzido incrementalmente, durante a 
+execução do programa.
+Em geral, a escolha por compilação resulta em maior velocidade (assumindo que a 
+compilação pode ser feita com antecedência à execução), enquanto que a 
+interpretação traz maior flexibilidade.
+
+## Estrutura Geral de Tradutores
+
+O processo de tradução de programas é dividio em diversas fases, como ilustra o 
+diagrama a seguir:
+
+    ESTRUTURA GERAL DE UM TRADUTOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[geração de código alvo]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+    - Execução
+        - CÓDIGO DE MÁQUINA --[carregador]--> EXECUÇÃO
+        - entrada --[execução]--> saída
+
+
+O "front end" (análise) lida com a sintaxe e semântica estática da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária, com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
+ends" com diferente "front ends", permitindo compilar diferentes linguagens 
+para diferentes máquinas (L x M combinações).
+Essa arquitetura é seguida por ferramentas bem sucedidas, tais como o GCC e o 
+LLVM, que permitem que diferentes linguagens sejam compiladas para uma 
+representação intermediária que pode em seguida ser compilada para diferentes 
+plataformas.
+
+Em linguagens compiladas, grande parte do esforço se concentra na "back-end", 
+onde ocorrem todas otimizações e a geração para a arquitetura final.
+Já em linguagens interpretadas, se a representação intermediária já forem 
+bytecodes para uma máquina virtual, o "front end" pode ser eliminado por 
+completo.
+
+A representação intermediária deve encontrar um balanço de expressividade entre 
+as possíveis linguagens sendo compiladas e as possíveis arquiteturas alvo.
+Em geral, RIs eliminam estrutras complexas de controle (e.g., switch-case, 
+for), mas também não se limitam a recursos finitos de arquiteturas finais 
+(e.g., número fixo de registradores).
+Sendo assim, não são aptas a executarem diretamente, devendo ser traduzidas 
+ainda para uma representação final reconhecida pela arquitetura alvo.
+As duas RIs intermediárias mais conuns usam grafos acíclicos direcionados 
+(DAGs, mais próximos da árvore sintática), ou código de 3 endereços (mais 
+próximos das linguagens de máquina).
+
+## Geração de Código
+
+O requisito básica da geração de código é o de manter a semântica original do 
+programa escrito na linguagem de alto nível.
+Como requisito secundário, o código gerado deve fazer uso efetivo dos recursos 
+oferecidos pela arquitetura, de maneira a otimizar a execução da aplicação 
+segundo critérios relevantes (tamanho de código, velocidade de execução, 
+consumo de energia).
+Para isso, o gerador de código deve considerar qualidades do formato RI de 
+entrada, assim como conhecer os detalhes da arquitetura alvo, tais como 
+conjunto de instruções, número de registradores disponíveis ou se a máquina usa 
+operandos na pilha.
+Arquiteturas RISC em geral possuem instruções simples de três endereços e 
+grande número de registradores, enquanto que arquiteturas CISC possuem 
+instruções complexas com diferentes tipos de endereçamento para um número 
+limitado de registradores.
+
+Os duas principais atribuições da geração de código são o de selecionar as 
+instruções de máquinas apropriadas para mapeamento da RI e o de alocar o uso de 
+registradores e atribuí-los aos símbolos do programa.
+Apesar de em teoria não existir um código ótimo, a geração de código se utiliza 
+de heurísticas para se aproximar o máximo possível do ótimo.
+
+### Seleção de Instruções
+
+A seleção de instruções apropriadas para o código final de levar em conta o 
+formato da RI e o conjunto de instruções oferecidos pela arquitetura.
+Na técnica de casamento de padrões mapeia de modelos de RI de entrada para 
+modelos de instruções de saída.
+
+Para RIs de três endereços com a forma "dst = src1 <op> src2", o padrão a 
+seguir pode ser aplicado:
+
+    LD R0, src1
+    OP R0, R0, src2
+    ST dst, R0
+
+De maneira análoga, o mesmo padrão pode ser aplicado a um DAG equivalente, 
+contando que as sub-árvores sejam substituídas pelos registradores que guardam 
+seus resultados temporários:
+
+        =
+      /   \
+    dst   <op>
+          /  \
+        src1 src2
+
+        =
+      /   \
+    dst    R0
+
+Essa visão extremamente localizada com o casamento de padrões invariavelmente 
+gera instruções reduntantes para "loads" e "stores" de variáveis usadas em 
+sequência ou em sub-expressões.
+Como exemplo, a sentença "a=b+c; d=a+e" gera duas instruções redundantes:
+
+    LD  R0, b
+    ADD R0, R0, c
+    ST  a, R0       ; reduntante (a não é mais utilizada)
+    LD  R0, a       ; reduntante (R0 já possui a)
+    ADD R0, R0, e
+    ST  d, R0
+
+### Otimizações
+
+Com otimizações de "peephole", essas intruções reduntantes podem ser detectadas 
+e removidas do código final.
+Através de múltiplas passadas no código e análise de pequenas janelas 
+("peephole"), essa técnica pode eliminar alguns trechos de código:
+
+- LD/ST reduntantes:
+    LD R, a
+    ST a, R     (a já contém o valor de R)
+
+- código não alcançável derivado de propagação de constantes (e.g., "if" para 
+  código no modo de debug)
+         LD R, 0     (R sempre é 0)
+         JE R, 0, #100
+         ...         (código não alcancável)
+    100:
+
+- saltos para saltos
+         JMP #100    (salto direto para 200)
+         ...
+    200: JMP #200
+
+### Alocação de Registradores
+
+Tipicamente a RI não distingue o custo de acessos à memória com o de acessos a 
+registradores, tampouco se limita ao uso de um número finito de registradores 
+quando conveniente.
+No entanto, a geração de código final deve se preocupar em fazer o maior número 
+de operações possíveis em registradores, sem acessar a memória principal, 
+levando em conta que nem sempre será possível manter todas as variáveis em 
+registradores.
+Quando não for possível manter todos as variáveis em registradores, o gerador 
+de código deve inserir instruções para gravar (e carregar) valores para a 
+memória principal (processo conhecido como "spill").
+
+A técnica mais comum para alocação de registradores é a de coloração de grafos 
+com "K" cores.
+Basicamente, cada nó representa uma variável e cada aresta entre dois nós 
+representa se as variáveis estão "vivas" ao mesmo tempo (contemporâneas):
+
+    (a)----(b)----(c)
+
+O número "K" de cores representa o número de registradores disponíveis na 
+arquitetura.
+Vértices ligadas por arestas não compartilhar a mesma cor, isto é, variáveis 
+contemporâneas não podem usar o mesmo registrador.
+O problema de coloração de grafos é NP-completo, mas uma heurítica gulosa 
+eficiente é remover um nó com menos de "K" arestas do grafo, atribuí-lo a uma 
+cor (diferente da de seus vizinhos) e repetir o processo até que não sobrem nós 
+no grafo.
+Para os nós que sobrarem, o gerador de código usará o processo de "spill" para 
+a memória principal.
+
+O problema de detectar quais variáveis são contemporâneas envolve a idéia 
+básica de construir um DAG para blocos atômicos de código (sem saltos para 
+dentro ou para fora) e detectar variáveis que nunca estão intercaladas em seus 
+usos:
+
+    (b) --> (x,y) --> (a) --> (x)
+
+- b não é intercalado com ninguém
+- x,y estão no mesmo bloco
+- a é intercalado com x
+
+             (a)
+            /
+    (b)--(x)
+            \
+             (y)

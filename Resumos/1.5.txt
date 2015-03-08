@@ -1,0 +1,327 @@
+# 1.5 Estruturas de Controle em Linguagens de Programação
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+Linguagens de "baixo nível", são linguagens com semântica mais próxima a da 
+máquina, em que o programador deve manipular diretamente registradores, 
+memória, e instruções específicas da máquina.
+Como contraste, linguagens de "alto nível" escondem os detalhes de 
+funcionamento da máquina, oferecendo, por exemplo, uma semântica para manipular 
+abstrações matemáticas (funções, valores e variáveis).
+
+- Assembly é um exemplo de linguagem de baixo nível, uma vez que oferece apenas 
+  mnemônicos que mapeiam palavras em inglês para instruções de máquina 
+(praticamente numa relação um para um).
+  Por exemplo, a sentença "MOV R1 10" copia o valor 10 para o um registrador da 
+máquina.
+- A linguagem C já oferece comandos de mais alto nível com estruturas de 
+  controle que se traduzem para várias instruções de máquina.
+  Por exemplo, a sentença "repeat { remove() } until(empty());" é mais 
+inteligível para um ser humano e não expõe detalhes sobre o funcionamento 
+interno da máquina.
+
+## Comandos e Expressões
+
+Comandos são instruções escritas em uma linguagem de alto nível e constituem a 
+sua unidade básica de execução.
+Em "programação estruturada", comandos da LP executam passo-a-passo, um após o 
+outro, produzindo efeitos colaterais na memória que representa o estado geral 
+do programa.
+Além da execução em sequência, a programação estruturada depende de 
+condicionais e repetições para o controle de fluxa das aplicações.
+Comandos podem ser combinados em blocos que definem um escopo dentro do qual um 
+subconjunto de variáveis pode ser manipulado de forma local.
+Blocos podem compor subrotinas, criando abstrações que podem ser reusadas em 
+outras partes da aplicação.
+
+Expressões combinam valores (operandos) através de operações (operadores) e 
+computam um novo valor.
+Os valores podem ser constantes literais, variáveis, aplicações de funções 
+entre outras entidades que possuam um valor associado ("r-value").
+Em notações infixas, operadores seguem regras de precedência e associatividade 
+de forma a eliminar ambigüidades, e.g., na expressão "1 + 1 * 2", a 
+multiplicação é efetuada antes da soma (considerando as regras de precedência 
+de C).
+O uso de parênteses para agrupar operações pode forçar a avaliação de 
+expressões em uma ordem arbritária.
+Linguagens com notação prefixa ou posfixa (e.g., "+ 1 1" ou "1 1 +"), eliminam 
+ambigüidades sob a pena de menor legibilidade.
+LISP adota notação prefixa, enquanto que Forth adota notação posfixa.
+
+Linguagens funcionais puras não possuem comandos, sendo que seus programas são 
+inteiramente avaliados como uma expressão.
+O modelo teórico funcional compreende apenas literais, variáveis, expressões 
+lambda (funções) e aplicações.
+Haskell adota esse modelo praticamente à risca, apenas incluindo um sistema de 
+tipos complexo.
+
+## Controle de Fluxo
+
+Linguagens imperativas convencionais seguem um fluxo natural sequencial, em que 
+cada comando é executado um após o outro.
+No entanto, programas devem tomar decisões durante a execução que podem 
+modificar o fluxo natural de execução.
+
+Estruturas de controle condicionais modificam o fluxo dependendo da avaliação 
+de uma expressão.
+Em sua forma mais simples, o "if-then-else", o valor booleano da expressão irá 
+decidir se o fluxo seguirá pelo bloco do "then" ou pelo bloco "else".
+Estruturas mais complexas, como o switch-case, podem decidir que caminho seguir 
+baseados na avaliação de uma expressão que pode assumir "n" valores diferentes.
+
+Estruturas de repetição (e.g., "while", "repeat") repetem a execução de um 
+bloco até que uma condição seja satisfeita.
+Em iteradores (e.g., "for"), uma variável de controle assume valores diferentes 
+a cada iteração, terminando quando todos os valores da variável forem tratados.
+Estruturas de repetição tipicamente oferecem uma forma de interrupção imediata 
+que ignora a condição normal de término (e.g., o comando "break").
+
+Apesar de sequências, condicionais e repetições serem amplamente difundidas e 
+entendidas, a programação estruturada foi um avanço em comparação com o uso 
+irrestrito de "gotos" para o controle de fluxo até a década de 60.
+
+## Subrotinas
+
+Praticamente qualquer linguagem de programação possui algum mecanismo de 
+chamadas de funções, procedimentos ou subrotinas.
+Subrotinas possuem uma declaração com nome, parâmetros esperados e um bloco a 
+ser executado sempre que forem invocadas.
+A amarração (binding) dos parâmetros formais aos respectivos valores reais pode 
+seguir diversas semânticas possíveis:
+
+- passagem por valor/cópia
+    No momento da chamada, o valor do parâmetro (rval) é copiado como novo 
+    valor da variável local da função (rval).
+    Linguagens funcionais puras (e.g., Haskell) também possuem uma variação 
+semântica em que a cópia só acontece quando o valor local à função é de fato 
+utilizado.
+Essa semântica de avaliação "lazy" não traz dificuldades de entendimento do 
+programa, já que não existem efeitos colaterais e o valor do parâmetro não pode 
+mudar entre a chamada e o uso.
+
+- passagem por referência
+    No momento da chamada, a locação do parâmetro (lval) é atribuída à locação 
+da variável local da função (lval), criando um "alias" para o valor de entrada, 
+que dessa maneira, pode ser alterado de dentro da função.
+
+- passagem por nome
+    O texto passado como parâmetro substitui todos os usos do parâmetro formal 
+dentro da função.
+    Essa semântica é usada por macros em C (#define's).
+
+Para permitir chamadas de rotina aninhadas ou recursivas, os ambientes de 
+execução dependem da região de memória conhecida como pilha para guardar os 
+registros de ativação de subrotinas (com seu estado completo), que vão sendo 
+sobrepostas respeitando a ordem natural de que a subrotina chamada por último 
+será a primeira a terminar ("last in, first out").
+
+Tipicamente, o ambiente de execução configura a região da pilha para iniciar no 
+último endereço de memória disponível (e.g., 0xFFFF), crescendo na direção do 
+início da memória (0x0000):
+
+-- início
+0x0000  CÓDIGO
+        ...                 // tamanho conhecido
+0xnnnn  DADOS ESTÁTICOS
+        ...                 // tamanho conhecido
+0xmmmm  HEAP
+        ... v               // tamanho desconhecido
+        ... ^
+0xFFFF  PILHA
+-- fim
+
+TODO: árvores de ativação
+
+Registros de ativação devem conter diversas informações que somente são 
+conhecidas durante a execução do programa: parâmetros de entrada, variáveis 
+locais e valor e endereço de retorno.
+A criação do registro de ativação deve seguir um protocolo conhecido, de 
+maneira que trechos que chamam subrotinas e trechos que executam dentro de 
+subrotinas saibam exatamente como proceder nas chamadas e retornos.
+Como regra geral, o máximo de trabalho deve ser feito pela subrotina chamada, 
+evitando a multiplicação desse trabalho entre todas as chamadas do programa.
+A figura a seguir ilustra dois registros de ativação encadeados em que "f()" 
+chamando "g()", destacando as responsabilidades envolvidas entre quem chama e 
+que é chamado:
+
+ ---    ---                         SP
+ c      link de controle                ----\   (3)
+ h      status dos registradores            |   (2)
+ a      variáveis locais                    |   (1)
+ m  g() =========================== FP      |
+ a      valor de retorno                    |
+ d      parâmetros da nova chamada          |
+ a--    ----                                |
+        link de controle             ----\  |
+        status dos registradores         |  |
+        variáveis locais                 |  /
+    f() =========================== FP <----
+                                         |
+                                         |
+                                         v (para frame anterior)
+
+No exemplo acima, a subrotina chamada aloca espaço na pilha para suas locais 
+(1), guarda o estado atual dos registradores da subrotina que a chamou (2), e 
+cria um link que aponta para o início da subrotina que a chamou (3).
+No momento da chamada, esse valor é mantido em um registrador especial 
+conhecido como "frame pointer" (FP) e logo em seguida é redirecionado para o 
+novo frame.
+O FP se coloca entre as variáveis locais e os parâmetros de entrada, que são 
+ambos acessados a partir dele (com offsets negativos e positivos, 
+respectivamente).
+O topo da pilha deve ser mantido sempre pelo registrador "stack pointer" (SP), 
+que pode ser usado pela subrotina em execução para guardar valores temporários.
+No momento do retorno, o valor de retorno de ser atribuído e o topo da pilha SP 
+pode ser reconfigurado com o valor atual de FP.
+Além disso, as operações inversas à entrada devem ser efetuadas: o link de 
+controle restaurado para o valor anterior, assim como o status dos 
+registradores.
+
+Algumas linguagens oferecem co-rotinas, que generalizam o conceito de rotinas.
+Uma co-rotina possui múltiplos pontos de entrada e saída, podendo ser executado 
+parcialmente a cada invocação.
+Os trechos a seguir ilustram o funcionamento de co-rotinas, um co-rotina "f" 
+sendo manipulada pelo programa principal:
+
+co-rotina f:
+    ...         // comandos-1
+    yield(1)    // retorno parcial
+    ...         // comandos-2
+    return(2)   // retorno final
+
+programa principal:
+    v = f()     // executa comandos-1 com retorno 1
+    v = f()     // executa comandos-2 com retorno 2
+
+Note que entre invocações, todo o estado da co-rotina deve ser mantido em 
+memória: variáveis locais, registradores e ponto de execução suspenso.
+Dessa maneira, é necessário que a linguagem mantenha múltiplas pilhas de 
+execução, uma para o programa principal e uma para cada co-rotina ativa.
+
+Os usos mais comuns de co-rotinas são para implementar geradores e iteradores, 
+máquinas de estado e multithreading cooperativo.
+Lua, Go e Scheme são exemplos de linguagens que suportam co-rotinas 
+nativamente.
+
+## Exceções
+
+Exceções representam condições anormais dentro do fluxo normal de execução 
+(e.g., divisões por zero, acessos fora do limite de vetores e erros de alocação 
+de memória).
+A ocorrência de uma exceção deve modificar a execução do programa abruptamente, 
+uma vez que o fluxo natural não a trata apropriadamente.
+Linguagens sem tratamento de exceção tipicamente terminam a execução ou 
+apresentam comportamento não determinado (e.g., em C a divisão por 0 ou acessos 
+fora dos limites de vetores assumem comportamento não especificado).
+
+Linguagens com suporte a exceções devem definir as seguintes funcionalidades:
+
+- definição de exceções
+    Exceções que podem ser geradas, se são somente pré-definidas ou se o 
+programador pode definir novas exceções.
+Java suporta extensões à classe base "Exception".
+- geração de exceções
+    Como as exceções são disparadas e se o programador também pode gerá-las.
+Java suporta "throw".
+
+- tratamento de exceções
+    Como as exceções são capturadas, tratadas, e o que acontece com o fluxo do 
+código após o tratamento.
+Java try-catch, sem recuperação do código abortado.
+
+## Concorrência e Paralelismo
+
+Linguagens concorrentes oferecem suporte a mútliplas linhas de execução 
+simultâneas em paralelo.
+Em arquiteturas com uma única CPU esse suporte é apenas conceitual e as linhas 
+de execução se alternam no controle da CPU.
+
+Um escalonador é responsável por gerenciar o controle das linhas de execução, 
+por exemplo limitando o tempo máximo que cada uma pode exeutar.
+Essa abordagem é conhecida como "multithreading preemptivo" e é adotada no 
+controle de processos de sistemas operacionais, assim como em linguagens que 
+oferecem "threads" primitivamente.
+
+Sistemas concorrentes precisam oferecer algum mecanismo de comunicação entre as 
+linhas de execução.
+Quando as linhas de execução compartilham o mesmo espaço de endereçamento, a 
+comunicação pode ser feita através de variáveis compartilhadas, como é o caso 
+de "threads" em C, C++ e Java.
+Quando as linhas de execução não compartilham memória, a comunicação se faz 
+através de uma primitiva especial para troca de mensagens.
+Esse é o modelo adotado por processos em sistemas operacionais, atores em 
+algumas linguagens (e.g., erlang e ADA), e por sistemas distribuídos através de 
+uma rede (e.g., CORBA, Java RMI).
+
+No momento da comunicação, é preciso que as linhas de execução estejam 
+sincronizadas, ou seja, que estejam em um estado consistente e seguro para que 
+não haja resultados imprevistos.
+
+No caso de troca de mensagens, a sincronização e comunicação são feitas pela 
+mesma primitiva (e.g., send e receive).
+No caso de memória compartilhada, como a comunicação acontece através de 
+atribuições normais, uma primitiva adicional para sincronização se faz 
+necessária.
+
+Uma condições de corrida ocorre quando duas linhas de execução tentam ler e 
+escrever na mesma região de memória concorrentemente:
+
+            // linha 1
+            a = a + 1
+a = 1                       print(a)
+            // linha 2
+            a = a * 2
+
+No exemplo acima, uma variável é inicializada com 0 e em seguida acessada 
+concorrentemente por duas linha de execução.
+A primeira vista, o resultado final pode ser "4" se a soma aconteceu primeiro 
+(i.e., (1+1)*2), ou 3, se a multiplicação aconteceu primeiro (i.e., (1*2)+1).
+No entanto, como o escalonamento dos processos não é determinístico, as duas 
+leituras concorrente a "a" podem acontecer antes das escritas, com outros 
+possíveis resultados finais.
+
+O uso de semáforos, monitores, barreiras e outros mecanismos de sincronização 
+impõem restrições sobre como as linhas de execução podem ser escalonadas.
+No exemplo abaixo reescrito, o uso de um mecanismo execução atômica assegura 
+que os blocos não sejam preemptados:
+
+        // linha 1              // linha 2
+        atomic {                atomic {
+            a = a + 1               a = a * 2
+        }                       }
+
+Semáforos se baseiam em um contador controlado por duas operações: incremento e 
+decremento.
+A operação de decremento testa se o valor do contador é maior que zero e o 
+decrementa, caso contrário, a linha de execução é bloqueada por tempo 
+indeterminado.
+A operação de incremento além de incrementar o contador, acorda as linhas de 
+execução bloqueadas no semáforo (caso o contador esteja em 0).
+O uso de semáforos é comum quando mais de um recurso pode ser manipulado 
+concorrentemente, e.g., o problema de produtores e consumidores.
+
+Monitores são mecanismos de mais alto nível que em geral estão associados a 
+classes ou tipos abstratos de dados.
+Um monitor é controlado por um objeto que possui operações de sincronização.
+Se dois clientes tentam acessar as operações concorrentemente, uma delas é 
+bloqueada até que a outra termine a sua operação e libere o monitor.
+Em Java, monitores estão associados a objetos que são acessados por métodos do 
+tipo "syncrhonized".
+
+
