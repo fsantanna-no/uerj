@@ -41,7 +41,7 @@ interno da máquina.
 No entanto, programadores C ainda precisam manipular a memória da máquina 
 diretamente e compreender, por exemplo, como os dados são fisicamente 
 organizados na memória.
-- A linguagem LISP se coloca no espectro oposto ao Assembly, provendo uma 
+- A linguagem LISP se coloca no espectro oposto ao assembly, provendo uma 
   semântica de manipulação de listas e operações sobre símbolos matemáticos, 
 abstraindo por completo os detalhes sobre operações e uso de memória numa 
 máquina real.
@@ -118,8 +118,8 @@ baseiam em teorias e técnicas distintas:
           ÁRVORE SINTÁTICA --[analisador semântico]-->
           ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
     - Síntese / Back-end:
-        - RI/CI             --[gerador de código]-->
-          CÓDIGO DE MÁQUINA --[otimizador de código]-->
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
           CÓDIGO DE MÁQUINA --[ligador]-->
           CÓDIGO DE MÁQUINA (não relocável)
     - Tabela de Símbolos
@@ -130,7 +130,7 @@ O compilador é o software responsável pela tradução do código fonte para o
 código de máquina e é dividio em duas grandes partes.
 O "front end" (análise) lida com a sintaxe e semântica da linguagem, 
 verificando se o programa de entrada é válido e gerando uma representação 
-intermediária sem os detalhes sintáticos
+intermediária (e.g., assembly), com os detalhes sintáticos eliminados.
 Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
 específica, transformando a representação intermediária no código final.
 Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
@@ -701,8 +701,8 @@ diagrama a seguir:
           ÁRVORE SINTÁTICA --[analisador semântico]-->
           ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
     - Síntese / Back-end:
-        - RI/CI             --[gerador de código]-->
-          CÓDIGO DE MÁQUINA --[otimizador de código]-->
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
           CÓDIGO DE MÁQUINA --[ligador]-->
           CÓDIGO DE MÁQUINA (não relocável)
     - Tabela de Símbolos
@@ -711,18 +711,19 @@ diagrama a seguir:
 
 O "front end" (análise) lida com a sintaxe e semântica estática da linguagem, 
 verificando se o programa de entrada é válido e gerando uma representação 
-intermediária.
+intermediária (e.g., assembly), com os detalhes sintáticos eliminados.
 Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
 específica, transformando a representação intermediária no código final.
 
 Em linguagens compiladas, grande parte do esforço se concentra na "back-end", 
 onde ocorrem todas otimizações e a geração para a arquitetura final.
-Já em linguagens interpretadas, se a representação intermediária já são os 
-bytecodes da máquina virtual, o "front end" pode ser eliminado por completo.
+Já em linguagens interpretadas, se a representação intermediária já forem
+bytecodes para uma máquina virtual, o "front end" pode ser eliminado por 
+completo.
 Note que o "back end" deve estar disponível durante toda a execução de 
 programas interpretados.
 
-## Ambientes de Execução
+## Ambientes de Tempo de Execução
 
 O ambiente de execução de uma linguagem controla o estado global da memória, 
 I/O, registradores e CPU.
@@ -768,6 +769,424 @@ específicas.
 ===============================================================================
 ===============================================================================
 
+# 1.3 Estruturas Clássicas de Linguagens
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como compilação.
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+Linguagens de "baixo nível", são linguagens com semântica mais próxima a da 
+máquina, em que o programador deve manipular diretamente registradores, 
+memória, e instruções específicas da máquina.
+Como contraste, linguagens de "alto nível" escondem os detalhes de 
+funcionamento da máquina, oferecendo, por exemplo, nomes para referenciar 
+abstrações tais como variáveis e subrotinas.
+
+- Assembly é um exemplo de linguagem de baixo nível, uma vez que oferece apenas 
+  mnemônicos que mapeiam palavras em inglês para instruções de máquina 
+(praticamente numa relação um para um).
+  Por exemplo, a sentença "MOV R1 10" copia o valor 10 para o um registrador da 
+máquina.
+- A linguagem C já oferece comandos de mais alto nível que se traduzem para 
+  várias instruções de máquina.
+  Por exemplo, a sentença "repeat { remove() } until(empty());" é mais 
+inteligível para um ser humano e não expõe detalhes sobre o funcionamento 
+interno da máquina.
+
+## Amarrações de Nomes
+
+Em linguagens de alto nível qualquer entidade de programação, seja ela uma 
+variável, subrotina ou tipo terá sempre um conjunto de atributos fixos ou que 
+podem variar durante a execução do programa.
+Como exemplos, uma variável possui um nome, valor corrente e um tipo;
+já uma subrotina, além do nome, também possui uma lista de parâmetros e um 
+corpo de execução.
+
+Cada atributo de uma entidade tem que ser associado ("amarrado") a um valor 
+antes de seu uso.
+A tempo de amarração pode ser estático, quando acontece antes da execução do 
+programa, ou dinâmico, quando acontece durante a execução:
+
+    - estático
+        - definição da linguagem (int é um tipo)
+        - implementação da linguagem (int tem 4 bytes)
+        - compilação de programas (novos tipos definidos pelo usuário)
+    - dinâmico
+        - execução: atribuição de variável (v=1)
+
+Normalmente cada nome está associado a uma única entidade (1:1).
+Em algumas estruturas de linguagem, com "aliasing" é possível ter mais de um 
+nome referenciando a mesma entidade, como é o caso de múltiplos ponteiros para 
+a mesma variável (N:1).
+Também é possível a sobrecarga de nomes, na qual o mesmo nome faz referência a 
+diferentes entidades (1:N), como é o caso de operadores de soma em C/C++ 
+(dependendo operandos, eles realizam a soma inteira ou real).
+
+## Variáveis
+
+Variáveis estão presentes em virtualmente todas as linguagens de programação e 
+mapeiam um nome a uma célua de memória.
+Além do nome, variáveis possuem outros atributos, como escopo de vida, tipo do 
+valor que carrega, locação da memória (lval) e conteúdo atual (rval).
+A amarração de nome, tipo e lval ocorre durante a execução, no momento da 
+declaração, enquanto que a amarração com o valor pode ser alterada através de 
+novas atribuições.
+
+Em geral, a amarração entre a variável e o seu escopo é léxica (respeitando a 
+posição no código fonte), mas algumas linguagens (e.g., perl e LISP) também 
+suportam escopo dinâmico conforme ilustrado a seguir:
+
+    int a = 0;
+    function g () {
+        print(a);       // escopo léxico: sempre imprime 0
+    }                   // escopo dinâmico: imprime 1 caso seja chamada de f()
+    function f () {
+        int a = 1;
+        g();
+    }
+
+Em linguagens dinâmicas, a amarração do tipo da variável também pode variar 
+durante a execução, de acordo com o valor (rval) atual da variável.
+Em Lua, por exemplo, uma variável pode carregar valores de tipos diferentes 
+durante a execução:
+
+    local a = 1
+    ...
+    a = 'hello'
+
+## Subrotinas
+
+Assim como variáveis, o uso de subrotinas ou algum mecanismo que associe um 
+bloco de código a um nome para reúso está presente em todas as linguagens de 
+programação.
+Novamente, subrotinas possuem outros atributos, como escopo de vida, tipo dos 
+parâmetros (assinatura) e posição e conteúdo do corpo na memória.
+
+Em linguagens estáticas convencionais (não funcionais) as amarrações acontecem 
+em tempo de compilação, de acordo com a declaração da assinatura da função 
+(e.g., protótipos de C).
+Em linguagens funcionais, as amarrações podem ser dinâmicas, uma vez que 
+funções podem ser criadas em tempo de execução (closures).
+
+Em linguagens dinâmicas, não existe uma amarração obrigatória entre os 
+parâmetros formais de uma função com os valores reais passados como parâmetros 
+nas chamadas, sendo comum funções receberem mais ou menos parâmetros do que 
+esperam, resultando em erros de execução (caso o corpo da função ignore essas 
+possibilidades).
+
+Quando estão presentes, a amarração dos parâmetros formais aos respectivos 
+valores reais passados acontece dinamicamente, mas com diversas semânticas 
+possíveis:
+
+- passagem por valor/cópia
+    No momento da chamada, o valor do parâmetro (rval) é copiado como novo 
+    valor da variável local da função (rval).
+    Linguagens funcionais puras (e.g., Haskell) também possuem uma variação 
+semântica em que a cópia só acontece quando o valor local à função é de fato 
+utilizado.
+Essa semântica de avaliação "lazy" não traz dificuldades de entendimento do 
+programa, já que não existem efeitos colaterais e o valor do parâmetro não pode 
+mudar entre a chamada e o uso.
+
+- passagem por referência
+    No momento da chamada, a locação do parâmetro (lval) é atribuída à locação 
+da variável local da função (lval), criando um "alias" para o valor de entrada, 
+que dessa maneira, pode ser alterado de dentro da função.
+
+- passagem por nome
+    O texto passado como parâmetro substitui todos os usos do parâmetro formal 
+dentro da função.
+    Essa semântica é usada por macros em C (#define's).
+
+### Chamadas de Subrotinas e a Pilha
+
+Para permitir aninhamento e chamadas recursivas, subrotinas dependem da região 
+de memória conhecida como pilha para guardar os registros de ativação de 
+subrotinas (com seu estado completo), que vão sendo sobrepostas respeitando a 
+ordem natural de que a subrotina chamada por último será a primeira a terminar 
+("last in, first out").
+
+Tipicamente, o ambiente de execução configura a região da pilha para iniciar no 
+último endereço de memória disponível (e.g., 0xFFFF), crescendo na direção do 
+início da memória (0x0000):
+
+-- início
+0x0000  CÓDIGO
+        ...                 // tamanho conhecido
+0xnnnn  DADOS ESTÁTICOS
+        ...                 // tamanho conhecido
+0xmmmm  HEAP
+        ... v               // tamanho desconhecido
+        ... ^
+0xFFFF  PILHA
+-- fim
+
+Registros de ativação devem conter diversas informações que somente são 
+conhecidas durante a execução do programa: parâmetros de entrada, variáveis 
+locais e valor e endereço de retorno.
+A criação do registro de ativação deve seguir um protocolo conhecido, de 
+maneira que trechos que chamam subrotinas e trechos que executam dentro de 
+subrotinas saibam exatamente como proceder nas chamadas e retornos.
+Como regra geral, o máximo de trabalho deve ser feito pela subrotina chamada, 
+evitando a multiplicação desse trabalho entre todas as chamadas do programa.
+A figura a seguir ilustra dois registros de ativação encadeados em que "f()" 
+chamando "g()", destacando as responsabilidades envolvidas entre quem chama e 
+que é chamado:
+
+ ---    ---                         SP
+ c      link de controle                ----\   (3)
+ h      status dos registradores            |   (2)
+ a      variáveis locais                    |   (1)
+ m  g() =========================== FP      |
+ a      valor de retorno                    |
+ d      parâmetros da nova chamada          |
+ a--    ----                                |
+        link de controle             ----\  |
+        status dos registradores         |  |
+        variáveis locais                 |  /
+    f() =========================== FP <----
+                                         |
+                                         |
+                                         v (para frame anterior)
+
+No exemplo acima, a subrotina chamada aloca espaço na pilha para suas locais 
+(1), guarda o estado atual dos registradores da subrotina que a chamou (2), e 
+cria um link que aponta para o início da subrotina que a chamou (3).
+No momento da chamada, esse valor é mantido em um registrador especial 
+conhecido como "frame pointer" (FP) e logo em seguida é redirecionado para o 
+novo frame.
+O FP se coloca entre as variáveis locais e os parâmetros de entrada, que são 
+ambos acessados a partir dele (com offsets negativos e positivos, 
+respectivamente).
+O topo da pilha deve ser mantido sempre pelo registrador "stack pointer" (SP), 
+que pode ser usado pela subrotina em execução para guardar valores temporários.
+No momento do retorno, o valor de retorno de ser atribuído e o topo da pilha SP 
+pode ser reconfigurado com o valor atual de FP.
+Além disso, as operações inversas à entrada devem ser efetuadas: o link de 
+controle restaurado para o valor anterior, assim como o status dos 
+registradores.
+
+===============================================================================
+===============================================================================
+===============================================================================
+
+# 1.4 Estruturação de Dados em Linguagens de Programação
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como compilação.
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+Linguagens de "baixo nível", são linguagens com semântica mais próxima a da 
+máquina, em que o programador deve manipular diretamente registradores, 
+memória, e instruções específicas da máquina.
+Como contraste, linguagens de "alto nível" escondem os detalhes de 
+funcionamento da máquina, oferecendo, por exemplo, abstrações para estruturar 
+os dados na memória através de tipos primitivos ou definidos pelo usuário, 
+assim como mecanismos para gerenciar o uso da memória durante a execução do 
+programa.
+
+- Assembly é um exemplo de linguagem de baixo nível, uma vez que oferece apenas 
+  mnemônicos que mapeiam palavras em inglês para instruções de máquina 
+(praticamente numa relação um para um).
+  Por exemplo, a sentença "MOV R1 10" copia o valor 10 para o um registrador da 
+máquina.
+- A linguagem C já oferece comandos de mais alto nível que se traduzem para 
+  várias instruções de máquina. Por exemplo:
+
+    int    a = 1;
+    char[] v = "ola mundo";
+
+As duas linhas do programa reservam espaço em memória para um inteiro, uma 
+string que é pré-alocada na região de dados, e um vetor com espaço suficiente 
+para a guardar a string que é copiada automaticamente na declaração.
+O exemplo ilustra não somente a economia em linhas de código, mas também o uso 
+de abstrações mais inteligíveis, como tipos e variáveis.
+
+## Tipos e Dados
+
+A todo dado manipulado em um programa está associado um tipo que lhe impõe um 
+conjunto de valores e operações disponíveis.
+Como exemplo, um dado com tipo "booleano" somente pode carregar os valores 
+"true" e "false" e somente pode operar sobre operações booleanas: negação 
+("not"), conjunção ("and") e disjunção ("or").
+
+Tipos são usados para organizar e documentar os dados de um programa.
+Também são usados para protegê-los de acessos não intencionais, como operações 
+inválidas (detectáveis por um sistema de tipos), ou intencionais, como em 
+quebra de regras de encapsulamento (evitados com tipos abstratos de dado).
+
+Tipos de dados em linguagens de programação podem ser primitivos, quando já 
+estão disponíveis previamente para uso, ou compostos, quando tipos primitivos 
+são combinados para formar tipos mais complexos.
+
+Tipos primitivos refletem o comportamento da arquitetura, mais especificamente 
+como os bits são interpretados pelo conjunto de instruções da CPU.
+Como exemplo, operações sobre inteiros em complemento a dois ou em ponto 
+flutuante são nativamente suportados pela maioria das arquiteturas modernas.
+
+Tipos compostos podem ser divididos em várias classes:
+
+- Mapeamentos:
+    Quando funcionam como funções, mapeando valores de um domínio para outro.
+    Vetores mapeiam inteiros para um tipo qualquer (e.g., o vetor com tipo 
+"void*[]" mapeia inteiros para ponteiros).
+    Tabelas associativas, comuns em linguagens dinâmicas, são uma generalização 
+de vetores, permitindo o mapeamento de entre quaisquer domínios.
+- Produtos Cartesianos:
+    Representam a combinação de dois domínios (T1xT2) e são conhecidos como 
+    registros no jargão de linguagens de programação (ou "structs" em C).
+- União:
+    Representam a disjunção de dois domínios (T1UT2).
+    Em C podem ser criados através da declaração "union".
+- Conjunto Potência:
+    Representam o conjunto de todos os conjuntos de um dado tipo.
+    Em programação aparecem para descrever conjuntos de bitflags, geralmente 
+representados por um inteiro que é manipulado com operações bit-a-bit.
+- Tipos recursivos:
+    São tipos que se auto referenciam na sua definição.
+    Podem descrever listas encadeadas infinitas, árvores e grafos em geral.
+
+Linguagens funcionais oferecem um construtor de tipos mais elaborado, conhecido 
+como tipos algébricos, que pode descrever produtos, uniões e recursões em 
+conjunto.
+
+###
+
+- vantagens
+    - esconde a representação
+        - facilidade de programação
+        - pode ser alterada
+    - checagem estática
+    - sobrecarga estática
+        - qual operação real escolher dado o mesmo operador
+    - controle de precisão vs eficiência
+        - float vs double
+## Alocação na Heap
+
+O uso da pilha pra armazenar dados de subrotinas só é efetivo devido ao fato do 
+que a execução de subrotinas são bem comportadas, sendo seguro liberar todas as 
+locais de um subrotina no momento de seu retorno.
+A região da heap deve ser usada para dados que são dinâmicos e que devem 
+sobreviver ao término do escopo onde foram criados.
+
+Como o ciclo de vida para cada dado na heap é indeterminado e depende da 
+execução do programa, algum mecanismo para gerenciar a memória deve ser 
+disponibilizado.
+As maiores dificuldades são em lidar com a variação do tamanho dos dados e com 
+a ordem de alocação e desalocação em que ocorrem.
+Três propriedades devem ser consideradas no gerenciador de memória:
+
+- Localidade: quanto mais distantes os dados estiverem entre eles, mais erros 
+  de acesso ao cache ocorrerão.
+- Fragmentação: quanto mais buracos existirem entre dados, maior é o 
+  desperdício de espaço útil para novas alocações.
+- Execução: quanto mais complexo for o gerenciador de memória for, maior é o 
+  desperdício de ciclos de CPU.
+
+Dentre as políticas de "first fit", "best fit" e "worst fit" para alocação de 
+blocos de memória, isto é, primeiro bloco encontrado, bloco de tamanho mais 
+próximo encontrado ou bloco de tamanho mais distante encontrado, a política de 
+"best fit" é a que se mostrou mais eficaz e é usada no "malloc" do GCC e no 
+"kmalloc" do kernel de Linux.
+
+Já a desalocação de memória pode ser feita manualmente ou de forma automática, 
+com o auxílio de um coletor de lixo que executa juntamente com o programa 
+buscando blocos não mais referenciados.
+
+Na desalocação manual, o programador é responsável por invocar uma primitiva 
+para liberar a memória apontada por uma referência (ponteiro) ao bloco alocado 
+anteriormente.
+Essa abordagem é eficiente, pois não exige custos extras associados ao 
+gerenciador de memória, no entanto é bastante insegura pois permite dois tipos 
+comuns de erros de programação: vazamentos de memória e acesso a ponteiros 
+pendentes (danrling pointers).
+Vazamentos de memória ocorrem quando o programador nunca desaloca um bloco de 
+memória que não é mais necessário e acessível, seja por esquecimento ou por 
+algum erro de lógica de programação.
+Para aplicações que executam por longos períodos e fazem muitas alocações, pode 
+acontecer da memória acabar.
+Acessos a ponteiros pendentes acontecem quando o programador desaloca um bloco 
+mas continua usando-o como se ele ainda estivesse vivo.
+Quando o mesmo bloco é alocado e usado novamente em outro trecho de código, as 
+consequências podem serão indeterminadas e possivelmente catastróficas.
+
+O uso do coletor de lixo (GC) libera o programador de tratar a desalocação de 
+memória e elimina por design tanto vazamentos de memória, quanto acessos a 
+ponteiros pendentes.
+A idéia básica de um GC é o de considerar como lixo quaisquer dados que não 
+possam mais ser referenciados pelo programa e assim desalocá-los da memória.
+Como o uso de um GC implica em um custo adicional, é preciso analisar o seu 
+overhead total de execução, tempo de latência (pausa para a coleta), assim como 
+o uso de espaço com metadados necessários para o seu funcionamento.
+
+No coletor por contagem de referência, cada bloco alocado possui um campo extra 
+com um contador de ponteiros para si, que ao chegar a zero, implica que o bloco 
+pode ser desalocado.
+Para manter o contador atualizado, cada operação que adiciona ou remove 
+referências ao bloco deve ser modificado para incrementar ou decrementar o 
+contador.
+Como exemplo, sempre que um ponteiro é copiado para outra variável ou passado 
+como parâmetro para uma função, o contador deve ser incrementado.
+O gerenciamento de memória por contagem de referência é bastante simples e não 
+involve longas pausas para detectar e coletar as referências mortas.
+No entanto, o custo de execução total e uso de memória é alto, dado que o 
+contador deve ser mantido atualizado e ocupa bytes extras para cada bloco 
+alocado.
+Outra desvantagem é que a abordagem não funciona para ciclos entre blocos 
+alocados, já que as referências mútuas vão manter o contador positivo.
+
+O coletor por "mark and sweep" funciona em duas fases que, de tempos em tempos 
+(e.g., quando a memória atinge um limiar mínimo), são intercaladas com a 
+execução do programa.
+Na fase de marcação ("mark"), partindo do conjunto raíz formado por todas as 
+referências globais e locais em escopo, o coletor percorre todas as referências 
+ativas da aplicação, recursivamente, marcando-as como vivas.
+Na fase de coleta ("sweep"), todas as referências que não foram marcadas como 
+vivas são desalocadas.
+Essa abordagem trata ciclos corretamente e tem um custo menor do uso de 
+memória.
+No entanto, as pausas longas para coleta são um obstáculo para a adoção do 
+"mark and sweep" para aplicações de tempo real.
+Na variação "tri-color mark and sweep", o algoritmo funciona de forma 
+incremental, com o auxílio de um conjunto de objetos "cinza" que ainda têm 
+referências pendentes a serem visitadas na próxima varredura.
+Outra variação é separar as regiões de memória em gerações, visitando as novas 
+gerações mais frequentemente, dado que objetos novos tendem a morrer antes.
+
+GCs não funcionam em linguagens com tipagem fraca, tais como C e C++, nas quais 
+o uso de aritmética de ponteiros e "type casts", já que o coletor pode 
+considerar alguns dados ainda referenciados como lixo.
+
+===============================================================================
+===============================================================================
+===============================================================================
+
 # 1.6 Estrutura da Programação
 
 A concepção de um software, desde sua especificação até implementação, deve 
@@ -778,14 +1197,16 @@ ilustrado no diagrama a seguir:
                     VERIFICAÇÃO E VALIDAÇÃO
                     MANUTENÇÃO
 
+TODO: req, ver/val, man
+
 No que diz respeito à estrutura de programação, as fases de "design" e 
 "implementação" são especialmente relevantes.
 O "design" vai lidar com escolhas mais estratégicas sobre o desenvolvimento, 
 tais como a decomposição do processo em etapas e times, a escolha da linguagens 
 e técnicas de programação, e a especificação do software.
 A "implementação" trata de como tornar do design um artefato concreto, 
-basicamente através do desenvolvimento em separad de subprogramas e módulos que 
-serão finalmente recombinados.
+basicamente através do desenvolvimento em separado de subprogramas e módulos 
+que serão finalmente recombinados.
 
 Como dois estilos gerais de estruturação de programas,
 a abordagem *top-down* parte de uma visão alto nível e abstrata da 
@@ -793,7 +1214,8 @@ especificação, decompondo o programa em sub-partes;
 já a abordagem *bottom-up* parte de requisitos e funcionalidades simples e vai 
 gradualmente construindo componentes mais complexos.
 A abordagem top-down é especialmente vantajosa na fase de design, quando os 
-detalhes da especificação ainda não estão totalmente prontos ou claros.
+detalhes da especificação ainda estão em aberto ou não totalmente 
+cirstalizados.
 A abordagem bottom-up facilita o desenvolvimento orientado a testes (TDD) já 
 nas fases iniciais do processo.
 Na prática, as duas abordagens podem ser usadas na concepção de um software.
@@ -803,8 +1225,8 @@ vez que diferentes linguagens seguem diferentes paradigmas e impõem diferentes
 estratégias de desenvolvimento.
 
 Em "programação estruturada", comandos da LP executam passo-a-passo, um após o 
-outro, podendo alterar o estado da memória residindo em variáveis locais e 
-globais.
+outro, com efeitos colaterais na memória que representa o estado geral do 
+programa.
 Além da execução em sequência, a programação estruturada depende de 
 condicionais e repetições para o controle de fluxa das aplicações.
 Blocos de comandos podem então ser combinados em rotinas, criando uma abstração 
@@ -814,11 +1236,14 @@ Apesar de sequências, condicionais e repetições serem amplamente difundidas e
 entendidas, a programação estruturada foi um avanço em comparação com o uso 
 irrestrito de "gotos" para o controle de fluxo até a década de 60.
 
+TODO: topdown
+TODO: globais, locais, static
+
 Em "programação funcional", introduzida por LISP no fim dos anos 50, a unidade 
 básica de execução são funcões matemáticas que permitem chamadas recursivas.
-Ao contrário de linguagens convencionais, funções são valores de primeira 
-classe e podem ser passados a outras funções (funções de alta ordem), 
-retornados, ou até mesmo criados dinamicamente (closures).
+Ao contrário do suporte convencional nos outros paradigmas, funções são valores 
+de primeira classe e podem ser passados a outras funções (funções de alta 
+ordem), retornados, ou até mesmo serem criados dinamicamente (closures).
 Além disso, as funções chamadas "puras" não podem ter efeitos colaterais sobre 
 outras partes do programa (e.g., globais).
 Dessa maneira, assim como funções matemáticas, chamadas repetidas com os mesmos 
@@ -826,7 +1251,7 @@ parâmetros sempre retornam o mesmo valor, propriedade conhecida como
 transparência referencial.
 Essa propriedade facilita o entendimento e análise do programa, uma vez que 
 funções sempre tem o mesmo comportamento, mesmo quando combinadas 
-irrestritamente em diferentes partes do programa.
+irrestritamente em múltiplas partes do programa.
 Haskell segue à risca o paradigma funcional puro, enquanto que algumas 
 linguagens impuras, também suportam o paradigma estruturado (e.g., Lua e 
 Scala).
@@ -834,40 +1259,49 @@ Scala).
 Em "programação orientada a objetos", programas são estruturados em hierarquias 
 de classes.
 Uma classe representa um modelo de funcionalidades que pode ser instanciado 
-múltiplas vezes para formar objetos daquela classe.
+múltiplas vezes, formando objetos daquela classe.
+Apesar de oferecerem a mesma funcionalidade, objetos de uma mesma classe vão 
+guardar estados diferentes, dependendo de como são manipulados durante a 
+execução do programa.
+Como exemplo, em um jogo de computador, uma classe Inimigo pode ser instanciada 
+múltiplas vezes, sendo que cada objeto é colocado em uma posição diferente da 
+tela, com movimentos em várias direções.
 A partir de uma classe pai (super-classe), novas classes filho (sub-classes) 
-podem ser criadas e toda funcionalidade existente na super-classe é 
+podem ser derivadas, sendo que toda funcionalidade existente na super-classe é 
 automaticamente herdadada pela sub-classe.
-Sub-classes podem alterar funcionalidades existentes ou criar novas 
+Sub-classes podem modificar funcionalidades existentes ou criar novas 
 funcionalidades para si.
-O modelo de classes encapsula todo o estado de seus objetos, não permitindo que 
-outros objetos acessem diretamente esse estado.
-A idéia fundamental é que objetos se comuniquem somente através de mensagens 
-(métodos), que por sua vez representam toda a funcionalide disponível em 
-objetos.
-O encapsulamento é um pré requisito para o polimorfismo, que permite que 
+Como exemplo, InimigoVoador pode herdar toda funcionalidade de Inimigo e ainda 
+exportar um método novo para voar.
+O modelo de classes encapsula todo o estado de suas instâncias, não permitindo 
+que objetos acessem diretamente o estado de outros.
+A idéia fundamental de POO é que objetos se comuniquem exclusivamente através 
+de mensagens (métodos), que por sua vez representam toda a funcionalide 
+disponível em objetos.
+O encapsulamento é um pré-requisito para o polimorfismo, que permite que 
 objetos de diferentes classes sejam intercambiáveis entre si, bastando que 
 exportem o mesmo conjunto de funcionalidades (interfaces):
 
     SetX x = new SetX(1,2,3);
     SetY y = new SetY(4,5,6);
     SetZ z = new SetZ();
-    z.add(x.all());   // 1,2,3
     z.add(y.all());   // 4,5,6
+    z.add(x.all());   // 1,2,3,4,5,6
 
-No exemplo anterior existem duas implementações diferentes para conjuntos que 
-são combinadas em uma terceira implementação.
-Independentemente da estrutura de dados utilizada em suas implementações, os 
-objetos podem se relacionar através de seus métodos.
+No exemplo anterior existem duas implementações para conjuntos que são 
+combinadas em uma terceira implementação.
+Independentemente da estrutura de dados interna utilizada em cada implementação 
+(e.g., array, lista ou hashmap), os objetos podem se relacionar através de seus 
+métodos.
 O polimorfismo é a principal distinção entre objetos e tipos abstratos de 
 dados.
 Smalltalk é considerada a primeira linguagem fundamentalmente orientada a 
 objetos, sendo seguida por Eiffel, C++, Java, entre outras.
 
 O desenvolvimento de softwares complexos depende, não somente de construções de 
-linguagens de programação para organizar dados e de controle, mas também de 
-mecanismos para combinar partes desenvolvidas em separado.
-Um sistema de modularização efetivo deve permitir que sub-partes de um programa 
+linguagens de programação para organizar os dados e o controle de fluxo, mas 
+também de mecanismos para combinar partes desenvolvidas em separado.
+Um sistema de modularização efetivo deve permitir que subpartes de um programa 
 sejam especificadas, implementadas e testadas em separado, sem que a fase de 
 fusão entre as partes seja penosa.
 
@@ -886,23 +1320,40 @@ Além da separação entre especificação e implementação, a fase de compila�
 execução também pode ser modularizada.
 Linguagens como C e Java permitem a compilação em separado de arquivos de 
 código fonte em arquivos objeto (.o e .class, respectivamente), que podem em 
-serguida serem recompilados em um executável ou pacote completo.
-Isso evita que cada alteração em um único arquivo necessite da recompilação de 
-todo o projeto.
+seguida serem religados em um executável ou pacote completo:
 
-Uma outra vantagem da geração de código objeto é a possível interoperabilidade 
-entre linguagens com paradigmas antagônicos.
+    A.c --[compilador]--> A.o  \
+    B.c --[compilador]--> B.o   > --[ligador]--> ABC.exe
+    C.c --[compilador]--> C.o  /
+
+Isso evita que cada alteração em um único arquivo necessite da recompilação de 
+projeto inteiro, além de, em muitos casos, evitar a exposição pública de 
+códigos fonte.
+
+O processo de ligação pode ocorrer em tempo de compilação (ligação estática) ou 
+em tempo de execução (ligação dinâmica).
+Na ligação estática, todos os módulos são combinados antes da execução, gerando 
+um novo arquivo com todas as referências cruzadas resolvidas (definição e usos 
+de símbolos globais entre módulos).
+Na ligação dinâmica, o programa executável é compilado juntamente com um código 
+de "stub" responsável por encontrar as bibliotecas dinâmicas (e.g., ".dll" ou 
+".so"), carregá-las na memória e preencher as entradas aproprioadas na tabela 
+de símbolos globais de maneira a apontar para a biblioteca carregada.
+
+Com a geração de código objeto também é a possível a interoperabilidade entre 
+linguagens com paradigmas antagônicos.
 O arquivo objeto de Java (.class) é formado por bytecodes que têm a JVM como 
 alvo.
 Para tirar proveito do ambiente de execução de portável e interoperabilidade 
-com Java, as linguagens Clojure e também geram código objeto para a JVM.
+com Java, as linguagens Clojure e Scala também geram código objeto para a JVM.
 O interessante é que essas linguagens têm características bastante distintas 
 entre si, formando um ecossistema fértil em torno da JVM.
+Para grandes projetos que envolvem aplicações do lado do servidor, cliente, 
+aplicações extensíveis através de scripts, etc. a ineteroperabilidade entre 
+linguagens pode ser fundamental.
 Essa tendência também pode ser observada no mundo da Web, com novas linguagens 
 que enchergam os browsers como máquina virtuais que executam "bytecodes em 
 JavaScript" (ClojureScript, CoffeeScript, Elm, entre outras).
-
-TODO: CORBA, COM, distr.systems
 
 ===============================================================================
 ===============================================================================
@@ -1095,3 +1546,872 @@ TODO
 
 TODO: cut
 
+===============================================================================
+===============================================================================
+===============================================================================
+
+# 2.8 Ambientes de Tempo de Execução para Linguagens de Programação
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+Existem duas abordagens para a tradução de linguagens de programação para 
+linguagens de máquina.
+Na compilação, o código fonte é traduzido por completo para a representação 
+binária antes da máquina executá-lo.
+Na interpretação, o código fonte é traduzido incrementalmente, durante a 
+execução do programa.
+Em geral, a escolha por compilação resulta em maior velocidade (assumindo que a 
+compilação pode ser feita com antecedência à execução), enquanto que a 
+interpretação traz maior flexibilidade.
+Tipicamente, linguagens interpretadas possuem ambientes de execução mais 
+complexos, dado que muitas decisões são tomadas somente nessa fase.
+
+O surgimento de máquinas virtuais para linguagens interpretadas introduziu um 
+intermediário entre a tradução e execução de programas:
+
+    código  -> (tradução) -> bytecodes -> (VM) -> execução
+    fonte
+
+Com essa abordagem, a máquina real agora interpreta "bytecodes" de uma máquina 
+virtual, mas o código fonte continua precisando ser traduzido (compilado) para 
+bytecodes em uma etapa anterior.
+No caso de linguagens dinâmicas que oferecem uma primitiva "eval" permitindo
+traduzir novos trechos de código durante a execução do programa, é necessário 
+que o tradutor também esteja embutido no ambiente de execução da linguagem:
+
+    código  -> (tradução) -> bytecodes -> (VM) -> execução
+    fonte
+                    \-------------------------------/
+
+## Estrutura Geral de Compiladores e Interpretadores
+
+O processo de tradução de programas é dividio em diversas fases, como ilustra o 
+diagrama a seguir:
+
+    ESTRUTURA GERAL DE UM TRADUTOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O "front end" (análise) lida com a sintaxe e semântica estática da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária (e.g., assembly), com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+
+Em linguagens compiladas, grande parte do esforço se concentra na "back-end", 
+onde ocorrem todas otimizações e a geração para a arquitetura final.
+Já em linguagens interpretadas, se a representação intermediária já forem
+bytecodes para uma máquina virtual, o "front end" pode ser eliminado por 
+completo.
+Note que o "back end" deve estar disponível durante toda a execução de 
+programas interpretados.
+
+## Ambientes de Tempo de Execução
+
+O ambiente de execução de uma linguagem controla o estado global da memória, 
+I/O, registradores e CPU.
+É ele que vai colocar a máquina em um estado consistente para iniciar a 
+execução do programa, determinar as chamadas de entrada e saída disponíveis, 
+administrar funcionalidades como alocação e coleta de memória e escalonar 
+linhas de execução no caso de linguagens concorrentes.
+Durante a execução normal, a CPU basicamente entra em um ciclo de buscar a 
+próxima instrução, decodificá-la e executá-la.
+
+Mesmo linguagens compiladas básicas como C possuem um ambiente de execução 
+("crt0.o", c-run-time) que é embutido no programa de maneira a inicializar a 
+pilha, preencher o vetor de interrupção, zerar a memória BSS antes de chamar a 
+"main" do programa.
+
+No caso da interpretação, além do ambiente de execução também embutir o front 
+end de tradução, o ciclo de busca/decodificação/execução é simulado pela 
+máquina virtual, sendo o principal custo de execução associado à 
+virtualização.
+
+### Chamadas de Subrotinas e a Pilha
+
+Praticamente qualquer linguagem de programação possui algum mecanismo de 
+chamadas de funções, procedimentos ou subrotinas.
+Para permitir chamadas de rotina aninhadas ou recursivas, os ambientes de 
+execução dependem da região de memória conhecida como pilha para guardar os 
+registros de ativação de subrotinas (com seu estado completo), que vão sendo 
+sobrepostas respeitando a ordem natural de que a subrotina chamada por último 
+será a primeira a terminar ("last in, first out").
+
+Tipicamente, o ambiente de execução configura a região da pilha para iniciar no 
+último endereço de memória disponível (e.g., 0xFFFF), crescendo na direção do 
+início da memória (0x0000):
+
+-- início
+0x0000  CÓDIGO
+        ...                 // tamanho conhecido
+0xnnnn  DADOS ESTÁTICOS
+        ...                 // tamanho conhecido
+0xmmmm  HEAP
+        ... v               // tamanho desconhecido
+        ... ^
+0xFFFF  PILHA
+-- fim
+
+TODO: árvores de ativação
+
+Registros de ativação devem conter diversas informações que somente são 
+conhecidas durante a execução do programa: parâmetros de entrada, variáveis 
+locais e valor e endereço de retorno.
+A criação do registro de ativação deve seguir um protocolo conhecido, de 
+maneira que trechos que chamam subrotinas e trechos que executam dentro de 
+subrotinas saibam exatamente como proceder nas chamadas e retornos.
+Como regra geral, o máximo de trabalho deve ser feito pela subrotina chamada, 
+evitando a multiplicação desse trabalho entre todas as chamadas do programa.
+A figura a seguir ilustra dois registros de ativação encadeados em que "f()" 
+chamando "g()", destacando as responsabilidades envolvidas entre quem chama e 
+que é chamado:
+
+ ---    ---                         SP
+ c      link de controle                ----\   (3)
+ h      status dos registradores            |   (2)
+ a      variáveis locais                    |   (1)
+ m  g() =========================== FP      |
+ a      valor de retorno                    |
+ d      parâmetros da nova chamada          |
+ a--    ----                                |
+        link de controle             ----\  |
+        status dos registradores         |  |
+        variáveis locais                 |  /
+    f() =========================== FP <----
+                                         |
+                                         |
+                                         v (para frame anterior)
+
+No exemplo acima, a subrotina chamada aloca espaço na pilha para suas locais 
+(1), guarda o estado atual dos registradores da subrotina que a chamou (2), e 
+cria um link que aponta para o início da subrotina que a chamou (3).
+No momento da chamada, esse valor é mantido em um registrador especial 
+conhecido como "frame pointer" (FP) e logo em seguida é redirecionado para o 
+novo frame.
+O FP se coloca entre as variáveis locais e os parâmetros de entrada, que são 
+ambos acessados a partir dele (com offsets negativos e positivos, 
+respectivamente).
+O topo da pilha deve ser mantido sempre pelo registrador "stack pointer" (SP), 
+que pode ser usado pela subrotina em execução para guardar valores temporários.
+No momento do retorno, o valor de retorno de ser atribuído e o topo da pilha SP 
+pode ser reconfigurado com o valor atual de FP.
+Além disso, as operações inversas à entrada devem ser efetuadas: o link de 
+controle restaurado para o valor anterior, assim como o status dos 
+registradores.
+
+### Alocação na Heap
+
+O uso da pilha pra armazenar dados de subrotinas só é efetivo devido ao fato do 
+que a execução de subrotinas são bem comportadas, sendo seguro liberar todas as 
+locais de um subrotina no momento de seu retorno.
+A região da heap deve ser usada para dados que são dinâmicos e que devem 
+sobreviver ao término do escopo onde foram criados.
+
+Como o ciclo de vida para cada dado na heap é indeterminado e depende da 
+execução do programa, algum mecanismo para gerenciar a memória deve ser 
+disponibilizado.
+As maiores dificuldades são em lidar com a variação do tamanho dos dados e com 
+a ordem de alocação e desalocação em que ocorrem.
+Três propriedades devem ser consideradas no gerenciador de memória:
+
+- Localidade: quanto mais distantes os dados estiverem entre eles, mais erros 
+  de acesso ao cache ocorrerão.
+- Fragmentação: quanto mais buracos existirem entre dados, maior é o 
+  desperdício de espaço útil para novas alocações.
+- Execução: quanto mais complexo for o gerenciador de memória for, maior é o 
+  desperdício de ciclos de CPU.
+
+Dentre as políticas de "first fit", "best fit" e "worst fit" para alocação de 
+blocos de memória, isto é, primeiro bloco encontrado, bloco de tamanho mais 
+próximo encontrado ou bloco de tamanho mais distante encontrado, a política de 
+"best fit" é a que se mostrou mais eficaz e é usada no "malloc" do GCC e no 
+"kmalloc" do kernel de Linux.
+
+Já a desalocação de memória pode ser feita manualmente ou de forma automática, 
+com o auxílio de um coletor de lixo que executa juntamente com o programa 
+buscando blocos não mais referenciados.
+
+Na desalocação manual, o programador é responsável por invocar uma primitiva 
+para liberar a memória apontada por uma referência (ponteiro) ao bloco alocado 
+anteriormente.
+Essa abordagem é eficiente, pois não exige custos extras associados ao 
+gerenciador de memória, no entanto é bastante insegura pois permite dois tipos 
+comuns de erros de programação: vazamentos de memória e acesso a ponteiros 
+pendentes (danrling pointers).
+Vazamentos de memória ocorrem quando o programador nunca desaloca um bloco de 
+memória que não é mais necessário e acessível, seja por esquecimento ou por 
+algum erro de lógica de programação.
+Para aplicações que executam por longos períodos e fazem muitas alocações, pode 
+acontecer da memória acabar.
+Acessos a ponteiros pendentes acontecem quando o programador desaloca um bloco 
+mas continua usando-o como se ele ainda estivesse vivo.
+Quando o mesmo bloco é alocado e usado novamente em outro trecho de código, as 
+consequências podem serão indeterminadas e possivelmente catastróficas.
+
+O uso do coletor de lixo (GC) libera o programador de tratar a desalocação de 
+memória e elimina por design tanto vazamentos de memória, quanto acessos a 
+ponteiros pendentes.
+A idéia básica de um GC é o de considerar como lixo quaisquer dados que não 
+possam mais ser referenciados pelo programa e assim desalocá-los da memória.
+Como o uso de um GC implica em um custo adicional, é preciso analisar o seu 
+overhead total de execução, tempo de latência (pausa para a coleta), assim como 
+o uso de espaço com metadados necessários para o seu funcionamento.
+
+No coletor por contagem de referência, cada bloco alocado possui um campo extra 
+com um contador de ponteiros para si, que ao chegar a zero, implica que o bloco 
+pode ser desalocado.
+Para manter o contador atualizado, cada operação que adiciona ou remove 
+referências ao bloco deve ser modificado para incrementar ou decrementar o 
+contador.
+Como exemplo, sempre que um ponteiro é copiado para outra variável ou passado 
+como parâmetro para uma função, o contador deve ser incrementado.
+O gerenciamento de memória por contagem de referência é bastante simples e não 
+involve longas pausas para detectar e coletar as referências mortas.
+No entanto, o custo de execução total e uso de memória é alto, dado que o 
+contador deve ser mantido atualizado e ocupa bytes extras para cada bloco 
+alocado.
+Outra desvantagem é que a abordagem não funciona para ciclos entre blocos 
+alocados, já que as referências mútuas vão manter o contador positivo.
+
+O coletor por "mark and sweep" funciona em duas fases que, de tempos em tempos 
+(e.g., quando a memória atinge um limiar mínimo), são intercaladas com a 
+execução do programa.
+Na fase de marcação ("mark"), partindo do conjunto raíz formado por todas as 
+referências globais e locais em escopo, o coletor percorre todas as referências 
+ativas da aplicação, recursivamente, marcando-as como vivas.
+Na fase de coleta ("sweep"), todas as referências que não foram marcadas como 
+vivas são desalocadas.
+Essa abordagem trata ciclos corretamente e tem um custo menor do uso de 
+memória.
+No entanto, as pausas longas para coleta são um obstáculo para a adoção do 
+"mark and sweep" para aplicações de tempo real.
+Na variação "tri-color mark and sweep", o algoritmo funciona de forma 
+incremental, com o auxílio de um conjunto de objetos "cinza" que ainda têm 
+referências pendentes a serem visitadas na próxima varredura.
+Outra variação é separar as regiões de memória em gerações, visitando as novas 
+gerações mais frequentemente, dado que objetos novos tendem a morrer antes.
+
+GCs não funcionam em linguagens com tipagem fraca, tais como C e C++, nas quais 
+o uso de aritmética de ponteiros e "type casts", já que o coletor pode 
+considerar alguns dados ainda referenciados como lixo.
+
+===============================================================================
+===============================================================================
+===============================================================================
+
+# 2.7 Linguagens Intermediárias
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+Existem duas abordagens para a tradução de linguagens de programação para 
+linguagens de máquina.
+Na compilação, o código fonte é traduzido por completo para a representação 
+binária antes da máquina executá-lo.
+Na interpretação, o código fonte é traduzido incrementalmente, durante a 
+execução do programa.
+Em geral, a escolha por compilação resulta em maior velocidade (assumindo que a 
+compilação pode ser feita com antecedência à execução), enquanto que a 
+interpretação traz maior flexibilidade.
+Em ambos os casos, a linguagem de programação pode ser traduzida para uma 
+representação intermediária ("bytecodes") que pode ser mais facilmente 
+compilada ou interpretada.
+
+## Estrutura Geral de Tradutores
+
+O processo de tradução de programas é dividio em diversas fases, como ilustra o 
+diagrama a seguir:
+
+    ESTRUTURA GERAL DE UM TRADUTOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O "front end" (análise) lida com a sintaxe e semântica estática da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária, com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
+ends" com diferente "front ends", permitindo compilar diferentes linguagens 
+para diferentes máquinas (L x M combinações).
+Essa arquitetura é seguida por ferramentas bem sucedidas, tais como o GCC e o 
+LLVM, que permitem que diferentes linguagens sejam compiladas para uma 
+representação intermediária que pode em seguida ser compilada para diferentes 
+plataformas.
+
+Em linguagens compiladas, grande parte do esforço se concentra na "back-end", 
+onde ocorrem todas otimizações e a geração para a arquitetura final.
+Já em linguagens interpretadas, se a representação intermediária já forem 
+bytecodes para uma máquina virtual, o "front end" pode ser eliminado por 
+completo.
+
+## Representações Intermediárias
+
+Como principais requisitos, a linguagem ou representação intermediária (RIs) 
+deve ser
+(1) independente de arquitetura, i.e., com operações simples que não visam uma 
+arquitetura específica (e.g., instruções CISC que efetuam diversas operações);
+(2) facilmente geradas e traduzidas entre front ends e back ends, por exemplo 
+com uma forma regular (e.g., árvore ou código de 3 endereços);
+(3) otimizáveis, com o mínimo de dependência entre instruções (e.g., uso de 
+offsets ou referências), de maneira a permitir manipulações arbritárias no 
+código.
+
+RIs devem encontrar um balanço de expressividade entre as possíveis linguagens
+sendo compiladas e as possíveis arquiteturas alvo.
+Em geral, RIs eliminam estrutras complexas de controle (e.g., switch-case, 
+for), mas também não se limitam a recursos finitos de arquiteturas finais 
+(e.g., número fixo de registradores).
+
+As duas RIs intermediárias mais conuns usam grafos acíclicos direcionados 
+(DAGs, mais próximos da árvore sintática), ou código de 3 endereços (mais 
+próximos das linguagens de máquina).
+
+Em DAGs, expressões são quebradas em sub-grafos onde os nós representam 
+operações e as folhas seus operandos.
+Como exemplo, a expressão (1+3*5) pode ser representada da seguinte maneira:
+    +
+   / \      (direcionado)
+  1   *
+     / \
+    3   5
+
+Esse tipo de representação expõe claramente a dependência entre suas partes, 
+mas não força uma ordem específica de execução.
+A representação por DAGs, além de garantir que existe uma forma correta de 
+percorrer o grafo respeitando as relações de dependência, não limita a uma 
+*única* forma, já que tipicamente possuem mútliplas ordem topológicas.
+Dessa maneira, a geração de código final pode tirar proveito dessa propriedade 
+e gerar a ordem mais conveniente, por exemplo, explorando a localidade de 
+memória ou aproximando instruções que aproveitam o paralelismo de pipeline.
+
+Uma outra vantagem de DAGs é permitir a detecção de sub-expressões comuns e o 
+eventual reúso de nós.
+Como exemplo, o DAG natural para a expressão (a + a * (b-c) + (b-c)) pode ser 
+otimizado para o da versão à direita:
+
+          +
+         / \
+        +   (b-c)
+       / \
+      (a) *
+         / \
+        a   -
+           / \
+          b   c
+
+Sendo uma representação mais abstrata, DAGs têm a desvantagem de não serem 
+convenientes para intepretação "on-the-fly" (para uso em máquinas virtuais), 
+por exemplo, por necessitarem da construção de uma ordem topológica antes da 
+execução iniciar.
+
+A representação de três endereços oferece uma forma linear e regular da AST, na 
+qual no máximo uma operação pode manipular até três operandos (endereços), 
+sendo um deles para guardar o resultado.
+Assim, no comando (while (v<100) { v = a + (b-c)}), a atribuição deve 
+necessariamente ser quebrada em duas instruções de três endereços:
+
+    0: ^4  =  v >= 100  ; (salto condicional: "jump-greater-equal")
+    1: t1  =  b - c
+    2: v   =  a + t1
+    3: ^1               ; (salto incondicional)
+
+Os endereços podem ser constantes, offsets no código (e.g., ^4), símbolos do 
+programa original ("v") ou gerados sob demanda ("t1").
+
+Dentre as variações de estruturas de dados para representar instruções de três 
+endereços, as quádruplas guardam exatamente a operação e os três operandos 
+(como no exemplo acima), enquanto que as triplas omitem o endereço de 
+resultado, se referindo indiretamente a eles em instruções seguintes:
+    1: b - c
+    2: a + (0)
+
+A variação por quádruplas utiliza mais espaço em memória, mas permite que o 
+código seja reordenado mais facilmente;
+a variação por triplas utiliza menos espaço, mas depende de acessos indiretos a 
+posições do código, dificultando sua reordenação.
+Existe uma variação da representação triplas que adiciona mais um nível de 
+indireção no acesso aos endereços de instruções, através do uso de uma tabela 
+auxiliar com ponteiros para esses endereços que pode ser alterada dinamicamente 
+ao mover instruções de posição.
+
+Na otimização de SSA (static-single-assignment) para código de três endereços, 
+todas as atribuições são feitas para diferentes variáveis, ou seja, se a mesma 
+variável é atribuída duas vezes, duas versões da variável são mantidas pelo 
+compilador.
+Essa reconfiguração transpõe o mal hábito de programação de reutilizar a mesma 
+variável para diferentes fins, o que pode dificultar a alocação de 
+registradores na fase de geração de código final:
+
+    int a1 = ...     // uso da variavel para determinado fim
+    ...
+    a2 = ...         // reuso da variavel para outro fim
+                     // a1 e a2 representam diferentes valores
+
+Dentre outras simplificações da representação intermediária em comparação com a 
+linguagem fonte, estão a eliminação de tipos e acesso a vetores e registros, 
+que devem ser convertidos para instruções mais simples que levam em conta os 
+tamanhos dos tipos envolvidos (e.g., a "largura" de um "int" tem 4 bytes) e 
+utilizam offsets para acesso a campos de vetores e registros:
+
+    struct X {
+        int a;
+        short[5] b;
+    }
+    X x;
+    v = x.b[4];
+
+    Os acesso a x.b[4] deve levar em conta o deslocamento de "b" em relação ao 
+    início da estrutura, assim como o deslocamento interno do índice 4 dentro 
+do vertor:
+
+    t1 = 2 * 4    ; deslocamento dentro do array
+    t2 = 4 + t1   ; deslocamento dentro do registro + array
+    t3 = x + t2   ; deslocamento em relação a x
+    v  = *t3      ; acesso ao conteudo final
+
+TODO: calls são mantidas em alto, diferentes protocolos, usos de 
+pilha/mem-estática, em diferentes linguagens de alto nível e arquiteturas 
+(algumas possuem call, outras necessitam empilhamento/des manual)
+TODO: traducao
+
+## Máquinas Virtuais
+
+A independência de arquitetura de RIs e, como consequência direta, sua 
+portabilidade tornam atrativo o uso de máquinas virtuais para interpretação 
+direta da RI, sem a necessidade do passo adicional de geração de código.
+
+Uma vantagem da interpretação direta é a possível interoperabilidade entre 
+linguagens com paradigmas antagônicos.
+Como exemplo, o mesmo bytecode gerado por Java para executar na JVM, também é 
+gerado por Clojure, uma linguagem funcional com tipagem dinâmica.
+
+Essa tendência também pode ser observada no mundo da Web, com novas linguagens 
+que enchergam os browsers como máquina virtuais que executam "bytecodes em 
+JavaScript" (ClojureScript, CoffeeScript, Elm, entre outras).
+
+===============================================================================
+===============================================================================
+===============================================================================
+
+# 2.8 Geração de Código
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+Existem duas abordagens para a tradução de linguagens de programação para 
+linguagens de máquina.
+Na compilação, o código fonte é traduzido por completo para a representação 
+binária antes da máquina executá-lo.
+Na interpretação, o código fonte é traduzido incrementalmente, durante a 
+execução do programa.
+Em geral, a escolha por compilação resulta em maior velocidade (assumindo que a 
+compilação pode ser feita com antecedência à execução), enquanto que a 
+interpretação traz maior flexibilidade.
+
+## Estrutura Geral de Tradutores
+
+O processo de tradução de programas é dividio em diversas fases, como ilustra o 
+diagrama a seguir:
+
+    ESTRUTURA GERAL DE UM TRADUTOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[geração de código alvo]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+    - Execução
+        - CÓDIGO DE MÁQUINA --[carregador]--> EXECUÇÃO
+        - entrada --[execução]--> saída
+
+
+O "front end" (análise) lida com a sintaxe e semântica estática da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária, com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
+ends" com diferente "front ends", permitindo compilar diferentes linguagens 
+para diferentes máquinas (L x M combinações).
+Essa arquitetura é seguida por ferramentas bem sucedidas, tais como o GCC e o 
+LLVM, que permitem que diferentes linguagens sejam compiladas para uma 
+representação intermediária que pode em seguida ser compilada para diferentes 
+plataformas.
+
+Em linguagens compiladas, grande parte do esforço se concentra na "back-end", 
+onde ocorrem todas otimizações e a geração para a arquitetura final.
+Já em linguagens interpretadas, se a representação intermediária já forem 
+bytecodes para uma máquina virtual, o "front end" pode ser eliminado por 
+completo.
+
+A representação intermediária deve encontrar um balanço de expressividade entre 
+as possíveis linguagens sendo compiladas e as possíveis arquiteturas alvo.
+Em geral, RIs eliminam estrutras complexas de controle (e.g., switch-case, 
+for), mas também não se limitam a recursos finitos de arquiteturas finais 
+(e.g., número fixo de registradores).
+Sendo assim, não são aptas a executarem diretamente, devendo ser traduzidas 
+ainda para uma representação final reconhecida pela arquitetura alvo.
+As duas RIs intermediárias mais conuns usam grafos acíclicos direcionados 
+(DAGs, mais próximos da árvore sintática), ou código de 3 endereços (mais 
+próximos das linguagens de máquina).
+
+## Geração de Código
+
+O requisito básica da geração de código é o de manter a semântica original do 
+programa escrito na linguagem de alto nível.
+Como requisito secundário, o código gerado deve fazer uso efetivo dos recursos 
+oferecidos pela arquitetura, de maneira a otimizar a execução da aplicação 
+segundo critérios relevantes (tamanho de código, velocidade de execução, 
+consumo de energia).
+Para isso, o gerador de código deve considerar qualidades do formato RI de 
+entrada, assim como conhecer os detalhes da arquitetura alvo, tais como 
+conjunto de instruções, número de registradores disponíveis ou se a máquina usa 
+operandos na pilha.
+Arquiteturas RISC em geral possuem instruções simples de três endereços e 
+grande número de registradores, enquanto que arquiteturas CISC possuem 
+instruções complexas com diferentes tipos de endereçamento para um número 
+limitado de registradores.
+
+Os duas principais atribuições da geração de código são o de selecionar as 
+instruções de máquinas apropriadas para mapeamento da RI e o de alocar o uso de 
+registradores e atribuí-los aos símbolos do programa.
+Apesar de em teoria não existir um código ótimo, a geração de código se utiliza 
+de heurísticas para se aproximar o máximo possível do ótimo.
+
+### Seleção de Instruções
+
+A seleção de instruções apropriadas para o código final de levar em conta o 
+formato da RI e o conjunto de instruções oferecidos pela arquitetura.
+Na técnica de casamento de padrões mapeia de modelos de RI de entrada para 
+modelos de instruções de saída.
+
+Para RIs de três endereços com a forma "dst = src1 <op> src2", o padrão a 
+seguir pode ser aplicado:
+
+    LD R0, src1
+    OP R0, R0, src2
+    ST dst, R0
+
+De maneira análoga, o mesmo padrão pode ser aplicado a um DAG equivalente, 
+contando que as sub-árvores sejam substituídas pelos registradores que guardam 
+seus resultados temporários:
+
+        =
+      /   \
+    dst   <op>
+          /  \
+        src1 src2
+
+        =
+      /   \
+    dst    R0
+
+Essa visão extremamente localizada com o casamento de padrões invariavelmente 
+gera instruções reduntantes para "loads" e "stores" de variáveis usadas em 
+sequência ou em sub-expressões.
+Como exemplo, a sentença "a=b+c; d=a+e" gera duas instruções redundantes:
+
+    LD  R0, b
+    ADD R0, R0, c
+    ST  a, R0       ; reduntante (a não é mais utilizada)
+    LD  R0, a       ; reduntante (R0 já possui a)
+    ADD R0, R0, e
+    ST  d, R0
+
+### Otimizações
+
+Com otimizações de "peephole", essas intruções reduntantes podem ser detectadas 
+e removidas do código final.
+Através de múltiplas passadas no código e análise de pequenas janelas 
+("peephole"), essa técnica pode eliminar alguns trechos de código:
+
+- LD/ST reduntantes:
+    LD R, a
+    ST a, R     (a já contém o valor de R)
+
+- código não alcançável derivado de propagação de constantes (e.g., "if" para 
+  código no modo de debug)
+         LD R, 0     (R sempre é 0)
+         JE R, 0, #100
+         ...         (código não alcancável)
+    100:
+
+- saltos para saltos
+         JMP #100    (salto direto para 200)
+         ...
+    200: JMP #200
+
+### Alocação de Registradores
+
+Tipicamente a RI não distingue o custo de acessos à memória com o de acessos a 
+registradores, tampouco se limita ao uso de um número finito de registradores 
+quando conveniente.
+No entanto, a geração de código final deve se preocupar em fazer o maior número 
+de operações possíveis em registradores, sem acessar a memória principal, 
+levando em conta que nem sempre será possível manter todas as variáveis em 
+registradores.
+Quando não for possível manter todos as variáveis em registradores, o gerador 
+de código deve inserir instruções para gravar (e carregar) valores para a 
+memória principal (processo conhecido como "spill").
+
+A técnica mais comum para alocação de registradores é a de coloração de grafos 
+com "K" cores.
+Basicamente, cada nó representa uma variável e cada aresta entre dois nós 
+representa se as variáveis estão "vivas" ao mesmo tempo (contemporâneas):
+
+    (a)----(b)----(c)
+
+O número "K" de cores representa o número de registradores disponíveis na 
+arquitetura.
+Vértices ligadas por arestas não compartilhar a mesma cor, isto é, variáveis 
+contemporâneas não podem usar o mesmo registrador.
+O problema de coloração de grafos é NP-completo, mas uma heurítica gulosa 
+eficiente é remover um nó com menos de "K" arestas do grafo, atribuí-lo a uma 
+cor (diferente da de seus vizinhos) e repetir o processo até que não sobrem nós 
+no grafo.
+Para os nós que sobrarem, o gerador de código usará o processo de "spill" para 
+a memória principal.
+
+O problema de detectar quais variáveis são contemporâneas envolve a idéia 
+básica de construir um DAG para blocos atômicos de código (sem saltos para 
+dentro ou para fora) e detectar variáveis que nunca estão intercaladas em seus 
+usos:
+
+    (b) --> (x,y) --> (a) --> (x)
+
+- b não é intercalado com ninguém
+- x,y estão no mesmo bloco
+- a é intercalado com x
+
+             (a)
+            /
+    (b)--(x)
+            \
+             (y)
+
+### Ordenação de Instruções
+
+
+===============================================================================
+===============================================================================
+===============================================================================
+
+# 2.9 Montadores e Ligadores em Linguagens de Programação
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como tradução:
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+    (código fonte)           (código binário)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+Linguagens de "baixo nível", são linguagens com semântica mais próxima a da 
+máquina, em que o programador deve manipular diretamente registradores, 
+memória, e instruções específicas da máquina.
+Como contraste, linguagens de "alto nível" escondem os detalhes de 
+funcionamento da máquina, oferecendo, por exemplo, uma semântica para manipular 
+abstrações matemáticas (funções, valores e variáveis).
+
+- Assembly é um exemplo de linguagem de baixo nível, uma vez que oferece apenas 
+  mnemônicos que mapeiam palavras em inglês para instruções de máquina 
+(praticamente numa relação um para um).
+  Por exemplo, a sentença "MOV R1 10" copia o valor 10 para o um registrador da 
+máquina.
+- A linguagem C já oferece comandos de mais alto nível que se traduzem para 
+  várias instruções de máquina.
+  Por exemplo, a sentença "repeat { remove() } until(empty());" é mais 
+inteligível para um ser humano e não expõe detalhes sobre o funcionamento 
+interno da máquina.
+
+    [LINGUAGENS DE BAIXO E ALTO NÍVEL]
+    baixo       alto
+    assembly    C
+
+## Estrutura de um Compilador
+
+O processo de tradução de programas é dividio em diversas fases, como ilustra o 
+diagrama a seguir:
+
+    ESTRUTURA GERAL DE UM COMPILADOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O compilador é o software responsável pela tradução do código fonte para o 
+código de máquina e é dividio em duas grandes partes.
+O "front end" (análise) lida com a sintaxe e semântica da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária (e.g., Assembly), com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+
+Quanto mais "alto nível" for a linguagem, mais trabalho será efetuado nas 
+diversas fase de compilação, principalmente no "back end".
+Como contraste, note que para programas escritos em Assembly, todo o "front 
+end" pode ser eliminado.
+
+O desenvolvimento de softwares complexos depende de mecanismos para combinar 
+partes desenvolvidas em separado.
+Um sistema de modularização efetivo deve permitir que sub-partes de um programa 
+sejam especificadas, implementadas e testadas em separado, sem que a fase de 
+fusão entre as partes seja penosa.
+Linguagens como C e Java permitem a compilação em separado de arquivos de 
+código fonte em arquivos objeto (.o e .class, respectivamente), que podem em 
+serguida serem ligados em um executável ou pacote completo.
+Isso evita que cada alteração em um único arquivo necessite da recompilação de 
+todo o projeto.
+
+    A.c --[compilador/montador]--> A.o  \
+    B.c --[compilador/montador]--> B.o   > --[ligador]--> ABC.exe
+    C.c --[compilador/montador]--> C.o  /
+
+## Montador
+
+O montador (assembler) é responsável por traduzir programas escritos em 
+Assembly para código objeto, basicamente mapeando cada mnemônico em
+Assembly para o respectivo código binário de instrução.
+Além dos mnemônicos para instruções, montadores também devem tratar nomes que 
+representam locações da memória e rótulo no código para saltos.
+O formato típico de uma instrução em assembly contém um rótulo, instrução e 
+operandos.
+Os operandos podem ser registradores, endereços de memória ou constantes, 
+dependendo da instrução e seu modo de endereçamento:
+
+    MOV R1 0xFF
+    LD  R1 0xFF
+
+Montadores de duas passadas usam uma tabela auxiliar rastrear usos e definições 
+de símbolos e rótulos e substituir os usos com seus valores finais na memória.
+Em montadores de passada única, a substituição é deixada para o ligador.
+O uso de variáveis e funções externas (e.g., anotados com "extern" em C), ainda 
+ficarão pendentes para serem resolvidas no ligador.
+Já símbolos globais exportados também devem ser mantidos pendentes para 
+eventual uso em outros módulos.
+
+Montadores podem efetuar otimizações de "peephole", com melhorias localizadas 
+através de uma janela deslizante sobre o código para detectar instruções 
+reduntantes:
+    - stores seguidos de loads:
+        LD R, a
+        ST a, R
+    - códigos não alcançáveis
+        LD R, #0
+        JZ LBL1
+        ...
+        LBL1
+    - saltos para saltos
+         JMP LBL1
+         ...
+    LBL1 JMP LBL2
+
+## Ligador
+
+O ligador (linker) combina arquivos compilados em separado em um único arquivo 
+pronto para ser executado ou armazenado como uma biblioteca para uso posterior.
+Durante o processo, o ligador deve resolver as referências cruzadas entre os 
+módulos, associando símbolos exportados a símbolos importados.
+Para a geração de executáveis, símbolos definidos mas não referenciados (e.g., 
+funções que nunca são chamadas) podem ser removidos juntamente com o código 
+associado.
+
+O ligador também deve relocar os endereços dos módulos combinados de maneira a 
+evitar que eles se sobreponham na memória, ou seja, se um módulo A ocupa 2K de 
+memória, um outro módulo B deve ser relocado para iniciar a partir de 2K.
+A relocação involve uma passada completa no código para recalcular os endereços 
+absolutos (e.g., saltos, loads e stores) partindo do novo offset.
+
+O processo de ligação pode ocorrer em tempo de compilação (ligação estática) ou 
+em tempo de execução (ligação dinâmica).
+Na ligação estática, todos os módulos são combinados antes da execução, gerando 
+um novo arquivo com todas as referências cruzadas resolvidas.
+Na ligação dinâmica, o programa executável é compilado juntamente com um código 
+de "stub" responsável por encontrar as bibliotecas dinâmicas (e.g., ".dll" ou 
+".so"), carregá-las na memória e preencher as entradas aproprioadas na tabela 
+de símbolos globais de maneira a apontar para a biblioteca carregada.
+
+TODO: JVM
