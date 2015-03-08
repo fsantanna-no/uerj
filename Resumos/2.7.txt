@@ -211,4 +211,12 @@ Essa tendência também pode ser observada no mundo da Web, com novas linguagens
 que enchergam os browsers como máquina virtuais que executam "bytecodes em 
 JavaScript" (ClojureScript, CoffeeScript, Elm, entre outras).
 
+Uma variação para a interpretação é o uso de JITs ("just-in-time-compilation"), 
+que compilam o código durante a execução do programa.
+Para códigos que executam com muita frequência (e.g., loops), a latência
+inicial de compilação pode ser compensada no longo prazo, se o trecho é 
+executado muitas vezes.
+Em teoria, JIT podem até ser mais rápidos que a pré-compilação, pois podem 
+tirar proveito do máquina em que estão executando no momento e usarem intruções 
+específicas.
 

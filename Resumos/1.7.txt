@@ -185,4 +185,51 @@ TODO
 
 TODO: cut
 
+## Programação Reativa Orientada a Eventos
 
+Aplicações reativos são aquelas que interagem continuamente e em tempo real com 
+o ambiente externo.
+O ambiente externo é constituído de dispositivos de entrada e saída, tais como 
+teclado, mouse, sensores, impressoras e motores.
+Um evento vindo de um dispositivo de entrada sinaliza que há algum dado para 
+ser computado.
+Como a aplicação pode estar conectada a diversos dispositios, eventos podem ser 
+disparados simultaneamente, caracterizando um grau de concorrência na 
+aplicação.
+
+A idéia básica de programação orientada a eventos é serializar os eventos em 
+uma fila:
+
+                                          / tratador-1
+eventos+dados -> [FILA] -> [DISPATCHER] --  tratador-2
+                                          \ tratador-3
+
+O despachante de eventos é um loop infinito que continuamente remove eventos da 
+fila e determina que tratadores disparar.
+
+Se os tratadores forem executados assincronamente, isto é, se o despachante não 
+aguardo o seu término, então existe um problema de concorrência real entre eles 
+e cada acesso a memória deve ser devidamente protegido de maneira a evitar 
+condições de corrida.
+Servidores web em geral funcionam dessa maneira, pois requisições tipicamente 
+não precisam compartilhar memória entre si.
+Quando o fazem se utilizam um banco de dados que já possui mecanismos de 
+proteção internos.
+
+Se os tratadores forem executados sincronamente, isto é, se o despachante 
+aguarda o retorno de cada tratador em sequência antes de tratar o próximo 
+evento, então a execução está de fato serializada e não existem perigos de 
+concorrência.
+Aplicações gráficas, GUIs, jogos e sistemas embarcados adotam essa política por 
+dependerem de consenso sobre o estado global do programa para seu funcionamento 
+correto.
+Como exemplo, no modelo assíncrono, se duas teclas são pressionadas em 
+sequência, é teoricamente possível que o tratador da segunda tecla termine 
+antes do primeiro, o que pode caracterizar uma violação de causalidade no 
+sistema.
+
+Tratadores síncronos, também conhecidos como callbacks, devem executar o mais 
+rápido possível para manter o sistema responsivo.
+Algumas linguagens reativas (e.g. Esterel) impõem restrições de expressividade 
+que garantem que a execução de callbacks não vai ultrapassar um limite finito 
+de tempo (e.g.  oferecendo somente funções recursivas primitivas).

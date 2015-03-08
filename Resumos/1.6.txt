@@ -8,7 +8,11 @@ ilustrado no diagrama a seguir:
                     VERIFICAÇÃO E VALIDAÇÃO
                     MANUTENÇÃO
 
-TODO: req, ver/val, man
+A análise de requisitos irá determinar a funcionalidade que o software deve 
+oferecer e envolve não apenas os responáveis pelo desenvolvimento, mas também 
+clientes e usuários futuros do software.
+Tipicamente, essa fase resulta em um documento de requisitos e manual de 
+usuários.
 
 No que diz respeito à estrutura de programação, as fases de "design" e 
 "implementação" são especialmente relevantes.
@@ -18,6 +22,16 @@ e técnicas de programação, e a especificação do software.
 A "implementação" trata de como tornar do design um artefato concreto, 
 basicamente através do desenvolvimento em separado de subprogramas e módulos 
 que serão finalmente recombinados.
+
+As fases de verificação e validação irão perdurar durante todo o processo de 
+desenvolvimento, certificando-se de que os requisitos estão sendo atendidos de 
+acordo com sua especificação (design) e de maneira eficiente (implementação).
+- produto certo? de maneira certa?
+
+A fase de manutenção se inicia após a entrega do software e cuida de coreções, 
+alterações e adição de novas funcionalidades.
+Estima-se que os custos envolvidos com manutenção de software costumam ser 
+maiores que todas as outras fases combinadas.
 
 Como dois estilos gerais de estruturação de programas,
 a abordagem *top-down* parte de uma visão alto nível e abstrata da 
@@ -34,6 +48,8 @@ Na prática, as duas abordagens podem ser usadas na concepção de um software.
 A escolha da linguagem de implementação é influenciada pela fase de design, uma 
 vez que diferentes linguagens seguem diferentes paradigmas e impõem diferentes 
 estratégias de desenvolvimento.
+
+TODO: figuras
 
 Em "programação estruturada", comandos da LP executam passo-a-passo, um após o 
 outro, produzindo efeitos colaterais na memória que representa o estado geral 
@@ -66,6 +82,31 @@ irrestritamente em múltiplas partes do programa.
 Haskell segue à risca o paradigma funcional puro, enquanto que algumas 
 linguagens impuras, também suportam o paradigma estruturado (e.g., Lua e 
 Scala).
+
+Programação estruturada e funcional costumam oferecer formas de abstração de 
+dados para facilitar a modularização e separação de conceitos.
+Tipos abstratos de dados (ADTs) podem ser definidos no programa para esconder a 
+representação interna de um dado, que não pode ser manipulada diretamente por 
+fora de sua definição.
+ADTs definem um conjunto de operações sobre si e somente podem ser manipulados 
+através delas, permitindo que detalhes internos de representação sejam 
+ajustados ou reprogramados sem que a abstração deixe de funcionar.
+
+O trecho de código a seguir em C define um ADT para manipular pilhas de 
+inteiros através das operações "new", "push" e "pop":
+
+    typedef Stack struct internal_stack_representation_t;
+    Stack* new  (void);
+    void   push (Stack* stack, int v);
+    int    pop  (Stack* stack);
+
+(linguagens funcionais retornariam novos valores em vez de manipular ponteiros)
+
+Note que apenas os protótipos para o tipo e operações estão determinados, sem
+nenhum detalhe sobre que tipos e instruções compõem o ADT (e.g., vetores ou 
+listas encadeadas).
+Diferentes implementações podem ser usadas, bastando compilar um código 
+diferente que respeite os protótipos.
 
 Em "programação orientada a objetos", programas são estruturados em hierarquias 
 de classes.
