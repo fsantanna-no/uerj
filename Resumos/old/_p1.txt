@@ -1,0 +1,622 @@
+# 1.1 Sintaxe e Semântica
+
+## Introdução
+
+### O que é uma LP?
+
+Computadores somente são capazes de executar instruções muito simples e que não 
+refletem a maneira como os seres humanos se comunicam, por isso, praticamente 
+todo software é escrito em uma linguagem de programação.
+
+De maneira geral, LPs oferecem construções linguísticas mais próximas às 
+linguagens naturais que, após serem combinadas em um programa por um humano, 
+são automaticamente traduzidas para instruções entendidas pela máquina, num 
+processo conhecido como compilação.
+
+    [TRADUÇÃO ENTRE LP E MÁQUINA]
+    abcxyz  -> |tradutor| -> 010101 -> |execução|
+    (humano)                 (máquina)
+
+A natureza da LP irá determinar que tipo de notação é aceita (sintaxe) e o que 
+é possível expressar com essa notação de maneira a controlar a máquina 
+(semântica).
+
+Linguagens de "baixo nível", são linguagens com semântica mais próxima a da 
+máquina, em que o programador deve manipular diretamente registradores, 
+memória, e instruções específicas da máquina.
+Como contraste, linguagens de "alto nível" escondem os detalhes de 
+funcionamento da máquina, oferecendo, por exemplo, uma semântica para manipular 
+abstrações matemáticas (funções, valores e variáveis).
+
+- Assembly é um exemplo de linguagem de baixo nível, uma vez que oferece apenas 
+  mnemônicos que mapeiam palavras em inglês para instruções de máquina 
+(praticamente numa relação um para um).
+  Por exemplo, a sentença "MOV R1 10" copia o valor 10 para o um registrador da 
+máquina.
+- A linguagem C já oferece comandos de mais alto nível que se traduzem para 
+  várias instruções de máquina.
+  Por exemplo, a sentença "repeat { remove() } until(empty());" é mais 
+inteligível para um ser humano e não expõe detalhes sobre o funcionamento 
+interno da máquina.
+No entanto, programadores C ainda precisam manipular a memória da máquina 
+diretamente e compreender, por exemplo, como os dados são fisicamente 
+organizados na memória.
+- A linguagem LISP se coloca no espectro oposto ao assembly, provendo uma 
+  semântica de manipulação de listas e operações sobre símbolos matemáticos, 
+abstraindo por completo os detalhes sobre operações e uso de memória numa 
+máquina real.
+
+    [LINGUAGENS DE BAIXO E ALTO NÍVEL]
+    baixo       médio       alto
+    assembly    C           LISP
+
+### Diferença entre Sintaxe e Semântica
+
+A sintaxe de uma LP define sua a estrutura ou forma.
+Para linguagens textuais, a sintaxe define regras sobre como combinar letras 
+para formar paralvras (tokens, no contexto de LPs), para então combinar 
+palavras para formar sentenças (ou comandos, no contexto de LPs).
+
+O conjunto de regras para a formação de tokens é conhecido como o *léxico* da 
+linguagem, e vai reconhecer, por exemplo, que o caracter 1 seguido de 0 forma o 
+número 10 e que qualquer sequência de caracteres que não começam por um dígito 
+formam um identificador:
+
+    10              (token numérico)
+    minha_variavel  (token para um identificador)
+
+Já o conjunto de regras para a formação de comandos a partir de tokens é 
+conhecido como a *sintaxe* da linguagem, e vai determinar, por exemplo, que uma 
+expressão pode ser formada por números ou identificadores separados por um 
+operador (um outro tipo de token):
+
+    10 + minha_variavel     (expressão)
+
+Tão importante quanto reconhecer formas aceitas pela linguagem, é reconhecer 
+por completo formas *não* são aceitas pela linguagem.
+Por exemplo, em C identificadores não podem começar com um dígito:
+
+    0minha_variavel     (não é nem um número nem um identificador)
+
+A sintaxe não lida com o sentido de palavras ou frases.
+Como uma analogia às linguagens naturais, a sentença "as duas cores dessa 
+cadeira são preto, branco e vermelho" está sintaticamente correta, mas possui 
+um erro semântico.
+
+Já a semântica de uma LP lida com o conteúdo, sentido ou interpretação de suas
+sentenças sintaticamente corretas.
+Pensando no exemplo anterior, o valor resultante da expressão "10 + 
+minha_variavel" será entendido como "a soma aritmética entre 10 e o conteúdo da 
+memória referente ao identificador minha_variavel".
+
+TODO: mais algo sobre semântica
+
+É comum LPs terem sintaxes diferentes para construções comuns com semântica 
+similares, como por exemplo na atribuição de variáveis:
+
+    [SINTAXE DIFERENTE, MESMA SEMÂNTICA]
+    x += y;       // C
+    x := x + y;   // Algol, Pascal, ML, Ada
+
+Também é comum linguagens de programação terem sintaxes iguais para construções 
+com semântica distintas:
+
+    [MESMA SINTAXE, SEMÂNTICA DIFERENTE]
+    s.f = 1;      // C, estrutura estática pré declarada
+    s.f = 1;      // Lua, tabela dinâmica, polimorfico, meta método
+
+### Estrutura de um Compilador
+
+Durante o processo de tradução dos programas escritos em uma LP para intruções 
+de máquina, sintaxe e semântica são tratadas em fases diferentes, já que se 
+baseiam em teorias e técnicas distintas:
+
+    ESTRUTURA GERAL DE UM COMPILADOR
+    - Análise / Front-end:
+        - CARACTERES       --[analisador léxico]-->
+          TOKENS           --[analisador sintático]-->
+          ÁRVORE SINTÁTICA --[analisador semântico]-->
+          ÁRVORE SINTÁTICA --[gerador de código intermediário]--> RI/CI
+    - Síntese / Back-end:
+        - RI/CI             --[montador]-->
+          CÓDIGO DE MÁQUINA --[otimizador]-->
+          CÓDIGO DE MÁQUINA --[ligador]-->
+          CÓDIGO DE MÁQUINA (não relocável)
+    - Tabela de Símbolos
+        - preenchida e compartilhada por todas as fases
+        - banco de dados com linha,tipo,escopo
+
+O compilador é o software responsável pela tradução do código fonte para o 
+código de máquina e é dividio em duas grandes partes.
+O "front end" (análise) lida com a sintaxe e semântica da linguagem, 
+verificando se o programa de entrada é válido e gerando uma representação 
+intermediária (e.g., assembly), com os detalhes sintáticos eliminados.
+Já o "back end" (síntese) lida com a geração de código para uma arquitetura 
+específica, transformando a representação intermediária no código final.
+Idealmente, essa divisão bem definida permite a combinação de diferentes "back 
+ends" com diferente "front ends", permitindo compilar diferentes linguagens 
+para diferentes máquinas (LxM combinações).
+Essa arquitetura é seguida por ferramentas bem sucedidas, tais como o GCC e o 
+LLVM, que permitem que diferentes linguagens sejam compiladas para diferentes 
+plataformas.
+
+## Sintaxe
+
+As duas primeiras fases do "front end", análise léxica e sintática, lidam com a 
+forma da LP.
+O objetivo dessas fases é o de reconhecer e transformar a entrada textual 
+"concreta" em uma forma abstrata, padronizada, de mais fácil manipulação para 
+as fases seguintes.
+Tipicamente o programa de entrada é transformado em uma árvore sintática 
+abstrata (AST).
+Como exemplo, independentemente da sintaxe concreta para somar dois números 
+("2+1" em C ou "(+ 2 1)" em LISP), a representação abstrata será a mesma:
+        +
+       / \
+      2   1
+
+Note que em geral uma LP pode descrever infinitos programas, dado que suas 
+construções permitem repetições ou composições:
+
+    [IDENTIFICADORES E COMANDOS POSSÍVEIS]
+    x, xx, xxx, ...                 (infinitos identificadores)
+    while(1) { while(1) { ... } }   (infinitos comandos while)
+
+Dessa maneira, as regras que descrevem o léxico e a sintaxe devem ser 
+expressadas em "meta-linguages" capazes de exprimir todas as infinitas 
+possibilidades através de uma forma finita.
+As duas meta-linguagens mais comuns são as expressões regulares, para o léxico, 
+e as BNFs (Backus-Naur form), para a sintaxe.
+
+### Análise léxica (scanning)
+
+A primeira fase do compilador lida com a transformação de um fluxo de 
+caracteres escritos na LP para um fluxo de tokens a ser repassado para a 
+análise sintática.
+Tipicamente os tokens representam números, identificadores, palavras reservadas 
+e operadores aceitos pela LP.
+Além do que ele representa, um token pode carregar atributos adicionais, tais 
+como o seu conteúdo completo (lexeme) e a linha onde aparece.
+
+O exemplo a seguir, em C, separa uma sequência de caracteres em tokens:
+
+    x = 1;  =>  <ID,"x",1>  <"=",1>  <NUM,"1",1> <";",1>
+
+O programa que reconhece a entrada como válida e a transforma em tokens é 
+conhecido como "scanner" e pode ser gerado automaticamente por uma ferramenta 
+"geradora de scanners".
+Essas ferramentas se baseiam na teoria de linguagens regulares (LRs) e sua 
+correspondência com autômatos finitos determinísticos (DFAs), ou seja, que 
+qualquer linguagem regular pode ser reconhecida por um DFA.
+
+Linguagens são formalmente definitas como um conjunto de strings, em outras 
+palavras, como o conjunto com todas as sequências de caracteres que a linguagem 
+reconhece.
+Já uma LR pode ser formalmente definida de maneira construtiva, com as 
+seguintes regras de base e de composição:
+    - base
+        - a string vazia @ é uma LR
+        - qualquer caractere "a" (em um dado alfabeto) é uma LR
+    - composição
+        - a concatenação (.) de duas LRs é uma LR
+        - a união (|) de duas LRs é uma LR
+        - a fecho ou repetição (*) de duas LRs é uma LR
+De maneira geral, o léxico de uma LP é uma LR, tornando essas ferramentas 
+convenientes para a construção de scanners.
+
+Finalmente, LRs podem ser descritas por expressões regulares (REs) com as 
+regras descritas acima e assim descrever regras do léxico de uma LP:
+
+    <while> = w.h.i.l.e         (LR que descreve a palavra reservada while)
+                                (o operador . de concatenação pode ser omitido)
+    <char>  = a|b|...|z         (descreve os caracteres)
+    <dig>   = 0|1|...|9         (descreve os algarismos)
+    <id>    = <char> (<char>|<dig>)*
+                                (descreve os identificadores)
+                                (os parênteses são usados como agrupamento)
+
+A ideia de um gerador de scanner é transformar um conjunto de REs que 
+especifica o léxico de uma LP em um DFA que reconhece esses padrões, 
+transformando-os em tokens, de maneira eficiente.
+
+Sabe-se que qualquer RE pode ser transformada em um DFA.
+Primeiramente, transformamos a RE em um atômato finito não determinístico (NFA) 
+seguindo os padrões a seguir:
+
+    - base
+        - r = @
+            --> (*i) --@--> (f*)
+        - r = a
+            --> (*i) --a--> (f*)
+    - composição
+        - r = st
+            --> (*i) --eps--> (s) --eps--> (t) --eps--> (f*)
+        - r = s|t
+                    /--eps--> (s) --\
+            --> (*i)                 --eps--> (f*)
+                    \--eps--> (t) --/
+        - r = s*
+            --> (*i) --eps--> (s) --eps--> (f*)
+                   \          \e/          /
+                    \--eps----------------/
+
+Essa transformação é linear no tamanho da expressão O(|r|).
+Apesar de a transformação de um DFA para um NFA ser em teoria exponencial, o 
+caso típico de transformação de uma RE para um DFA é O(|r|^3).
+
+Repare que esse processo é feito apenas na construção do scanner.
+A partir de então, com o DFA construído, o reconhecimento de qualquer entrada 
+será linear com o seu tamanho O(|s|).
+
+TODO: brancos e comentários
+
+### Análise sintática (parsing)
+
+As contruções sintáticas são consideravelmente mais complexas que as léxicas, 
+tipicamente descrevendo aninhamento e regras recursivas.
+Dessa forma, um formalismo mais poderoso que LRs se faz necessário, como por 
+exemplo as linguagens livre de contexto (CFL) e sua correspondência com 
+autômatos de pilha.
+
+A toda LP está associada uma gramática que descreve as construções aceitas pela 
+linguagem.
+A notação BNF é usada para esse fim e é composta pelos seguintes elementos:
+
+    - terminais:       representam os tokens vindo do scanner
+    - não terminais:   representam as regras de composição
+    - produções:       descrevem as regras de composição
+    - símbolo inicial: um não terminal representando programas válidos (em
+                       geral o que aparece em primeiro na gramática)
+
+A BNF a seguir ilustra uma gramática com aninhamento e recursão:
+
+    Exp := Exp '+' Exp      (regra com recursão)
+        | '(' Exp ')'       (regra com aninhamento)
+        |  <id>             (regra básica)
+
+A partir do símbolo inicial, essa gramática pode gerar expressões como "v", 
+"((v))" e "v+(v)".
+
+BNFs descrevem gramáticas livres de contexto (CFGs), sendo que o lado esquerdo 
+de cada produção só pode conter um único símbolo não terminal (e nenhum 
+terminal).
+
+O processo de gerar strings a partir da escolha de regras de uma CFG é 
+conhecido como derivação, que implicitamente forma uma árvore de derivação.
+Por exemplo, a string "v" é gerada com a escolha da regra 3 acima, enquanto que 
+a string "v+(v)", com a escolhas das regras 1,3,2,3:
+
+    Exp --(1)--> v
+    Exp --(1)--> Exp '+' Exp
+                  --(3)-->v
+                          --(2)--> '(' Exp ')'
+                                        --(3)-->v
+
+Em uma árvore de derivação, nós representam não terminais e folhas representam 
+terminais.
+
+TODO: derivações à esquerda e à direita
+
+É comum a árvore carregar informações que são irrelevantes para as fases 
+posteriores de compilação, tais como o nomes das regras derivadas, parênteses 
+de grupamento ou pontuações.
+No exemplo anterior, a árvore concreta pode ser simplificada para uma árvore 
+abstrata como a seguir:
+
+    v '+' v
+
+Quando uma string pode ser gerar mais de uma árvore de derivação, a gramática é 
+considerada ambígua, o que pode acarretar em inconsistências na semântica da 
+linguagem.
+Note que a gramática do exemplo anterior é ambígua, pois para duas somas em 
+sequência "v + v + v", pode gerar uma árvore desbalanceada para esquerda ou 
+para a direita:
+
+    (v + v) + v         v + (v + v)
+
+Como a soma é comutativa, essa ambiguidade não gera problemas semânticos.
+
+No entanto, há dois casos clássicos de ambiguidade na gramática da linguagem C.
+O primeiro, conhecido como "dangling else" deixa dúvidas sobre a qual "if" o 
+"else" deve casar:
+    if e1 then if e2 then s1 else s2
+               (                   )
+               (           )
+O segundo caso não distingue precisamente declarações de expressões e a string 
+"x * y" pode ter duas interpretações: "declaração de y como tipo ponteiro para 
+x" ou "multiplicação entre x e y com o resultado sendo ignorado".
+Essas ambiguidades são resolvidas com truques na implementação da linguagem, 
+por exemplo, o "dangling else" é resolvido dando prioridade ao "if" mais 
+próximo ao "else".
+
+TODO: retirar ambiguidade soma com termos, etc
+
+O programa que reconhece programas de entrada de acordo com uma CFG é conhecido 
+como "parser" e também pode ser gerado automaticamente por uma ferramenta 
+"geradora de parsers".
+
+Existem duas técnicas básicas para a construção de parsers, ambas usam um 
+algoritmo determinístico com o auxílio de um pilha.
+Na técnica top down, também conhecida como preditiva, o topo da pilha sempre 
+contém o não terminal da CFG que será reconhecido a seguir, começando pelo 
+símbolo inicial da CFG.
+Na técnica bottom up, o topo da pilha sempre contém o último símbolo 
+reconhecido, sempre terminando com o símbolo inicial da CFG (em caso de 
+sucesso).
+
+#### Top down
+
+A técnica top down pode ser aplicada manualmente, sem o auxílio de ferramenta 
+geradoras de parsers.
+No parser recursivo descendente, a cada regra da CFG é associada uma função que 
+tenta casar a sua produção.
+Para uma regra como "While ::= <while> ( Exp ) Stmt", a função While pode ser 
+definida da seguinte maneira:
+
+    int While () {
+        return match("while")
+            && match("(")
+            && Exp()
+            && match(")"
+            && Stmt();
+    }
+
+Cada terminal é casado com a função "match" e cada não terminal chama a sua 
+função correspondente (a função retorna se sucedeu ou não).
+
+Note que para uma regra com duas ou mais produções (e.g., Stmt ::= While|If), o 
+uso da técnica descrita dependeria de backtracking, ou seja, se uma regra 
+falhar, a outra deve ser tentada.
+Algoritmos com backtracking são exponenciais e devem ser evitados.
+
+Note também que regras com recursão à esquerda (e.g., Exp ::= Exp '+' Exp) não 
+podem ser reconhecidas por parsers top down, uma vez que a máquina nunca iria 
+avançar com a entrada (e.g., sempre empilhando Exp sobre Exp sobre Exp).
+
+O componente preditivo do parser top down remove a necessidade de backtracking 
+do parser recursivo e se baseia na construção de uma tabela que prevê qual 
+regra escolher para uma determinada entrada:
+
+    T[A,a] = A -> alpha
+    -- (Se a entrada é "a" e o topo da pilha é "A", então escolha a regra "A -> alpha")
+
+Os parsers preditivos podem ser construidos automaticamente para uma classe de 
+CFGs conhecidas como LL(1).
+A construção da tabela se baseia na existência dos conjuntos FIRST(alpha) e 
+FOLLOW(A).
+FIRST(alpha) diz quais terminais podem aparecer no início de uma produção 
+alpha.
+FOLLOW(A) diz quais terminais pode vir após "A" ser casado dentro de qualquer 
+produção.
+Para montar a tabela, basta percorrer todas as produções "A -> alpha" da CFG:
+    - se "a" está em FIRST(alpha), então T[A,a]=alpha
+    - se @ está em FIRST(alpha) e para cada "b" em FOLLOW(A), então T[A,b]=alpha
+Campos vazios na tabela representam pontos em que o parser não tem como 
+prosseguir com a entrada, devendo gerar um erro de compilação (caso um programa
+alcance esse estado).
+
+Além de não lidar com recursões à esquerda, a classe LL(1) também não pode 
+lidar com CFGs que gerem tabelas onde um campo possui duas entradas, uma vez 
+que o algoritmo não saberá para onde prosseguir.
+
+TODO: construção de FIRST e FOLLOW
+TODO: eliminação de recursão à esquerda
+
+#### bottom up
+
+TODO: all
+A classe LR é mais poderosa que LL
+
+TODO: o que LR
+
+TODO: resumo
+separação lex yacc
+    - simplicidade
+    - eficiência
+    - portabilidade (I/O)
+top vs bot
+notação polonesa
+recuperação de erro
+yacc lex
+
+## Semântica
+
+Após a fase de análise sintática, o front end de um compilador prossegue para a 
+fase de análise semântica, na qual tipicamente cria uma árvore sintática 
+abstrata (AST) (caso ainda não exista) e a anota com informações semânticas que 
+impõem novas restrições ao programa.
+
+Essa fase também é conhecida como semântica estática e difere da semântica 
+dinâmica que descreve como programas na linguagem devem executar.
+
+### Semântica Estática
+
+CFGs não são suficientemente poderosas para descrever restrições necessárias a 
+sintaxe de uma LP.
+Por exemplo, se identificadores são declarados antes de seus usos e se o número 
+de argumentos passados a uma função corresponde ao que sua declaração 
+especifica.
+
+#### Esquemas de Tradução
+
+Esquemas de tradução fazem a ligação entre fase sintática e semântica, 
+permitindo, por exemplo, a construção de ASTs anotadas.
+Em sua forma mais geral, tradução orientada por sintaxe (SDT), permite associar 
+ações semânticas a regras da CFG, executando um trecho de código sempre que a 
+regra for derivada.
+
+Tipicamente, a SDT pode criar uma AST extendendo uma CFG com ações semânticas:
+
+    Exp = Exp + Exp { $$.node = new Node('+', $1.node, $3.node); }
+
+A notação é originada da ferramenta "yacc", que executa o trecho de código 
+entre chaves sempre que a regra associada for reduzida, gerando dinamicamente a 
+AST da derivação em curso.
+Os símbolos $$, $1 e $3 representam, respectivamente, o não terminal sendo 
+reduzido e dois dos três elementos que compõem a regra e estão no topo da 
+pilha.
+
+No exemplo acima, o atributo "node" do não terminal sendo reduzido é construído 
+a partir dos atributos "node" de seus filhos no topo da pilha.
+Essa forma de atribuir atributos aos símbolos é conhecida como sintetizada 
+(S-attributes) e é a mais comum em parsers bottom up.
+A outra forma de atribuição é conhecida como herdada, na qual os filhos podem 
+herdar atributos de seus pais.
+Parsers top down usam uma variação conhecida como L-attributes que permite
+o uso de atributos herdados e sintetizados.
+Note que para parsers top down, o uso de atributos herdados é dificultado, dado 
+que a redução da regra ocorre quando os filhos já foram tratados.
+Isso não acontece no método preditivo, que já sabe que vai derivar os filhos a 
+partir de um pai.
+
+Além da AST, a tabela de símbolos também pode ser preenchida durante a SDT, uma 
+vez que as ações semânticas permitem efeitos colaterais globais.
+Como exemplo, sempre que uma regra de declaração de variáveis for derivada, a 
+tabela de símbolos associada ao identificador pode ser aumentada com o tipo 
+declarado.
+Assim, toda vez que o identificador for usado em comandos e expressões, a 
+análise semântica pode verificar se o uso está compatível com o seu tipo.
+
+TODO: LL geração on-the-fly "int[][] v"
+
+#### Sistemas de Tipos
+
+A tarefa mais complicada da semântica estática é a de verificação de tipos em 
+programas, já que ela depende da análise do programa como um todo.
+Um sistema de tipos é um conjunto de regras que atribui tipos às partes do 
+programa e verifica se as conexões entre essas partes está consistente.
+Dentre as possíveis verificações, podemos destacar
+
+    - se variáveis são declaradas e tipadas antes de seus usos
+    - se o número de argumentos e seus tipos correspondem ao esperado pela 
+      assinatura da função
+    - se os operandos de uma operação possuem os tipos esperados
+
+O objetivo principal de um sistema de tipos é o de prevenir bugs sem a 
+necessidade de executar o programa.
+Em outras palavras, um sistema de tipos assegura que uma certa classe de 
+programas incorretos nunca será executada.
+Essa visão contrasta com um sistema de testes (TDD) que tenta assegurar que um 
+programa correto nunca falha, executando-o à exaustão.
+
+Além da detecção de bugs, um sistema de tipos também ajuda no entendimento e 
+documentação de programas e permite a otimização de trechos de código (e.g., 
+evitando checagens em tempo de execução).
+
+Sistemas de tipos são tão pervasivos em LPs que é comum categorizá-las de 
+acordo com o seus sistemas de tipos.
+Por exemplo, a separação entre linguagens estáticas e dinâmicas se dá 
+principalmente pela tipagem dos programas ser feita em tempo de compilação 
+(tipagem estática) ou em tempo de execução (tipagem dinâmica).
+Em linguagens dinâmicas, a verificação de operações é feita somente no momento 
+de executá-las, quando os tipos ("tags", nesse contexto) de seus operandos são 
+finalmente verificados.
+Como forma de unir a flexibilidade de linguagens dinâmicas com a confiabilidade 
+de linguagens estáticas, alguns projetos estendem linguagens dinâmicas com 
+sistemas de tipos graduais, nos quais é possível anotar partes do código com 
+tipos para verificação estática.
+Como exemplos, a Microsoft introduziu recentemente TypeScript que estende 
+JavaSript com tipagem gradual, enquanto que o Facebook introduziu Hack, uma 
+extensão à PHP com os mesmos objetivos.
+
+Algumas linguagens, mesmo tenho um sistema de tipos estático, não requerem 
+declarações explícitas de tipo no código, que podem ser inferidos 
+automaticamente pelo compilador.
+A linguagem ML introduziu esse conceito no fim da década de 70, que hoje é 
+adotado em outras linguagens como Haskell, Go e até (parcialmente) em versões 
+recentes de C++:
+
+    auto v = 1.0;     // (tipo de "v" é inferido como "float")
+
+Por outro lado, C e C++ são casos atípicos (mas extremamente populares) de 
+linguagens com sistemas de tipos e declarações explícitas, mas que não oferecem 
+garantias estáticas satisfatórias (possuem sistemas de tipos fracos).
+O uso de aritmética de ponteiros, casts explícitos de tipos e uniões sem tags 
+expõem o sistema de tipos a diversas "brechas" que podem acarretar em estouro 
+de buffers (buffer overflows) e acesso a regiões de memória não controlados 
+pelo programa.
+
+TODO: estrutural vs nominal
+TODO: tipos polimórficos
+
+Tarefas corriqueiras em programas podem exigir a conversão de um valor para um 
+novo tipo.
+Um exemplo comum, é o de ler uma entrada do teclado como string e tentar 
+reinterpretar esse valor como um número:
+
+    idade = io.read()
+    if idade > 18 then
+        ...
+    end
+
+Novamente, dependendo da LP e de seu sistema de tipos, existem diferentes 
+semânticas para a conversão de tipos.
+Em conversões implícitas (conhecidas como coersões), o compilador é responsável 
+por verificar e adicionar instruções de maneira a efetuar a conversão 
+automáticamente.
+Em conversões explícitas (conhecidas como casts), o sistema de tipos obriga que 
+o programador faça a conversão manualmente através de uma operação (e.g.  
+tonumber(idade)).
+
+Se em conversões os operandos se adaptam aos seus operadores, em sobrecarga de 
+operadores, são os operadores que se adaptam aos seus operandos.
+O exemplo típico é o operador de soma que se comporta de maneira diferente se 
+seu operandos são inteiros ou reais, gerando instruções diferentes para a 
+execução do programa.
+Muitas linguagens permitem que o programador adapte o uso de operadores e 
+funções de acordo com seus operandos (C++ com overloading e Lua com 
+metamétodos, por exemplo).
+
+TODO: conclusão
+
+### Semântica Dinâmica
+
+A semântica dinâmica de um LP especifica o comportamento de um programa e todo 
+o seu ambiente de execução: como os dados são alocados e desalocados da 
+memória, como instruções para operar sobre valores são escalonadas, como a 
+chamadas de função preparam seus argumentos e recuperam o valor de retorno, 
+etc.
+
+Existem notações formais para descrever a semântica dinâmica de linguagens de 
+forma compacta e precisa.
+Infelizmente, não existe um "programa gerador de semântica dinâmica", que dada 
+uma especificação semântica gera um programa para executá-la.
+Em termos práticos, o uso de semânticas formais se restringe aos meios 
+acadêmicos, em geral para descrever o comportamento de novas abstrações (e.g., 
+tipos de dados, primitivas de concorrência) e permitir a manipulação matemática 
+dessas abastrações de maneira a se discutir propriedades de interesse (e.g., 
+equivalência com abstrações existentes, terminação de execução).
+
+TODO: independência de implementação
+
+As duas técnicas mais comuns para descrever a semântica de linguagens são a 
+denotacional e operacional.
+Ambas se baseiam em uma sintaxe abstrata simplificada da linguagem em questão.
+
+A semântica denotacional usa funções matemáticas que operam sobre a sintaxe 
+abstrata e "denotam" um valor para cada uma das construções da linguagem:
+
+    TODO: exemplo
+
+Uma restrição importante é que a denotação para uma construção só pode ser 
+descrita a partir de suas sub-partes.
+Dessa maneira, as provas sobre semânticas denotacionais podem ser feitas por 
+indução na estrutura sintática dos programas.
+Além disso, a ausência de efeitos colaterais simplifica o entendimento de 
+composições de regras, uma vez que as sub-partes podem ser analisadas em 
+separado.
+
+A semântica operacional descreve o funcionamento mecânico de um programa, de 
+maneira similar a um interpretador simplificado:
+
+    TODO: exemplo
+
+A execução da máquina é representada pela sequência de derivação das regras 
+semânticas que alteram o estado global da máquina a cada passo.
+Dessa maneira, as provas sobre semânticas operacionais são feitas por indução 
+na árvore de derivação.
+Quando comparada à semântica denotacional, a semântica operacional é mais 
+"concreta" e próxima de uma implementação real, oferecendo meios de medir 
+custos de execução, uso de memória, etc.
+
+
